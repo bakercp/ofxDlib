@@ -12,7 +12,7 @@ GIT_URL="https://github.com/davisking/dlib"
 #GIT_TAG="v$VER"
 GIT_TAG=
 
-FORMULA_TYPES=( "osx" "android")
+FORMULA_TYPES=( "osx" "android" "linux64")
 
 
 # download the source code and unpack it into LIB_NAME
@@ -35,7 +35,7 @@ function build() {
 	echo "++++++"
 	pwd
 
-	if [ "$TYPE" == "osx" ] ; then
+	if [ "$TYPE" == "osx" ] || [ "$TYPE" == "linux64" ] ; then
 
 		cd dlib
 		mkdir -p build
@@ -71,7 +71,7 @@ function copy() {
 	mkdir -p $1/include
 	mkdir -p $1/lib/$TYPE
 
-	if [ "$TYPE" == "osx" ] ; then
+	if [ "$TYPE" == "osx" ] || [ "$TYPE" == "linux64" ] ; then
 		cd $BUILD_DIR/dlib/dlib/build
 		make install
 		cd -
@@ -105,7 +105,7 @@ function copy() {
 
 # executed inside the lib src dir
 function clean() {
-	if [ "$TYPE" == "osx" ] ; then
+	if [ "$TYPE" == "osx" ] || [ "$TYPE" == "linux64" ] ; then
 		cd dlib/build
 		cmake clean .
 		cd ..
