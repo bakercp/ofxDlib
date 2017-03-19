@@ -10,9 +10,6 @@
 
 void ofApp::setup()
 {
-    // This is a hack to keep the camera from crashing on close due to an oF bug.
-    ofEvents().exit.add([&](ofEventArgs&){ camera.disableMouseInput(); }, 0);
-
     // Use points.
     mesh.setMode(OF_PRIMITIVE_POINTS);
 
