@@ -6,6 +6,7 @@ _*/
 
 raw/
 models/
+data/
 libs/dlib/
 
 .compiler*
