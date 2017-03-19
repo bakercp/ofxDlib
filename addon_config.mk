@@ -24,7 +24,7 @@ meta:
 common:
 	# dependencies with other addons, a list of them separated by spaces
 	# or use += in several lines
-#	ADDON_DEPENDENCIES = ofxCv
+	# ADDON_DEPENDENCIES = 
 
 	# include search paths, this will be usually parsed from the file system
 	# but if the addon or addon libraries need special search paths they can be
@@ -78,6 +78,9 @@ osx:
 
 linux64:
 	ADDON_LIBS = libs/dlib/lib/linux64/libdlib.a
+	
+	# If dlib is compiled with MKL support, you may need to add an include here. 
+	# ADDON_INCLUDES+=/opt/intel/mkl/include
 
 android/armeabi-v7a:
 	ADDON_LIBS = libs/dlib/lib/android/armeabi-v7a/libdlib.a
