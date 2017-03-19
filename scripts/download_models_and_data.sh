@@ -96,7 +96,7 @@ for required_data in `ls $ADDON_PATH/example*/bin/data/required_data.txt`
 do
   while read data || [ -n "$data" ];
   do
-    cp -vr $DATA_PATH/$model $(dirname $required_data)/
+    cp -vr $DATA_PATH/$data $(dirname $required_data)/
   done < $required_data
   echo ""
 done
