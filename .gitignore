@@ -9,8 +9,6 @@ models/
 libs/dlib/
 
 .compiler*
-config.make
-Makefile
 Project.xcconfig
 *.xcodeproj
 *.plist
