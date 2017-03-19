@@ -100,8 +100,8 @@ void ofApp::setup()
     std::cout << "elapsed time: " << elapsed_seconds.count() << "s";
     std::cout << std::endl;
 
-    // 16 seconds on MacBook Pro (15-inch, Mid 2012), no CUDA support.
-    // 1.2 seconds on i7 7700 + Nvidia 1080, CUDA support + MKL libs.
+    // ? Never finished ...  seconds on MacBook Pro (15-inch, Mid 2012), no CUDA support.
+    // 432 seconds on i7 7700 + Nvidia 1080, CUDA support + MKL libs.
 }
 
 
