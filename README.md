@@ -69,5 +69,10 @@ This can happen with CUDA 8 is installed and the underlying NVIDIA drivers are t
 Make sure your drivers are up to date with the driver manager.
 
 
+make sure you have lapack and blas in yoru pkg-config
 
+Linking bin/example_face_landmark_detection for linux64
+obj/linux64/Release/src/ofApp.o: In function `int dlib::lapack::gesvd<double, 0l, 3l, 0l, 3l, 3l, 1l, 3l, 3l, dlib::memory_manager_stateless_kernel_1<char> >(char, char, dlib::matrix<double, 0l, 3l, dlib::memory_manager_stateless_kernel_1<char>, dlib::row_major_layout>&, dlib::matrix<double, 3l, 1l, dlib::memory_manager_stateless_kernel_1<char>, dlib::row_major_layout>&, dlib::matrix<double, 0l, 3l, dlib::memory_manager_stateless_kernel_1<char>, dlib::row_major_layout>&, dlib::matrix<double, 3l, 3l, dlib::memory_manager_stateless_kernel_1<char>, dlib::row_major_layout>&)':
+ofApp.cpp:(.text._ZN4dlib6lapack5gesvdIdLl0ELl3ELl0ELl3ELl3ELl1ELl3ELl3ENS_33memory_manager_stateless_kernel_1IcEEEEiccRNS_6matrixIT_XT0_EXT4_ET8_NS_16row_major_layoutEEERNS4_IS5_XT1_EXT5_ES6_S7_EERNS4_IS5_XT2_EXT6_ES6_S7_EERNS4_IS5_XT3_EXT7_ES6_S7_EE[_ZN4dlib6lapack5gesvdIdLl0ELl3ELl0ELl3ELl3ELl1ELl3ELl3ENS_33memory_manager_stateless_kernel_1IcEEEEiccRNS_6matrixIT_XT0_EXT4_ET8_NS_16row_major_layoutEEERNS4_IS5_XT1_EXT5_ES6_S7_EERNS4_IS5_XT2_EXT6_ES6_S7_EERNS4_IS5_XT3_EXT7_ES6_S7_EE]+0x189): undefined reference to `dgesvd_'
+ofApp.cpp:(.text._ZN4dlib6lapack5gesvdIdLl0ELl3ELl0ELl3ELl3ELl1ELl3ELl3ENS_33memory_manager_stateless_kernel_1IcEEEEiccRNS_6matrixIT_XT0_EXT4_ET8_NS_16row_major_layoutEEERNS4_IS5_XT1_EXT5_ES6_S7_EERNS4_IS5_XT2_EXT6_ES6_S7_EERNS4_IS5_XT3_EXT7_ES6_S7_EE[_ZN4dlib6lapack5gesvdIdLl0ELl3ELl0ELl3ELl3ELl1ELl3ELl3ENS_33memory_manager_stateless_kernel_1IcEEEEiccRNS_6matrixIT_XT0_EXT4_ET8_NS_16row_major_layoutEEERNS4_IS5_XT1_EXT5_ES6_S7_EERNS4_IS5_XT2_EXT6_ES6_S7_EERNS4_IS5_XT3_EXT7_ES6_S7_EE]+0x293): undefined reference to `dgesvd_'
 

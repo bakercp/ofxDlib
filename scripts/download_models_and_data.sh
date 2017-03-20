@@ -40,7 +40,7 @@ do
   fi
 done
 
-popd
+popd > /dev/null
 
 
 dlib_model_base_url="http://dlib.net/files"
@@ -117,13 +117,13 @@ do
     url=${tokens[1]}
 
     if ! [ -f $destination ] ; then
-      echo "Decompressing $dlib_model_compressed_path"
+      echo "Downloading $url"
       curl -L -o $destination --progress-bar $url
     else
       echo "- Exists: Skipping $destination"
     fi
   done < $required_media
-  popd
+  popd > /dev/null
   echo ""
 done
 
