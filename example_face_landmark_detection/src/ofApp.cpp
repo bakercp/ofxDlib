@@ -26,7 +26,7 @@ void ofApp::setup()
     dlib::load_image(img, ofToDataPath("Crowd.jpg", true));
 
     // Make the image larger so we can detect small faces.
-    dlib::pyramid_up(img);
+    // dlib::pyramid_up(img);
 
     ofPixels pixels;
     toOf(img, pixels);
