@@ -16,8 +16,7 @@ void ofApp::setup()
 
     // And we also need a shape_predictor.  This is the tool that will predict face
     // landmark positions given an image and face bounding box.  Here we are just
-    // loading the model from the shape_predictor_68_face_landmarks.dat file you gave
-    // as a command line argument.
+    // loading the model from the shape_predictor_68_face_landmarks.dat.
     dlib::shape_predictor sp;
     
     dlib::deserialize(ofToDataPath("shape_predictor_68_face_landmarks.dat", true)) >> sp;
@@ -29,33 +28,29 @@ void ofApp::setup()
     // Make the image larger so we can detect small faces.
     dlib::pyramid_up(img);
 
+    ofPixels pixels;
+    toOf(img, pixels);
+    image.setFromPixels(pixels);
+
     // Now tell the face detector to give us a list of bounding boxes
     // around all the faces in the image.
-    std::vector<dlib::rectangle> dets = detector(img);
+    dets = detector(img);
 
     std::cout << "Number of faces detected: " << dets.size() << std::endl;
-
     // Now we will go ask the shape_predictor to tell us the pose of
     // each face we detected.
-    std::vector<dlib::full_object_detection> shapes;
 
     for (auto j = 0; j < dets.size(); ++j)
     {
         dlib::full_object_detection shape = sp(img, dets[j]);
-
-        std::cout << "number of parts: "<< shape.num_parts() << std::endl;
-        std::cout << "pixel position of first part:  " << shape.part(0) << std::endl;
-        std::cout << "pixel position of second part: " << shape.part(1) << std::endl;
+        // std::cout << "number of parts: "<< shape.num_parts() << std::endl;
+        // std::cout << "pixel position of first part:  " << shape.part(0) << std::endl;
+        // std::cout << "pixel position of second part: " << shape.part(1) << std::endl;
         // You get the idea, you can get all the face part locations if
         // you want them.  Here we just store them in shapes so we can
         // put them on the screen.
         shapes.push_back(shape);
     }
-
-    // Now let's view our face poses on the screen.
-//    win.clear_overlay();
-//    win.set_image(img);
-//    win.add_overlay(render_face_detections(shapes));
 
     // We can also extract copies of each face that are cropped, rotated upright,
     // and scaled to a standard size as shown here:
@@ -69,13 +64,8 @@ void ofApp::setup()
     {
         ofPixels p;
         toOf(f, p);
-        ofSaveImage(p, ofGetTimestampString() + "_" + std::to_string(ofRandom(1)) + ".jpg");
+        facechips.push_back(ofImage(p));
     }
-
-//    for (auto& chip: face_chips)
-//    {
-//        dlib::serial
-//    }
 
 }
 
@@ -86,29 +76,22 @@ void ofApp::draw()
     ofNoFill();
     ofSetColor(ofColor::white);
 
-//    ofPushMatrix();
-//    ofScale(0.5);
+    image.draw(0, 0);
 
-    texture.draw(0, 0);
-
-    for (auto& r: rectangles)
+    for (auto& r: dets)
     {
-        std::stringstream ss;
-        ss << "Confidence: " << r.detection_confidence << std::endl;
-        ss << "Ignore: " << r.ignore;
-
-        ofRectangle rect = toOf(r);
-
-//        rect.x *= scale;
-//        rect.y *= scale;
-//        rect.width *= scale;
-//        rect.height *= scale;
-
-        ofDrawRectangle(rect);
-        ofPopMatrix();
-        ofDrawBitmapString(ss.str(), rect.getCenter());
+        ofSetColor(ofColor::red);
+        ofDrawRectangle(toOf(r));
     }
 
-//    ofPopMatrix();
+    for (auto& shape: shapes)
+    {
+        ofSetColor(ofColor::yellow);
+        ofDrawRectangle(toOf(shape.get_rect()));
+        for (std::size_t i = 0; i < shape.num_parts(); ++i)
+        {
+            ofDrawCircle(toOf(shape.part(i)), 5);
+        }
+    }
 }
 

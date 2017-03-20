@@ -18,11 +18,11 @@ public:
     void setup() override;
     void draw() override;
 
+    ofImage image;
 
-    ofPixels pixels;
-    ofTexture texture;
+    std::vector<dlib::rectangle> dets;
 
-    std::vector<dlib::mmod_rect> rectangles;
+    std::vector<dlib::full_object_detection> shapes;
 
-    float scale = 1;
+    std::vector<ofImage> facechips;
 };
