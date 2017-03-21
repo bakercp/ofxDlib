@@ -14,6 +14,10 @@ Project.xcconfig
 *.xcodeproj
 *.plist
 
+*.swp
+*.bg
+*.qbs
+
 *.sln
 *.vcxproj
 *.vcxproj.filters
