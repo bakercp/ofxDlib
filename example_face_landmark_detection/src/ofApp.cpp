@@ -21,27 +21,26 @@ void ofApp::setup()
     
     dlib::deserialize(ofToDataPath("shape_predictor_68_face_landmarks.dat", true)) >> sp;
 
-
     dlib::array2d<dlib::rgb_pixel> img;
 
     dlib::load_image(img, ofToDataPath("Crowd.jpg", true));
 
-    ofPixels pixels;
-    image.load("Crowd.jpg");
-//    toDlib(pixels, img);
+    ofPixels p;
+    ofxDlib::toOf(img, p);
+    image.setFromPixels(p);
+
     double detScale = 1;
 
     // Make the image larger so we can detect small faces.
-    while (img.size() < 800 * 800)
+    while (img.size() < 2400 * 2400)
     {
         dlib::pyramid_up(img);
-         detScale *= 2;
+        detScale *= 2;
     }
 
     // Now tell the face detector to give us a list of bounding boxes
     // around all the faces in the image.
     std::vector<dlib::rectangle> dets = detector(img);
-
 
     std::cout << "Number of faces detected: " << dets.size() << std::endl;
     // Now we will go ask the shape_predictor to tell us the pose of
@@ -53,21 +52,29 @@ void ofApp::setup()
         shapes.push_back(shape);
     }
 
-//    // We can also extract copies of each face that are cropped, rotated upright,
-//    // and scaled to a standard size as shown here:
-//    dlib::array<dlib::array2d<dlib::rgb_pixel>> face_chips;
+    // We can also extract copies of each face that are cropped, rotated upright,
+    // and scaled to a standard size as shown here:
 
-//    dlib::extract_image_chips(img,
-//                              dlib::get_face_chip_details(shapes),
-//                              face_chips);
+    std::vector<dlib::chip_details> chipDetails = dlib::get_face_chip_details(shapes);
 
-//    for (auto& f: face_chips)
-//    {
-//        ofPixels p;
-//        toOf(f, p);
-//        facechips.push_back(ofImage(p));
-//    }
+    dlib::array<dlib::array2d<dlib::rgb_pixel>> face_chips;
 
+    dlib::extract_image_chips(img,
+                              chipDetails,
+                              face_chips);
+
+    for (auto& f: face_chips)
+    {
+        ofPixels p;
+        ofxDlib::toOf(f, p);
+        p.resize(p.getWidth() / detScale, p.getHeight() / detScale);
+        faceChips.push_back(ofImage(p));
+    }
+
+    for (auto& shape: shapes)
+    {
+        ofxDlib::scale(shape, 1.0f / detScale);
+    }
 }
 
 
@@ -78,20 +85,37 @@ void ofApp::draw()
     ofSetColor(ofColor::white);
 
     ofPushMatrix();
-    //ofScale(0.5);
-
 
     image.draw(0, 0);
 
     for (auto& shape: shapes)
     {
         ofSetColor(ofColor::yellow);
-        ofDrawRectangle(toOf(shape.get_rect()));
+        ofDrawRectangle(ofxDlib::toOf(shape.get_rect()));
 
         for (std::size_t i = 0; i < shape.num_parts(); ++i)
         {
-            ofDrawCircle(toOf(shape.part(i)), 5);
+            ofDrawCircle(ofxDlib::toOf(shape.part(i)), 5);
         }
+    }
+
+    float x = 0;
+    float y = 0;
+
+    for (std::size_t i = 0; i < faceChips.size(); ++i)
+    {
+        auto& face = faceChips[i];
+
+        if (i != 0 && x + face.getWidth() > ofGetWidth())
+        {
+            y += face.getHeight();
+            x = 0;
+        }
+
+        ofSetColor(ofColor::white);
+        face.draw(x, y);
+
+        x += face.getWidth();
     }
 
     ofPopMatrix();

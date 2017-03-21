@@ -121,25 +121,48 @@ inline void toDlib(const ofPixels& input,
 }
 
 
-/// \todo Re-work.
-inline ofPixels toOf(const dlib::matrix<unsigned char>& input)
+///// \todo Re-work.
+//inline ofPixels toOf(const dlib::matrix<unsigned char>& input)
+//{
+//    auto w = std::size_t(input.nc());
+//    auto h = std::size_t(input.nr());
+
+//    ofPixels output;
+
+//    output.allocate(w, h, 1);
+
+//    for (std::size_t y = 0; y < h; ++y)
+//    {
+//        for (std::size_t x = 0; x < w; ++x)
+//        {
+//            output.setColor(x, y, ofColor(input(y, x)));
+//        }
+//    }
+
+//    return output;
+//}
+
+
+template<typename T>
+inline ofPixels copy(const dlib::matrix<T>& in)
 {
-    auto w = std::size_t(input.nc());
-    auto h = std::size_t(input.nr());
+    ofPixels pixels;
 
-    ofPixels output;
+    auto channels = dlib::pixel_traits<T>::num;
+    auto height = dlib::num_rows(in);
+    auto width = dlib::num_columns(in);
 
-    output.allocate(w, h, 1);
+    pixels.allocate(width, height, channels);
 
-    for (std::size_t y = 0; y < h; ++y)
+    for (auto y = 0; y < height; ++y)
     {
-        for (std::size_t x = 0; x < w; ++x)
+        for (auto x = 0; x < width; ++x)
         {
-            output.setColor(x, y, ofColor(input(y, x)));
+            pixels.setColor(x, y, toOf(in(y, x)));
         }
     }
 
-    return output;
+    return pixels;
 }
 
 
@@ -149,10 +172,6 @@ inline bool toOf(const dlib::array2d<dlib::rgb_pixel>& inPix,ofPixels& outPix ){
     int h = inPix.nr(); //number of rows
     int w = inPix.nc(); //nuber of cols
 
-//    auto w = std::size_t(input.nc());
-//    auto h = std::size_t(input.nr());
-//
-//
     ofLog()<<"inPix.nr() "<<h<<",  inPix.nc() "<<w;
     outPix.allocate(w, h, 3);
 
@@ -163,6 +182,7 @@ inline bool toOf(const dlib::array2d<dlib::rgb_pixel>& inPix,ofPixels& outPix ){
     }
     return true;
 }
+
 
 /// \todo Re-work.
 inline bool toOf(const dlib::array2d<unsigned char>& inPix,ofPixels& outPix ){
@@ -233,24 +253,40 @@ inline bool toOf(const dlib::array2d<unsigned char>& inPix,ofPixels& outPix ){
 //}
 
 
-/// \brief scale the given object detection by the given amount.
+/// \brief Scale the given object detection by the given amount.
 /// \param v The object to be scaled.
 /// \param scale The amount the scale the object by.
-inline void scale(dlib::full_object_detection& v, double scale)
+inline void scale(dlib::rectangle& in, double scaler)
 {
-    for (unsigned int i = 0; i < v.num_parts(); ++i)
+    in.left() *= scaler;
+    in.top() *= scaler;
+    in.right() *= scaler;
+    in.bottom() *= scaler;
+}
+
+/// \brief Scale the given object detection by the given amount.
+/// \param v The object to be scaled.
+/// \param scale The amount the scale the object by.
+inline void scale(dlib::full_object_detection& in, double scaler)
+{
+    for (unsigned int i = 0; i < in.num_parts(); ++i)
     {
-        v.part(i) *= scale;
+        // Must be done individually.
+        in.part(i).x() *= scaler;
+        in.part(i).y() *= scaler;
     }
 
-    auto oldRect = v.get_rect();
+    scale(in.get_rect(), scaler);
 
-    v.get_rect() = dlib::rectangle(oldRect.left() * scale,
-                                   oldRect.top() * scale,
-                                   oldRect.right() * scale,
-                                   oldRect.bottom() * scale);
+}
 
 
+/// \brief Scale the given object detection by the given amount.
+/// \param v The object to be scaled.
+/// \param scale The amount the scale the object by.
+inline void scale(dlib::mmod_rect& in, double scaler)
+{
+    scale(in.rect, scaler);
 }
 
 

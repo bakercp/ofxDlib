@@ -20,9 +20,8 @@ public:
 
     ofImage image;
 
-
     std::vector<dlib::full_object_detection> shapes;
 
-    std::vector<ofImage> facechips;
+    std::vector<ofImage> faceChips;
 
 };

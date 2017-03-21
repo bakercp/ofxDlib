@@ -16,24 +16,20 @@ void ofApp::setup()
     // Load the network data.
     dlib::deserialize(ofToDataPath("mmod_human_face_detector.dat", true)) >> net;
 
-    if (ofLoadImage(pixels, "Crowd.jpg"))
-    {
-        texture.loadData(pixels);
-    }
-
-    dlib::matrix<rgb_pixel> img;
+    dlib::matrix<dlib::rgb_pixel> img;
 
     dlib::load_image(img, ofToDataPath("Crowd.jpg", true));
 
-    // Upsampling the image will allow us to detect smaller faces but will cause
-    // the program to use more RAM and run longer.
+    image.setFromPixels(ofxDlib::copy(img));
 
-    float initialSize = img.size();
+    double detScale = 1;
 
-    //    while (img.size() < 800 * 800)
-    //    {
-            dlib::pyramid_up(img);
-    //    }
+    // Make the image larger so we can detect small faces.
+    while (img.size() < 2400 * 2400)
+    {
+        dlib::pyramid_up(img);
+        detScale *= 2;
+    }
 
     // Note that you can process a bunch of images in a std::vector at once and
     // it runs much faster, since this will form mini-batches of images and
@@ -55,6 +51,11 @@ void ofApp::setup()
 	
     // 16 seconds on MacBook Pro (15-inch, Mid 2012), no CUDA support.
     // 1.2 seconds on i7 7700 + Nvidia 1080, CUDA support + MKL libs.
+
+    for (auto& det: dets)
+    {
+        ofxDlib::scale(det, 1.0f / detScale);
+    }
 }
 
 
@@ -64,7 +65,7 @@ void ofApp::draw()
     ofNoFill();
     ofSetColor(ofColor::white);
 
-    texture.draw(0, 0);
+    image.draw(0, 0);
 
     for (auto& r: dets)
     {
@@ -72,12 +73,11 @@ void ofApp::draw()
         ss << "Confidence: " << r.detection_confidence << std::endl;
         ss << "Ignore: " << r.ignore;
 
-        ofRectangle rect = toOf(r);
+        ofRectangle rect = ofxDlib::toOf(r);
 
         ofDrawRectangle(rect);
         ofPopMatrix();
         ofDrawBitmapString(ss.str(), rect.getCenter());
     }
-
 }
 

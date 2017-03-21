@@ -32,8 +32,7 @@ public:
 
     net_type net;
 
-    ofPixels pixels;
-    ofTexture texture;
+    ofImage image;
 
     std::vector<dlib::mmod_rect> dets;
 
