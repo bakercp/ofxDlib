@@ -5,7 +5,7 @@
 //
 
 
-#include "ofx/Dlib/Utils.h"
+#include "ofx/Dlib/Types.h"
 
 
 namespace ofx {

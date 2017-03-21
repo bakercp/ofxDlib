@@ -35,6 +35,6 @@ public:
     ofPixels pixels;
     ofTexture texture;
 
-    std::vector<dlib::mmod_rect> rectangles;
+    std::vector<dlib::mmod_rect> dets;
 
 };

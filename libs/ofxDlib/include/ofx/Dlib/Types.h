@@ -9,16 +9,7 @@
 
 
 namespace ofx {
-namespace dlib {
+namespace Dlib {
 
 
-class Utils
-{
-public:
-
-
-};
-
-
-
-} } // namespace ofx::dlib
+} } // namespace ofx::Dlib

@@ -32,7 +32,7 @@ void ofApp::setup()
 
     //    while (img.size() < 800 * 800)
     //    {
-    //        dlib::pyramid_up(img);
+            dlib::pyramid_up(img);
     //    }
 
     // Note that you can process a bunch of images in a std::vector at once and
@@ -40,12 +40,7 @@ void ofApp::setup()
     // therefore get better parallelism out of your GPU hardware.  However, all
     // the images must be the same size.  To avoid this requirement on images
     // being the same size we process them individually in this example.
-    auto dets = net(img);
-
-    for (auto&& d: dets)
-    {
-        rectangles.push_back(d);
-    }
+    dets = net(img);
 
     end = std::chrono::system_clock::now();
 
@@ -56,6 +51,8 @@ void ofApp::setup()
     std::cout << "elapsed time: " << elapsed_seconds.count() << "s";
     std::cout << std::endl;
 
+    std::cout << "Found " << dets.size() << " faces." << std::endl;
+	
     // 16 seconds on MacBook Pro (15-inch, Mid 2012), no CUDA support.
     // 1.2 seconds on i7 7700 + Nvidia 1080, CUDA support + MKL libs.
 }
@@ -69,7 +66,7 @@ void ofApp::draw()
 
     texture.draw(0, 0);
 
-    for (auto& r: rectangles)
+    for (auto& r: dets)
     {
         std::stringstream ss;
         ss << "Confidence: " << r.detection_confidence << std::endl;
