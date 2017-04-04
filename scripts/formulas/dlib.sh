@@ -16,10 +16,12 @@ FORMULA_TYPES=( "osx" "android" "linux64")
 
 # download the source code and unpack it into LIB_NAME
 function download() {
-	curl -Lk http://dlib.net/files/dlib-$VER.tar.bz2 -o dlib-$VER.tar.bz2
-	tar -xjvf dlib-$VER.tar.bz2
-	mv dlib-$VER dlib
-	rm dlib-$VER.tar.bz2
+	#curl -Lk http://dlib.net/files/dlib-$VER.tar.bz2 -o dlib-$VER.tar.bz2
+	#tar -xjvf dlib-$VER.tar.bz2
+	#mv dlib-$VER dlib
+	#rm dlib-$VER.tar.bz2
+        git clone git@github.com:davisking/dlib.git
+
 }
 
 # prepare the build environment, executed inside the lib src dir
