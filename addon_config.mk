@@ -24,7 +24,7 @@ meta:
 common:
 	# dependencies with other addons, a list of them separated by spaces
 	# or use += in several lines
-	# ADDON_DEPENDENCIES = 
+	# ADDON_DEPENDENCIES =
 
 	# include search paths, this will be usually parsed from the file system
 	# but if the addon or addon libraries need special search paths they can be
@@ -79,13 +79,15 @@ osx:
 linux64:
 	ADDON_LIBS=libs/dlib/lib/linux64/libdlib.a
 	ADDON_PKG_CONFIG_LIBRARIES=libpng libjpeg
-	
+
+  # If dlib is compiled with libblas/liblapack support, you may need to include these.
+  # ADDON_PKG_CONFIG_LIBRARIES+=blas lapack
+
 	# If dlib is compiled with CUDA support, you made need to include these.
-	# ADDON_LDFLAGS+=-L/usr/local/cuda/lib64 -lcuda -lcudart -lcudnn -lcublas -lcurand
+	# ADDON_LDFLAGS+=-L/usr/local/cuda/lib64 -lcuda -lcudart -lcudnn -lcublas -lcurand -lcusolver
 
-	# If dlib is compiled with MKL support, you may need to add an include here. 
+	# If dlib is compiled with MKL support, you may need to add an include here.
 	# ADDON_INCLUDES+=/opt/intel/mkl/include
-
 
 
 android/armeabi-v7a:
