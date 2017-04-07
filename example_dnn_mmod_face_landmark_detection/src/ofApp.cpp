@@ -52,7 +52,6 @@ void ofApp::setup()
 
     std::cout << "Found " << dets.size() << " faces." << std::endl;
 
-
     for (auto& det: dets)
     {
         ofxDlib::scale(det, 1.0f / detScale);

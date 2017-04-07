@@ -9,7 +9,6 @@
 
 
 #include <iostream>
-#include "ofxCv.h"
 #include <dlib/data_io.h>
 #include <dlib/dnn.h>
 #include <dlib/image_io.h>
@@ -19,7 +18,9 @@
 #if !defined(DLIB_NO_GUI_SUPPORT)
 #include <dlib/gui_widgets.h>
 #endif
+#if defined(OPENCV)
 #include <dlib/opencv.h>
+#endif
 #include "ofx/Dlib/Types.h"
 #include "ofx/Dlib/Utils.h"
 

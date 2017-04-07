@@ -4,6 +4,13 @@
 // SPDX-License-Identifier:	MIT
 //
 
+//
+// From http://dlib.net/3d_point_cloud_ex.cpp.html
+//
+// This is an example illustrating the use of the perspective_window tool
+// in the dlib C++ Library.  It is a simple tool for displaying 3D point
+// clouds on the screen.
+//
 
 #pragma once
 

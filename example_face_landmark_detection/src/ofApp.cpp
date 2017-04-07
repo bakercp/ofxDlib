@@ -10,6 +10,9 @@
 
 void ofApp::setup()
 {
+    // Set up a timing mechanism for benchmarking.
+    auto start = std::chrono::system_clock::now();
+
     // We need a face detector. We will use this to get bounding boxes for
     // each face in an image.
     dlib::frontal_face_detector detector = dlib::get_frontal_face_detector();
@@ -41,6 +44,15 @@ void ofApp::setup()
     // Now tell the face detector to give us a list of bounding boxes
     // around all the faces in the image.
     std::vector<dlib::rectangle> dets = detector(img);
+
+    // Finish benchmarking.
+    auto end = std::chrono::system_clock::now();
+    auto elapsed_seconds = end - start;
+    std::time_t end_time = std::chrono::system_clock::to_time_t(end);
+
+    std::cout << "Finished computation at " << std::ctime(&end_time);
+    std::cout << "Elapsed time: " << elapsed_seconds.count() << "s";
+    std::cout << std::endl;
 
     std::cout << "Number of faces detected: " << dets.size() << std::endl;
     // Now we will go ask the shape_predictor to tell us the pose of

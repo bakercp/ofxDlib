@@ -19,7 +19,6 @@ void ofApp::setup()
     for (float i = -10; i < 10; i += 0.001)
     {
         // Get a point on a spiral.
-
         dlib::vector<float> val(sin(i), cos(i), i / 4);
 
         // Now add some random noise to it.
@@ -34,8 +33,8 @@ void ofApp::setup()
         // Pick a color based on how far we are along the spiral.
         dlib::rgb_pixel color = dlib::colormap_jet(i, 0, 20);
 
-        mesh.addVertex(toOf(val));
-        mesh.addColor(toOf(color));
+        mesh.addVertex(ofxDlib::toOf(val));
+        mesh.addColor(ofxDlib::toOf(color));
     }
 
     ofEnableDepthTest();
