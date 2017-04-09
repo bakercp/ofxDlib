@@ -40,7 +40,7 @@ void ofApp::setup()
 
     // Finish benchmarking.
     auto end = std::chrono::system_clock::now();
-    auto elapsed_seconds = end - start;
+    std::chrono::duration<double> elapsed_seconds = end - start;
     std::time_t end_time = std::chrono::system_clock::to_time_t(end);
 
     std::cout << "Finished computation at " << std::ctime(&end_time);

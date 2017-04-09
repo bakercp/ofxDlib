@@ -21,7 +21,7 @@ void ofApp::setup()
     // landmark positions given an image and face bounding box.  Here we are just
     // loading the model from the shape_predictor_68_face_landmarks.dat.
     dlib::shape_predictor sp;
-    
+
     dlib::deserialize(ofToDataPath("shape_predictor_68_face_landmarks.dat", true)) >> sp;
 
     dlib::array2d<dlib::rgb_pixel> img;
@@ -47,7 +47,7 @@ void ofApp::setup()
 
     // Finish benchmarking.
     auto end = std::chrono::system_clock::now();
-    auto elapsed_seconds = end - start;
+    std::chrono::duration<double> elapsed_seconds = end - start;
     std::time_t end_time = std::chrono::system_clock::to_time_t(end);
 
     std::cout << "Finished computation at " << std::ctime(&end_time);

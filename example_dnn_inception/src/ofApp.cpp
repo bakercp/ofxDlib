@@ -27,7 +27,7 @@ void ofApp::setup()
 
     // Make an instance of our inception network.
     net_type net;
-    
+
     std::cout << "The net has " << net.num_layers << " layers in it." << std::endl;
     std::cout << net << std::endl;
 
@@ -105,7 +105,7 @@ void ofApp::setup()
 
     // Finish benchmarking.
     auto end = std::chrono::system_clock::now();
-    auto elapsed_seconds = end - start;
+    std::chrono::duration<double> elapsed_seconds = end - start;
     std::time_t end_time = std::chrono::system_clock::to_time_t(end);
 
     std::cout << "Finished computation at " << std::ctime(&end_time);
