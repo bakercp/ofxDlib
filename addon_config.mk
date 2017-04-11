@@ -33,7 +33,7 @@ common:
 
 	# any special flag that should be passed to the compiler when using this
 	# addon
-	ADDON_CFLAGS = -O2
+	ADDON_CFLAGS = -O2 -Wno-strict-aliasing
 
 	# any special flag that should be passed to the linker when using this
 	# addon, also used for system libraries with -lname
@@ -80,8 +80,8 @@ linux64:
 	ADDON_LIBS=libs/dlib/lib/linux64/libdlib.a
 	ADDON_PKG_CONFIG_LIBRARIES=libpng libjpeg
 
-  # If dlib is compiled with libblas/liblapack support, you may need to include these.
-  # ADDON_PKG_CONFIG_LIBRARIES+=blas lapack
+	# If dlib is compiled with libblas/liblapack support, you may need to include these.
+	# ADDON_PKG_CONFIG_LIBRARIES+=blas lapack
 
 	# If dlib is compiled with CUDA support, you made need to include these.
 	# ADDON_LDFLAGS+=-L/usr/local/cuda/lib64 -lcuda -lcudart -lcudnn -lcublas -lcurand -lcusolver
