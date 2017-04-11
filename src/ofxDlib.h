@@ -9,6 +9,7 @@
 
 
 #include <iostream>
+#include <dlib/clustering.h>
 #include <dlib/data_io.h>
 #include <dlib/dnn.h>
 #include <dlib/image_io.h>

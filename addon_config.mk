@@ -76,19 +76,23 @@ common:
 osx:
 	ADDON_LIBS = libs/dlib/lib/osx/libdlib.a
 
+	# Clang has problems with deep, recursive templates.
+	# https://github.com/davisking/dlib/issues/229
+	# Increase the depth if needed.
+	ADDON_CPPFLAGS += -ftemplate-depth=512
+
 linux64:
-	ADDON_LIBS=libs/dlib/lib/linux64/libdlib.a
-	ADDON_PKG_CONFIG_LIBRARIES=libpng libjpeg
+	ADDON_LIBS = libs/dlib/lib/linux64/libdlib.a
+	ADDON_PKG_CONFIG_LIBRARIES = libpng libjpeg
 
 	# If dlib is compiled with libblas/liblapack support, you may need to include these.
 	# ADDON_PKG_CONFIG_LIBRARIES+=blas lapack
 
 	# If dlib is compiled with CUDA support, you made need to include these.
-	# ADDON_LDFLAGS+=-L/usr/local/cuda/lib64 -lcuda -lcudart -lcudnn -lcublas -lcurand -lcusolver
+	# ADDON_LDFLAGS += -L/usr/local/cuda/lib64 -lcuda -lcudart -lcudnn -lcublas -lcurand -lcusolver
 
 	# If dlib is compiled with MKL support, you may need to add an include here.
-	# ADDON_INCLUDES+=/opt/intel/mkl/include
-
+	# ADDON_INCLUDES += /opt/intel/mkl/include
 
 android/armeabi-v7a:
 	ADDON_LIBS = libs/dlib/lib/android/armeabi-v7a/libdlib.a
