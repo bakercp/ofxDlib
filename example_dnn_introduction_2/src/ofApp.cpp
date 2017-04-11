@@ -29,7 +29,7 @@ void ofApp::setup()
     // a lot of RAM.  If you find that you run out of RAM on your graphics card
     // then you can call this function and we will request the slower but more
     // RAM frugal cuDNN algorithms.
-    set_dnn_prefer_smallest_algorithms();
+    //set_dnn_prefer_smallest_algorithms();
 
 
     // Create a network as defined above.  This network will produce 10 outputs
@@ -138,15 +138,15 @@ void ofApp::setup()
     // The dnn_trainer will use SGD by default, but you can tell it to use
     // different solvers like adam with a weight decay of 0.0005 and the given
     // momentum parameters.
-    dnn_trainer<net_type,adam> trainer(net,adam(0.0005, 0.9, 0.999));
+    //dnn_trainer<net_type,adam> trainer(net,adam(0.0005, 0.9, 0.999));
     // Also, if you have multiple graphics cards you can tell the trainer to use
     // them together to make the training faster.  For example, replacing the
     // above constructor call with this one would cause it to use GPU cards 0
     // and 1.
-    //dnn_trainer<net_type,adam> trainer(net,adam(0.0005, 0.9, 0.999), {0,1});
+    dnn_trainer<net_type,adam> trainer(net,adam(0.0005, 0.9, 0.999), {0/*,1*/});
 
     trainer.be_verbose();
-    trainer.set_synchronization_file("mnist_resnet_sync", std::chrono::seconds(100));
+    trainer.set_synchronization_file(ofToDataPath("mnist_resnet_sync",true), std::chrono::seconds(100));
     // While the trainer is running it keeps an eye on the training error.  If
     // it looks like the error hasn't decreased for the last 2000 iterations it
     // will automatically reduce the learning rate by 0.1.  You can change these

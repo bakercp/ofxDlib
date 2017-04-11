@@ -66,7 +66,11 @@ void ofApp::setup()
     net_type net;
     // And then train it using the MNIST data.  The code below uses mini-batch stochastic
     // gradient descent with an initial learning rate of 0.01 to accomplish this.
-    dlib::dnn_trainer<net_type> trainer(net);
+    //dlib::dnn_trainer<net_type> trainer(net);
+   
+    dlib::dnn_trainer<net_type,dlib::sgd> trainer(net, dlib::sgd(), {1});
+
+
     trainer.set_learning_rate(0.01);
     trainer.set_min_learning_rate(0.00001);
     trainer.set_mini_batch_size(128);
