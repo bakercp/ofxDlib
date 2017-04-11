@@ -1,3 +1,5 @@
+# this is under development currently ... so, your please post questions to the issues for now.
+
 # ofxDlib
 A wrapper for dlib.  http://dlib.net/
 
