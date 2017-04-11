@@ -80,8 +80,8 @@ linux64:
 	ADDON_LIBS=libs/dlib/lib/linux64/libdlib.a
 	ADDON_PKG_CONFIG_LIBRARIES=libpng libjpeg
 
-  # If dlib is compiled with libblas/liblapack support, you may need to include these.
-  # ADDON_PKG_CONFIG_LIBRARIES+=blas lapack
+	# If dlib is compiled with libblas/liblapack support, you may need to include these.
+	# ADDON_PKG_CONFIG_LIBRARIES+=blas lapack
 
 	# If dlib is compiled with CUDA support, you made need to include these.
 	# ADDON_LDFLAGS+=-L/usr/local/cuda/lib64 -lcuda -lcudart -lcudnn -lcublas -lcurand -lcusolver
