@@ -20,7 +20,7 @@ function download() {
 	#tar -xjvf dlib-$VER.tar.bz2
 	#mv dlib-$VER dlib
 	#rm dlib-$VER.tar.bz2
-        git clone git@github.com:davisking/dlib.git
+        git clone https://github.com/davisking/dlib.git
 
 }
 
