@@ -11,6 +11,7 @@
 #include <vector>
 #include <dlib/geometry.h>
 #include <dlib/image_processing/full_object_detection.h>
+#include "ofImage.h"
 #include "ofPixels.h"
 #include "ofRectangle.h"
 #include "ofTypes.h"
@@ -163,7 +164,8 @@ inline ofColor toOf(const dlib::rgb_alpha_pixel& v)
 //    }
 //
 //    return pixels;
-//}
+//}            img.load("Puppy.jpg");
+
 
 
 template<typename pixel_type>
@@ -271,6 +273,24 @@ inline ofPixels_<typename dlib::pixel_traits<pixel_type>::basic_pixel_type> toOf
     return out;
 }
 
+
+template<typename pixel_type>
+inline ofPixels_<typename dlib::pixel_traits<pixel_type>::basic_pixel_type> toOf(const dlib::matrix_exp<pixel_type>& in)
+{
+    typedef typename dlib::pixel_traits<pixel_type>::basic_pixel_type basic_pixel_type;
+
+    ofPixels_<basic_pixel_type> out;
+
+    out.setFromPixels(reinterpret_cast<const basic_pixel_type*>(dlib::image_data(in)),
+                      dlib::num_columns(in),
+                      dlib::num_rows(in),
+                      getPixelFormat<pixel_type>());
+
+    return out;
+}
+
+
+
 ///// \todo Re-work.
 //inline bool toOf(const dlib::array2d<unsigned char>& inPix, ofPixels& outPix)
 //{
@@ -348,6 +368,17 @@ inline void scale(dlib::full_object_detection& in, double scaler)
 inline void scale(dlib::mmod_rect& in, double scaler)
 {
     scale(in.rect, scaler);
+}
+
+
+inline ofPixels toGrayscale(const ofPixels& pixels)
+{
+    // Quick and dirty hack to use existing FreeImage algorithm.
+    ofImage img;
+    img.setUseTexture(false);
+    img.setFromPixels(pixels);
+    img.setImageType(OF_IMAGE_GRAYSCALE);
+    return img.getPixels();;
 }
 
 

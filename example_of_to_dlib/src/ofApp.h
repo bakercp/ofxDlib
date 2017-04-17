@@ -25,11 +25,6 @@ public:
     void setup() override;
     void draw() override;
 
-    ofTexture imgTexture;
-    ofTexture blurTexture;
-    ofTexture edgeTexture;
-
-    ofTexture heatEdgeTexture;
-    ofTexture jetEdgeTexture;
+    std::vector<ofTexture> textures;
 
 };
