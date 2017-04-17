@@ -20,7 +20,7 @@ void ofApp::setup()
 
     dlib::load_image(img, ofToDataPath("Crowd.jpg", true));
 
-    image.setFromPixels(ofxDlib::copy(img));
+    image.loadData(ofxDlib::toOf(img));
 
     double detScale = 1;
 

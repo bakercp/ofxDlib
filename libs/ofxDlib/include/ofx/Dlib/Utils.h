@@ -85,40 +85,40 @@ inline ofColor toOf(const dlib::rgb_alpha_pixel& v)
 }
 
 
-/// \todo Re-work.
-inline void toDlib(const ofPixels& input,
-                   dlib::array2d<dlib::rgb_pixel>& output)
-{
-    auto width = input.getWidth();
-    auto height = input.getHeight();
-    auto chans = input.getNumChannels();
-
-    const unsigned char* data = input.getData();
-
-    output.set_size(static_cast<long>(height), static_cast<long>(width));
-
-    for (std::size_t n = 0; n < height; ++n)
-    {
-        const unsigned char* v =  &data[n * width *  chans];
-
-        for (std::size_t m = 0; m < width; ++m)
-        {
-            if (chans == 1)
-            {
-                auto p = v[m];
-                dlib::assign_pixel(output[n][m], p);
-            }
-            else
-            {
-                dlib::rgb_pixel p;
-                p.red = v[m * 3];
-                p.green = v[m * 3 + 1];
-                p.blue = v[m * 3 + 2];
-                dlib::assign_pixel(output[n][m], p);
-            }
-        }
-    }
-}
+///// \todo Re-work.
+//inline void toDlib(const ofPixels& input,
+//                   dlib::array2d<dlib::rgb_pixel>& output)
+//{
+//    auto width = input.getWidth();
+//    auto height = input.getHeight();
+//    auto chans = input.getNumChannels();
+//
+//    const unsigned char* data = input.getData();
+//
+//    output.set_size(static_cast<long>(height), static_cast<long>(width));
+//
+//    for (std::size_t n = 0; n < height; ++n)
+//    {
+//        const unsigned char* v =  &data[n * width *  chans];
+//
+//        for (std::size_t m = 0; m < width; ++m)
+//        {
+//            if (chans == 1)
+//            {
+//                auto p = v[m];
+//                dlib::assign_pixel(output[n][m], p);
+//            }
+//            else
+//            {
+//                dlib::rgb_pixel p;
+//                p.red = v[m * 3];
+//                p.green = v[m * 3 + 1];
+//                p.blue = v[m * 3 + 2];
+//                dlib::assign_pixel(output[n][m], p);
+//            }
+//        }
+//    }
+//}
 
 
 ///// \todo Re-work.
@@ -143,62 +143,149 @@ inline void toDlib(const ofPixels& input,
 //}
 
 
-template<typename T>
-inline ofPixels copy(const dlib::matrix<T>& in)
+//template<typename T>
+//inline ofPixels copy(const dlib::matrix<T>& in)
+//{
+//    ofPixels pixels;
+//
+//    auto channels = dlib::pixel_traits<T>::num;
+//    auto height = dlib::num_rows(in);
+//    auto width = dlib::num_columns(in);
+//
+//    pixels.allocate(width, height, channels);
+//
+//    for (auto y = 0; y < height; ++y)
+//    {
+//        for (auto x = 0; x < width; ++x)
+//        {
+//            pixels.setColor(x, y, toOf(in(y, x)));
+//        }
+//    }
+//
+//    return pixels;
+//}
+
+
+template<typename pixel_type>
+inline ofPixelFormat getPixelFormat()
 {
-    ofPixels pixels;
-
-    auto channels = dlib::pixel_traits<T>::num;
-    auto height = dlib::num_rows(in);
-    auto width = dlib::num_columns(in);
-
-    pixels.allocate(width, height, channels);
-
-    for (auto y = 0; y < height; ++y)
+    if (std::is_same<pixel_type, dlib::rgb_pixel>::value)
     {
-        for (auto x = 0; x < width; ++x)
-        {
-            pixels.setColor(x, y, toOf(in(y, x)));
-        }
+        return OF_PIXELS_RGB;
     }
-
-    return pixels;
+    else if (std::is_same<pixel_type, dlib::rgb_alpha_pixel>::value)
+    {
+        return OF_PIXELS_RGBA;
+    }
+    else if (std::is_same<pixel_type, dlib::bgr_pixel>::value)
+    {
+        return OF_PIXELS_BGR;
+    }
+    else if (std::is_same<pixel_type, dlib::hsi_pixel>::value)
+    {
+        ofLogWarning("getPixelFormat") << "HSI pixel format not supported, using RGB.";
+        return OF_PIXELS_RGB;
+    }
+    else if (std::is_same<pixel_type, dlib::lab_pixel>::value)
+    {
+        ofLogWarning("getPixelFormat") << "LAB pixel format not supported, using RGB.";
+        return OF_PIXELS_BGR;
+    }
+    else if (dlib::pixel_traits<pixel_type>::num == 1)
+    {
+        return OF_PIXELS_GRAY;
+    }
+    else
+    {
+        ofLogWarning("getPixelFormat") << "Unknown pixel format.";
+        return OF_PIXELS_UNKNOWN;
+    }
 }
 
 
-/// \todo Re-work.
-inline bool toOf(const dlib::array2d<dlib::rgb_pixel>& inPix,ofPixels& outPix ){
+// TODO:
+//
+// - hsi_pixel, lab_pixel do not have a corresponding OF_PIXELS_* type.
+// - When converting from a non-char pixel type, the dlib values stay in 0-255
+//   range.
+// - combine toOf functions to not seperate dlib::array2d an dlib::matrix
 
-    int h = inPix.nr(); //number of rows
-    int w = inPix.nc(); //nuber of cols
+template<typename pixel_type>
+inline ofPixels_<typename dlib::pixel_traits<pixel_type>::basic_pixel_type> toOf(dlib::array2d<pixel_type>& in)
+{
+    typedef typename dlib::pixel_traits<pixel_type>::basic_pixel_type basic_pixel_type;
 
-    ofLog()<<"inPix.nr() "<<h<<",  inPix.nc() "<<w;
-    outPix.allocate(w, h, 3);
+    ofPixels_<basic_pixel_type> out;
 
-    for(int y = 0; y<h; y++){
-        for(int x=0; x<w;x++){
-            outPix.setColor(x, y, toOf(inPix[y][x]));
-        }
-    }
-    return true;
+    out.setFromExternalPixels(reinterpret_cast<basic_pixel_type*>(dlib::image_data(in)),
+                              dlib::num_columns(in),
+                              dlib::num_rows(in),
+                              getPixelFormat<pixel_type>());
+    return out;
 }
 
 
-/// \todo Re-work.
-inline bool toOf(const dlib::array2d<unsigned char>& inPix,ofPixels& outPix ){
+template<typename pixel_type>
+inline ofPixels_<typename dlib::pixel_traits<pixel_type>::basic_pixel_type> toOf(const dlib::array2d<pixel_type>& in)
+{
+    typedef typename dlib::pixel_traits<pixel_type>::basic_pixel_type basic_pixel_type;
 
-    int h = inPix.nr(); //number of rows
-    int w = inPix.nc(); //nuber of cols
-    ofLog()<<"inPix.nr() "<<h<<",  inPix.nc() "<<w;
-    outPix.allocate(w, h, 1);
+    ofPixels_<basic_pixel_type> out;
 
-    for(int y = 0; y<h; y++){
-        for(int x=0; x<w;x++){
-            outPix.setColor(x, y, ofColor(inPix[y][x]));
-        }
-    }
-    return true;
+    out.setFromPixels(reinterpret_cast<const basic_pixel_type*>(dlib::image_data(in)),
+                      dlib::num_columns(in),
+                      dlib::num_rows(in),
+                      getPixelFormat<pixel_type>());
+
+    return out;
 }
+
+
+template<typename pixel_type>
+inline ofPixels_<typename dlib::pixel_traits<pixel_type>::basic_pixel_type> toOf(dlib::matrix<pixel_type>& in)
+{
+    typedef typename dlib::pixel_traits<pixel_type>::basic_pixel_type basic_pixel_type;
+
+    ofPixels_<basic_pixel_type> out;
+
+    out.setFromExternalPixels(reinterpret_cast<basic_pixel_type*>(dlib::image_data(in)),
+                              dlib::num_columns(in),
+                              dlib::num_rows(in),
+                              getPixelFormat<pixel_type>());
+    return out;
+}
+
+
+template<typename pixel_type>
+inline ofPixels_<typename dlib::pixel_traits<pixel_type>::basic_pixel_type> toOf(const dlib::matrix<pixel_type>& in)
+{
+    typedef typename dlib::pixel_traits<pixel_type>::basic_pixel_type basic_pixel_type;
+
+    ofPixels_<basic_pixel_type> out;
+
+    out.setFromPixels(reinterpret_cast<const basic_pixel_type*>(dlib::image_data(in)),
+                      dlib::num_columns(in),
+                      dlib::num_rows(in),
+                      getPixelFormat<pixel_type>());
+    
+    return out;
+}
+
+///// \todo Re-work.
+//inline bool toOf(const dlib::array2d<unsigned char>& inPix, ofPixels& outPix)
+//{
+//    int h = inPix.nr(); //number of rows
+//    int w = inPix.nc(); //nuber of cols
+//    ofLog()<<"inPix.nr() "<<h<<",  inPix.nc() "<<w;
+//    outPix.allocate(w, h, 1);
+//
+//    for(int y = 0; y<h; y++){
+//        for(int x=0; x<w;x++){
+//            outPix.setColor(x, y, ofColor(inPix[y][x]));
+//        }
+//    }
+//    return true;
+//}
 
 
 //template<typename image_type>
@@ -228,31 +315,6 @@ inline bool toOf(const dlib::array2d<unsigned char>& inPix,ofPixels& outPix ){
 //}
 
 
-//template <
-//typename image_type
-//>
-//cv::Mat toMat (
-//               image_type& img
-//               )
-//{
-//    if (image_size(img) == 0)
-//        return cv::Mat();
-//
-//    typedef typename image_traits<image_type>::pixel_type type;
-//    if (pixel_traits<type>::num == 1)
-//    {
-//        return cv::Mat(num_rows(img), num_columns(img), cv::DataType<type>::type, image_data(img), width_step(img));
-//    }
-//    else
-//    {
-//        int depth = sizeof(typename pixel_traits<type>::basic_pixel_type)*8;
-//        int channels = pixel_traits<type>::num;
-//        int thetype = CV_MAKETYPE(depth, channels);
-//        return cv::Mat(num_rows(img), num_columns(img), thetype, image_data(img), width_step(img));
-//    }
-//}
-
-
 /// \brief Scale the given object detection by the given amount.
 /// \param v The object to be scaled.
 /// \param scale The amount the scale the object by.
@@ -279,7 +341,6 @@ inline void scale(dlib::full_object_detection& in, double scaler)
     scale(in.get_rect(), scaler);
 
 }
-
 
 /// \brief Scale the given object detection by the given amount.
 /// \param v The object to be scaled.

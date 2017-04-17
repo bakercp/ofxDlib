@@ -8,6 +8,8 @@
 #pragma once
 
 
+#include "ofx/Dlib/Types.h"
+#include "ofx/Dlib/Utils.h"
 #include <iostream>
 #include <dlib/clustering.h>
 #include <dlib/data_io.h>
@@ -22,9 +24,8 @@
 #if defined(OPENCV)
 #include <dlib/opencv.h>
 #endif
-#include "ofx/Dlib/Types.h"
-#include "ofx/Dlib/Utils.h"
 
 
 namespace ofxDlib = ofx::Dlib;
+
 
