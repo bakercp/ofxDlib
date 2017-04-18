@@ -9,7 +9,6 @@ SCRIPTS_PATH=$ADDON_PATH/scripts
 MODELS_PATH=$ADDON_PATH/models
 DATA_PATH=$ADDON_PATH/data
 
-
 echo ""
 echo "Download Caltech256 Image data"
 mkdir -p $DATA_PATH/caltech
@@ -26,7 +25,7 @@ fi
 
 if ! [ -d $caltech_256_data ] ; then
   echo "Decompressing $caltech_256_data_compressed"
-  tar xf $caltech_256_data_compressed
+  #tar xf $caltech_256_data_compressed
 else
   echo "- Exists: Skipping decompression $caltech_256_data_compressed"
 fi
@@ -92,7 +91,7 @@ do
 
   if ! [ -f $mnist_datum ] ; then
     echo "Decompressing $mnist_datum_compressed"
-    gunzip $mnist_datum_compressed
+    #gunzip $mnist_datum_compressed
   else
     echo "- Exists: Skipping decompression $mnist_datum_compressed"
   fi
@@ -100,7 +99,8 @@ done
 
 popd > /dev/null
 
-dlib_model_base_url="http://dlib.net/files"
+# dlib_model_base_url="http://dlib.net/files"
+dlib_model_base_url="https://github.com/bakercp/ofxDlib/releases/download/models/"
 dlib_model_compressed_suffix=".bz2"
 dlib_models=(
   "dlib_face_recognition_resnet_model_v1.dat"
@@ -141,7 +141,7 @@ for required_models in `ls $ADDON_PATH/example*/bin/data/required_models.txt`
 do
   while read model || [ -n "$model" ];
   do
-    echo $required_models 
+    echo $required_models
     rsync -Prvaq $MODELS_PATH/$model $(dirname $required_models)
   done < $required_models
   echo ""
