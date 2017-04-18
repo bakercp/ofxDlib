@@ -15,12 +15,18 @@ void ofApp::setup()
 
     // Now load the image file into our image.
     ofLoadImage(img, "Puppy.jpg");
-    img = ofxDlib::toGrayscale(img);
 
+    // Convert the image to grayscale.
+    ofPixels gray = ofxDlib::toGrayscale(img);
+
+    // ofxDlib includes wrappers to translate ofPixels into of dlib::generic_image.
+
+    // Declare our result image (note that it has not yet been allocated, but
+    // will be within the dlib::gaussian_blur function below).
     ofPixels blurred_img;
 
     // Blur the image.
-    dlib::gaussian_blur(img, blurred_img, 3);
+    dlib::gaussian_blur(gray, blurred_img, 3);
 
     // Now find the horizontal and vertical gradient images.
     ofFloatPixels horz_gradient;
@@ -29,47 +35,59 @@ void ofApp::setup()
 
     dlib::sobel_edge_detector(blurred_img, horz_gradient, vert_gradient);
 
-    // now we do the non-maximum edge suppression step so that our edges are nice and thin
+    // Now we do the non-maximum edge suppression step so that our edges are
+    // nice and thin.
     dlib::suppress_non_maximum_edges(horz_gradient, vert_gradient, edge_image);
 
-    // Now we would like to see what our images look like.  So let's upload them
-    // to ofTextures.
+    // We can also easily display the edge_image as a heatmap or using the jet
+    // color scheme like so.
+    dlib::matrix<dlib::rgb_pixel> heat_edge_matrix = dlib::heatmap(edge_image);
+
+    // Here we use create the heat_edge_image.
+    // This is a shallow copy and shares the same underlying data with
+    // heat_edge_matrix. Thus, it is important that heat_edge_matrix does not
+    // go out of scope before heat_edge_image.
+    ofPixels heat_edge_image = ofxDlib::toOf(heat_edge_matrix);
+
+    std::cout << "The same underlying data? " <<  (dlib::image_data(heat_edge_matrix) == dlib::image_data(heat_edge_image)) << std::endl;
+
+    // Since dlib::heatmap and similar objects return dlib::matrix_exp, our
+    // toOf helper functions correctly resolve the expression without an
+    // additional assignment to a dlib::matrix before passing to ofxDlib::toOf.
+    //
+    // Thus, ofxDlib::toOf will preserve the speedy templated expression system
+    // inÊdlib when possible.
+    ofPixels jet_edge_image = ofxDlib::toOf(dlib::jet(edge_image));
+    ofPixels random_edge_image = ofxDlib::toOf(dlib::randomly_color_image(edge_image));
+
+    // Upload the data to the textures.
     imgTexture.loadData(img);
+    grayTexture.loadData(gray);
     blurTexture.loadData(blurred_img);
     edgeTexture.loadData(edge_image);
-
-    // We can also easily display the edge_image as a heatmap or using the jet color
-    // scheme like so.
-
-    ofPixels heat_edge_image = dlib::heatmap(edge_image);
-    ofPixels jet_edge_image = dlib::jet(edge_image);
-
-    heatEdgeTexture.loadData(ofxDlib::toOf(heat_edge_image));
-    jetEdgeTexture.loadData(ofxDlib::toOf(jet_edge_image));
-
-
-    //image_window win_hot(heatmap(edge_image));
-    // auto heatMap = dlib::heatmap(edge_image);
-
-    // auto heatMap = ofxDlib::toOf(dlib::heatmap(edge_image));
-    //dlib::image_window win_jet(jet(edge_image));
-    // auto jetImg = dlib::jet(edge_image);
-
-
-    // Finally, note that you can access the elements of an image using the normal [row][column]
-    // operator like so:
-    //  std::cout << horz_gradient[0][3] << std::endl;
-    //  std::cout << "number of rows in image:    " << horz_gradient.nr() << std::endl;
-    //  std::cout << "number of columns in image: " << horz_gradient.nc() << std::endl;
+    heatEdgeTexture.loadData(heat_edge_image);
+    jetEdgeTexture.loadData(jet_edge_image);
+    randomEdgeTexture.loadData(random_edge_image);
 
 }
 
 
 void ofApp::draw()
 {
-    imgTexture.draw(0, 0);
-    blurTexture.draw(imgTexture.getWidth(), 0);
-    edgeTexture.draw(0, imgTexture.getHeight());
+    int w = imgTexture.getWidth();
+    int h = imgTexture.getHeight();
 
+    grayTexture.draw(0, 0);
+    blurTexture.draw(w, 0);
+    edgeTexture.draw(0, h);
+
+    ofPushMatrix();
+    ofTranslate(w, h);
+    ofScale(0.5);
+    heatEdgeTexture.draw(0, 0);
+    jetEdgeTexture.draw(w, 0);
+    randomEdgeTexture.draw(0, h);
+    imgTexture.draw(w, h);
+    ofPopMatrix();
 }
 

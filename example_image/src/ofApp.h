@@ -5,11 +5,10 @@
 //
 
 //
-// From http://dlib.net/3d_point_cloud_ex.cpp.html
+// From http://dlib.net/image_ex.cpp.html
 //
-// This is an example illustrating the use of the perspective_window tool
-// in the dlib C++ Library.  It is a simple tool for displaying 3D point
-// clouds on the screen.
+// This example illustrates some basic dlib image manipulation functions as but
+// does so using native openFrameworks types.
 //
 
 #pragma once
@@ -26,10 +25,11 @@ public:
     void draw() override;
 
     ofTexture imgTexture;
+    ofTexture grayTexture;
     ofTexture blurTexture;
     ofTexture edgeTexture;
-
     ofTexture heatEdgeTexture;
     ofTexture jetEdgeTexture;
+    ofTexture randomEdgeTexture;
 
 };

@@ -141,7 +141,8 @@ for required_models in `ls $ADDON_PATH/example*/bin/data/required_models.txt`
 do
   while read model || [ -n "$model" ];
   do
-    cp -v $MODELS_PATH/$model $(dirname $required_models)/
+    echo $required_models 
+    rsync -Prvaq $MODELS_PATH/$model $(dirname $required_models)
   done < $required_models
   echo ""
 done
@@ -153,7 +154,8 @@ for required_data in `ls $ADDON_PATH/example*/bin/data/required_data.txt`
 do
   while read data || [ -n "$data" ];
   do
-    cp -vr $DATA_PATH/$data $(dirname $required_data)/
+    echo $required_data
+    rsync -Prvaq $DATA_PATH/$data $(dirname $required_data)
   done < $required_data
   echo ""
 done

@@ -3,16 +3,38 @@
 # ofxDlib
 A wrapper for dlib.  http://dlib.net/
 
+# General Notes
+- Recommended configuration:
+  - Ubuntu 16.04+ (or derived distro like Linux Mint 18.\*).
+  - NVIDIA 10xx Graphics Card or better.
+  - NVIDIA 375+ graphics driver.
+  - NVIDIA Cuda 8.0+
+  - NVIDIA cuDNN 5.1+
+
+Efforts have been made to make everything run on OSX and Linux, with and without modern NVidia graphics cards.
 
 # On all platforms
 
-- Run the `build_dlib` script.
-- Run the `install media` script.
+Highly Recommended for DNN examples
+  - Install CUDA 8+ and NVIDIA drivers if needed.
+  - Install cuDNN 6+.
+  - _CUDA/cuDNN will not work on OSX without Xcode 8+ due to missing `std::thread_local` support._
 
+From the `scripts/` directory ...
+- Compile and install `dlib` _This uses `apothecary` and runs the dlib cmake scripts._
+  - `./install_dlib.sh`
+- Download and install the example data and models. _This reads each `required_models.txt` and `required_data.txt` scripts in each `bin/data` directory._
+  - `./download_models_and_data.sh`
+
+## On OSX
+- Xcode 8+ is recommended to support `std::thread_local` (ref)[https://stackoverflow.com/questions/28094794/why-does-apple-clang-disallow-c11-thread-local-when-official-clang-supports]
 
 ## On Linux
 - Run the `install_ubuntu.sh` script.
-- Check the `addons_config.mk` file to make sure all of the includes are correct.
+- Check the `addons_config.mk` file to make sure all of the includes / variables are correct for your configuration.
+
+## On Windows
+- Untested, but dlib is compatible, so it should be possible.
 
 Errors like
 
