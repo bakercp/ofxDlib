@@ -143,7 +143,8 @@ void ofApp::setup()
     // them together to make the training faster.  For example, replacing the
     // above constructor call with this one would cause it to use GPU cards 0
     // and 1.
-    dnn_trainer<net_type,adam> trainer(net,adam(0.0005, 0.9, 0.999), {0/*,1*/});
+    //    dnn_trainer<net_type,adam> trainer(net,adam(0.0005, 0.9, 0.999), {0/*,1*/});
+    dnn_trainer<net_type,sgd> trainer(net,sgd(), {0/*,1*/});
 
     trainer.be_verbose();
     trainer.set_synchronization_file(ofToDataPath("mnist_resnet_sync",true), std::chrono::seconds(100));

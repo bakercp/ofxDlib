@@ -56,7 +56,7 @@ void ofApp::setup()
     // additional assignment to a dlib::matrix before passing to ofxDlib::toOf.
     //
     // Thus, ofxDlib::toOf will preserve the speedy templated expression system
-    // in dlib when possible.
+    // in dlib when possible.
     ofPixels jet_edge_image = ofxDlib::toOf(dlib::jet(edge_image));
     ofPixels random_edge_image = ofxDlib::toOf(dlib::randomly_color_image(edge_image));
 
