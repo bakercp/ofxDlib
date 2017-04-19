@@ -11,4 +11,8 @@ echo $SCRIPTS_DIR
 # /home/travis/build/bakercp/ofxDlib
 # /bin/bash: install_dlib.sh: No such file or directory
 
-/bin/bash $SCRIPTS_DIR/install_dlib.sh
+pushd $SCRIPTS_DIR/ >> /dev/null
+
+/bin/bash install_dlib.sh
+
+popd >> /dev/null
