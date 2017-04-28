@@ -16,8 +16,7 @@ A wrapper for dlib.  http://dlib.net/
 
 ### TL;DR
 - From the `scripts/` directory ...
-  - `./install_dlib.sh`
-  - `./download_models_and_data.sh`
+  - `./install.sh`
 - From the `example_3d_point_cloud/` directory ...
   - `make && make run`
 
