@@ -20,8 +20,7 @@ function download() {
 	#tar -xjvf dlib-$VER.tar.bz2
 	#mv dlib-$VER dlib
 	#rm dlib-$VER.tar.bz2
-        git clone https://github.com/davisking/dlib.git
-
+    git clone https://github.com/davisking/dlib.git
 }
 
 # prepare the build environment, executed inside the lib src dir
@@ -37,9 +36,14 @@ function build() {
 		cd dlib
 		mkdir -p build
 		cd build
-		export MAKEFLAGS="-j$PARALLEL_MAKE -s"
-		cmake -D DLIB_NO_GUI_SUPPORT=yes -D CMAKE_INSTALL_PREFIX=$LIBS_DIR/dlib/install ..
-		cmake --build . --config Release
+        export MAKEFLAGS="-j$PARALLEL_MAKE -s"
+	    if [ "$TYPE" == "osx" ] ; then
+            cmake -D CMAKE_OSX_DEPLOYMENT_TARGET=10.9 -D DLIB_NO_GUI_SUPPORT=yes -D CMAKE_INSTALL_PREFIX=$LIBS_DIR/dlib/install ..
+        else
+            cmake -D DLIB_NO_GUI_SUPPORT=yes -D CMAKE_INSTALL_PREFIX=$LIBS_DIR/dlib/install ..
+        fi
+
+        cmake --build . --config Release
 		cd ../../
 	elif [ "$TYPE" == "android" ] ; then
 		${NDK_ROOT}/ndk-build -j4 NDK_DEBUG=0 NDK_PROJECT_PATH=.
