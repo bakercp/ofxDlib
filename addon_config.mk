@@ -1,19 +1,3 @@
-# All variables and this file are optional, if they are not present the PG and the
-# makefiles will try to parse the correct values from the file system.
-#
-# Variables that specify exclusions can use % as a wildcard to specify that anything in
-# that position will match. A partial path can also be specified to, for example, exclude
-# a whole folder from the parsed paths from the file system
-#
-# Variables can be specified using = or +=
-# = will clear the contents of that variable both specified from the file or the ones parsed
-# from the file system
-# += will add the values to the previous ones in the file or the ones parsed from the file
-# system
-#
-# The PG can be used to detect errors in this file, just create a new project with this addon
-# and the PG will write to the console the kind of error and in which line it is
-
 meta:
 	ADDON_NAME = ofxDlib
 	ADDON_DESCRIPTION = An dlib wrapper.
@@ -22,53 +6,13 @@ meta:
 	ADDON_URL = http://github.com/bakercp/ofxDlib
 
 common:
-	# dependencies with other addons, a list of them separated by spaces
-	# or use += in several lines
-	# ADDON_DEPENDENCIES =
+	ADDON_CFLAGS = -O3 -Wno-strict-aliasing
 
-	# include search paths, this will be usually parsed from the file system
-	# but if the addon or addon libraries need special search paths they can be
-	# specified here separated by spaces or one per line using +=
-	#ADDON_INCLUDES = libs/dlib/include
-
-	# any special flag that should be passed to the compiler when using this
-	# addon
-	ADDON_CFLAGS = -O2 -Wno-strict-aliasing
-
-	# any special flag that should be passed to the linker when using this
-	# addon, also used for system libraries with -lname
-	#ADDON_LDFLAGS = -Llibs/dlib/lib/ -ldlib
-	#ADDON_LDFLAGS = -ldlib
-
-	# linux only, any library that should be included in the project using
-	# pkg-config
-	# ADDON_PKG_CONFIG_LIBRARIES =
-
-	# osx/iOS only, any framework that should be included in the project
-	# ADDON_FRAMEWORKS =
-
-	# source files, these will be usually parsed from the file system looking
-	# in the src folders in libs and the root of the addon. if your addon needs
-	# to include files in different places or a different set of files per platform
-	# they can be specified here
-	#ADDON_SOURCES = src/%
-
-	# some addons need resources to be copied to the bin/data folder of the project
-	# specify here any files that need to be copied, you can use wildcards like * and ?
-	# ADDON_DATA = models/
-
-	# when parsing the file system looking for libraries exclude this for all or
-	# a specific platform
-	# ADDON_LIBS_EXCLUDE =
-
-	# when parsing the file system looking for sources exclude this for all or
-	# a specific platform
+	# Exclude includes and source.
 	ADDON_SOURCES_EXCLUDE = libs/dlib/include/%
-
-	# when parsing the file system looking for include paths exclude this for all or
-	# a specific platform
 	ADDON_INCLUDES_EXCLUDE = libs/dlib/include/%
 
+	# Manually add the includes and source.
 	ADDON_INCLUDES = libs/dlib/include
 	ADDON_INCLUDES += libs/ofxDlib/include
 	ADDON_INCLUDES += src
@@ -81,9 +25,15 @@ osx:
 	# Increase the depth if needed.
 	ADDON_CPPFLAGS += -ftemplate-depth=512
 
+	# If your processor supports SIMD AVX instructions.
+	ADDON_CPPFLAGS += -mavx
+
 linux64:
 	ADDON_LIBS = libs/dlib/lib/linux64/libdlib.a
 	ADDON_PKG_CONFIG_LIBRARIES = libpng libjpeg
+
+	# If your processor supports SIMD AVX instructions.
+	ADDON_CPPFLAGS += -mavx
 
 	# If dlib is compiled with libblas/liblapack support, you may need to include these.
 	# ADDON_PKG_CONFIG_LIBRARIES+=blas lapack
@@ -96,6 +46,10 @@ linux64:
 
 android/armeabi-v7a:
 	ADDON_LIBS = libs/dlib/lib/android/armeabi-v7a/libdlib.a
+	# If your processor supports SIMD NEON instructions.
+	# ADDON_CPPFLAGS += -mfpu=neon
 
 android/x86:
 	ADDON_LIBS = libs/dlib/lib/android/x86/libdlib.a
+	# If your processor supports SIMD AVX instructions.
+	ADDON_CPPFLAGS += -mavx
