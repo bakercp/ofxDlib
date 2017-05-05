@@ -1,5 +1,5 @@
 #!/bin/bash
 
-echo pwd
+pwd
 
 /bin/bash .././build.sh
