@@ -1,8 +1,11 @@
 #!/bin/bash
 
 # openFrameorks information.
+
 # This script assumes it is in the openFrameworks/addons/THE_ADDON/scripts dir.
-OF_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../../../" && pwd )"
+if ! [ -z ${OF_ROOT+x} ]; then
+  export OF_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../../../" && pwd )"
+fi
 OF_ADDONS_PATH=$OF_ROOT/addons
 OF_SCRIPTS_PATH=$OF_ROOT/scripts
 OF_APOTHECARY_PATH=$OF_SCRIPTS_PATH/apothecary

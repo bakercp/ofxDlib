@@ -1,7 +1,8 @@
 #!/bin/bash
 
-# This script assumes it is in the openFrameworks/addons/THE_ADDON/scripts/apothecary dir.
-OF_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../../../../" && pwd )"
+if ! [ -z ${OF_ROOT+x} ]; then
+  OF_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../../../../" && pwd )"
+fi
 
 # This is the default location for apothecary.
 APOTHECARY_DIR=$OF_ROOT/scripts/apothecary
