@@ -9,11 +9,29 @@ OF_APOTHECARY_PATH=$OF_SCRIPTS_PATH/apothecary
 
 # Addon information.
 ADDON_NAME="$(basename $( cd "$( dirname "${BASH_SOURCE[0]}" )/../" && pwd ))"
-ADDON_PATH=$OF_ADDONS_PATH/$ADDON_NAME/
-ADDON_SCRIPTS_PATH=$ADDON_PATH/scripts/
-
+ADDON_PATH=$OF_ADDONS_PATH/$ADDON_NAME
+ADDON_SCRIPTS_PATH=$ADDON_PATH/scripts
 # Get the OS type.
 OS_TYPE=`${ADDON_SCRIPTS_PATH}/shared/ostype.sh`
+
+echo "openFrameworks Config"
+echo "====================="
+echo "           OF_ROOT: ${OF_ROOT}"
+echo "    OF_ADDONS_PATH: ${OF_ADDONS_PATH}"
+echo "   OF_SCRIPTS_PATH: ${OF_SCRIPTS_PATH}"
+echo "OF_APOTHECARY_PATH: ${OF_APOTHECARY_PATH}"
+echo ""
+echo "MACHINE CONFIG"
+echo "=============="
+echo "           OS_TYPE: ${OS_TYPE}"
+echo ""
+echo "ADDON CONFIG"
+echo "============"
+echo "        ADDON_NAME: ${ADDON_NAME}"
+echo "        ADDON_PATH: ${ADDON_PATH}"
+echo "ADDON_SCRIPTS_PATH: ${ADDON_SCRIPTS_PATH}"
+echo ""
+
 echo "Building for ${OS_TYPE} ..."
 
 # Install any apothecary dependencies.
