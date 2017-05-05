@@ -1,5 +1,8 @@
 #!/bin/bash
 
+echo "Calling ${BASH_SOURCE[0]} from `pwd`"
+
+
 if ! [ -z ${OF_ROOT+x} ]; then
   OF_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../../../../" && pwd )"
 fi

@@ -2,6 +2,8 @@
 
 # openFrameorks information.
 
+echo "Calling ${BASH_SOURCE[0]} from `pwd`"
+
 # This script assumes it is in the openFrameworks/addons/THE_ADDON/scripts dir.
 if ! [ -z ${OF_ROOT+x} ]; then
   export OF_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../../../" && pwd )"

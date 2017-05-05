@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "Calling from `pwd`"
+echo "Calling ${BASH_SOURCE[0]} from `pwd`"
 
 # This script assumes it is in the openFrameworks/addons/THE_ADDON/scripts/ci.
 SCRIPTS_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../" && pwd )"
