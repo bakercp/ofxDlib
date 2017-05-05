@@ -1,5 +1,5 @@
 #!/bin/bash
 
-cd ../
+cd ../../
 
-/bin/bash install_dlib.sh
+/bin/bash build.sh
