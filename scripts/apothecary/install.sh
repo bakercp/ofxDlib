@@ -28,7 +28,7 @@ TARGET_OS=`./ostype.sh`
 # Install apthecary requirements.
 popd > /dev/null
 
-# Install any dependencies.
+# Install any apothecary dependencies.
 if [ -f $APOTHECARY_DIR/scripts/$TARGET_OS/install.sh ] ; then
   echo "Installing apothecary dependencies."
   $APOTHECARY_DIR/scripts/$TARGET_OS/install.sh
