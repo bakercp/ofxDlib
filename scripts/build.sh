@@ -7,6 +7,9 @@ echo "Calling ${BASH_SOURCE[0]} from `pwd`"
 # This script assumes it is in the openFrameworks/addons/THE_ADDON/scripts dir.
 if ! [ -z ${OF_ROOT+x} ]; then
   export OF_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../../../" && pwd )"
+  echo "Setting OF_ROOT to: ${OF_ROOT}"
+else
+  echo "OF_ROOT is already set to: ${OF_ROOT}"
 fi
 OF_ADDONS_PATH=$OF_ROOT/addons
 OF_SCRIPTS_PATH=$OF_ROOT/scripts
