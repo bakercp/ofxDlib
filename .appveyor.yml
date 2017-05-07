@@ -19,7 +19,7 @@ environment:
 
 configuration: Debug
 shallow_clone: true
-clone_depth: 10
+clone_depth: 1
 init:
 - set MSYS2_PATH=c:\msys64
 - set CHERE_INVOKING=1
@@ -29,7 +29,7 @@ init:
 
 install:
 - cd ..
-- git clone --depth=1 --branch=master https://github.com/openframeworks/openFrameworks
+- git clone --depth=1 --branch=CI-ADDON_TESTS https://github.com/bakercp/openFrameworks
 - call openFrameworks\scripts\ci\addons\install.cmd
 
 build_script:
