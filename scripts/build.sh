@@ -59,9 +59,9 @@ fi
 echo "Installing apothecary ..."
 $ADDON_SCRIPTS_PATH/apothecary/install.sh
 
-# Clean any prior builds.
-echo "Cleaning prior apothecary builds for ${ADDON_NAME} ..."
-$OF_APOTHECARY_PATH/apothecary/apothecary -v clean $ADDON_NAME
+# # Clean any prior builds.
+# echo "Cleaning prior apothecary builds for ${ADDON_NAME} ..."
+# $OF_APOTHECARY_PATH/apothecary/apothecary -v clean $ADDON_NAME
 
 # Build using apothcary
 echo "Building ${ADDON_NAME} libraries for ${TARGET} ..."
