@@ -29,7 +29,7 @@ init:
 
 install:
 - cd ..
-- git clone --depth=1 --branch=CI-ADDON_TESTS https://github.com/bakercp/openFrameworks
+- git clone --depth=1 --branch=CI-ADDON-TESTS https://github.com/bakercp/openFrameworks
 - call openFrameworks\scripts\ci\addons\install.cmd
 
 build_script:
