@@ -1,12 +1,12 @@
 #!/bin/bash
-set -ev
+set -e
 
 # openFrameorks information.
 echo "Calling ${BASH_SOURCE[0]} from `pwd`"
 
 # This script assumes it is in the openFrameworks/addons/THE_ADDON/scripts dir.
 if ! [ -z ${OF_ROOT+x} ]; then
-  export OF_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../../../" && pwd )"
+  OF_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../../../" && pwd )"
   echo "Setting OF_ROOT to: ${OF_ROOT}"
 else
   echo "OF_ROOT is already set to: ${OF_ROOT}"
@@ -17,9 +17,13 @@ OF_SCRIPTS_PATH=$OF_ROOT/scripts
 OF_APOTHECARY_PATH=$OF_SCRIPTS_PATH/apothecary
 
 # Addon information.
-ADDON_NAME="$(basename $( cd "$( dirname "${BASH_SOURCE[0]}" )/../" && pwd ))"
+if ! [ -z ${ADDON_NAME+x} ]; then
+  ADDON_NAME="$(basename $( cd "$( dirname "${BASH_SOURCE[0]}" )/../" && pwd ))"
+fi
+
 ADDON_PATH=$OF_ADDONS_PATH/$ADDON_NAME
 ADDON_SCRIPTS_PATH=$ADDON_PATH/scripts
+
 # Get the OS type.
 TARGET=`${ADDON_SCRIPTS_PATH}/shared/ostype.sh`
 
