@@ -1,8 +1,7 @@
 language: c++
 compiler: gcc
 sudo: true
-env:
-  - OF_ROOT=~/openFrameworks
+env: OF_ROOTQ="~/openFrameworks" 
 matrix:
   include:
   # fully specify builds, include can't dynamically expand matrix entries
@@ -12,7 +11,7 @@ matrix:
   - os: linux
     dist: trusty
     sudo: required
-    env: TARGET="linux64" OF_BRANCH="master"
+    env: OF_ROOTZ="~/openFrameworks" TARGET="linux64" OF_BRANCH="master"
     addons:
       apt:
         sources:
@@ -25,19 +24,21 @@ matrix:
   - os: osx
     osx_image: xcode8
     compiler: clang
-    env: TARGET="osx" OF_BRANCH="master"
+    env: OF_ROOTZ="~/openFrameworks" TARGET="osx" OF_BRANCH="master"
 
 # Linux ARM6, OF master
   - os: linux
     sudo: required
     dist: trusty
-    env: TARGET="linuxarmv6l" OF_BRANCH="master"
+    env: OF_ROOTZ="~/openFrameworks" TARGET="linuxarmv6l" OF_BRANCH="master"
   # Exclude the default build that would otherwise be generated
   # see https://github.com/travis-ci/travis-ci/issues/1228
   exclude:
     - compiler: gcc
 
 install:
+  - echo "ENV VARS"
+  - printenv
   - echo "------------------------------"
   - pwd
   - echo "000000000000000000000000000000"
