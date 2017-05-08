@@ -23,6 +23,7 @@ clone_depth: 1
 init:
 - set MSYS2_PATH=c:\msys64
 - set CHERE_INVOKING=1
+- set OF_ROOT=%APPVEYOR_BUILD_FOLDER%\..\
 - if "%BUILDER%_%PLATFORM%"=="MSYS2_x86" set MSYSTEM=MINGW32
 - if "%BUILDER%_%PLATFORM%"=="MSYS2_x64" set MSYSTEM=MINGW64
 - if "%BUILDER%"=="VS" set PATH=C:\Program Files (x86)\MSBuild\14.0\Bin;%PATH%
