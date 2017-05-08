@@ -1,6 +1,8 @@
 language: c++
 compiler: gcc
 sudo: true
+env:
+  - OF_ROOT=~/openFrameworks
 matrix:
   include:
   # fully specify builds, include can't dynamically expand matrix entries
@@ -38,11 +40,10 @@ matrix:
 install:
   - echo "------------------------------"
   - pwd
-  - cd ~
   - echo "000000000000000000000000000000"
   - pwd
-  - git clone --depth=1 --branch=CI-ADDON-TESTS https://github.com/bakercp/openFrameworks
-  - cd openFrameworks
+  - git clone --depth=1 --branch=CI-ADDON-TESTS https://github.com/bakercp/openFrameworks $OF_ROOT
+  - cd $OF_ROOT
   - echo "111111111111111111111111111111"
   - pwd
   - scripts/ci/addons/install.sh
