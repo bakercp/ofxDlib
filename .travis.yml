@@ -16,7 +16,6 @@ matrix:
         sources:
           - ubuntu-toolchain-r-test
         packages:
-          - realpath
           - gcc-4.9
           - g++-4.9
           - gdb
@@ -55,8 +54,7 @@ install:
 
 script:
   - echo "SCRIPT XXXXXXXXXXXXXXXXXXXXXXXX"
-  - pwd
-  - scripts/ci/addons/build.sh
+  - $HOME/openFrameworks/scripts/ci/addons/build.sh
   - echo "333333333333333333333333333333"
   - pwd
 
