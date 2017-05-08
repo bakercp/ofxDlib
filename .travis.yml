@@ -16,6 +16,7 @@ matrix:
         sources:
           - ubuntu-toolchain-r-test
         packages:
+          - realpath
           - gcc-4.9
           - g++-4.9
           - gdb
