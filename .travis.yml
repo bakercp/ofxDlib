@@ -10,7 +10,7 @@ matrix:
   - os: linux
     dist: trusty
     sudo: required
-    env: OF_ROOT="~/openFrameworks" TARGET="linux64" OF_BRANCH="master"
+    env: OF_ROOT=$HOME/openFrameworks TARGET="linux64" OF_BRANCH="master"
     addons:
       apt:
         sources:
@@ -23,13 +23,13 @@ matrix:
   - os: osx
     osx_image: xcode8
     compiler: clang
-    env: OF_ROOT="~/openFrameworks" TARGET="osx" OF_BRANCH="master"
+    env: OF_ROOT=$HOME/openFrameworks TARGET="osx" OF_BRANCH="master"
 
 # Linux ARM6, OF master
   - os: linux
     sudo: required
     dist: trusty
-    env: OF_ROOT="~/openFrameworks" TARGET="linuxarmv6l" OF_BRANCH="master"
+    env: OF_ROOT=$HOME/openFrameworks TARGET="linuxarmv6l" OF_BRANCH="master"
   # Exclude the default build that would otherwise be generated
   # see https://github.com/travis-ci/travis-ci/issues/1228
   exclude:
