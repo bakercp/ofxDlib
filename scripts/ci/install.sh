@@ -8,4 +8,5 @@ SCRIPTS_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../" && pwd )"
 
 echo "Scripts path ${SCRIPTS_PATH}"
 
-/bin/bash $SCRIPTS_PATH/build.sh
+echo "Calling ${SCRIPTS_PATH}/build.sh"
+$SCRIPTS_PATH/build.sh

@@ -36,6 +36,7 @@ matrix:
     - compiler: gcc
 
 install:
+  - echo "--"
   - echo "ENV VARS"
   - printenv
   - echo "------------------------------"
