@@ -25,7 +25,6 @@ elif [ "$OS" == "linux" ]; then
 		# Make an exception for raspberry pi to run on armv6l, to conform
 		# with openFrameworks.
 		if [ -f /opt/vc/include/bcm_host.h ]; then
-			echo "Detected Raspberry Pi -- forcing armv6l."
 			OS="linuxarmv6l"
 		else
 			OS="linuxarmv7l"
