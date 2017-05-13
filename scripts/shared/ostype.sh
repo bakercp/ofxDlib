@@ -22,7 +22,14 @@ elif [ "$OS" == "linux" ]; then
 	elif [ "$ARCH" == "armv6l" ] ; then
 		OS="linuxarmv6l"
 	elif [ "$ARCH" == "armv7l" ] ; then
-		OS="linuxarmv7l"
+		# Make an exception for raspberry pi to run on armv6l, to conform
+		# with openFrameworks.
+		if [ -f /opt/vc/include/bcm_host.h ]; then
+			echo "Detected Raspberry Pi -- forcing armv6l."
+			OS="linuxarmv6l"
+		else
+			OS="linuxarmv7l"
+		fi
 	else
 		# We don't know this one, but we will try to make a reasonable guess.
 		OS="linux"$ARCH
