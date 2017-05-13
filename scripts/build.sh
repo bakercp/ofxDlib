@@ -5,7 +5,7 @@ set -e
 echo "Calling ${BASH_SOURCE[0]} from `pwd`"
 
 # This script assumes it is in the openFrameworks/addons/THE_ADDON/scripts dir.
-if ! [ -z ${OF_ROOT+x} ]; then
+if [ -z ${OF_ROOT+x} ]; then
   OF_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../../../" && pwd )"
   echo "Setting OF_ROOT to: ${OF_ROOT}"
 else
@@ -17,7 +17,7 @@ OF_SCRIPTS_PATH=$OF_ROOT/scripts
 OF_APOTHECARY_PATH=$OF_SCRIPTS_PATH/apothecary
 
 # Addon information.
-if ! [ -z ${ADDON_NAME+x} ]; then
+if [ -z ${ADDON_NAME+x} ]; then
   ADDON_NAME="$(basename $( cd "$( dirname "${BASH_SOURCE[0]}" )/../" && pwd ))"
 fi
 
@@ -65,6 +65,6 @@ $ADDON_SCRIPTS_PATH/apothecary/install.sh
 
 # Build using apothcary
 echo "Building ${ADDON_NAME} libraries for ${TARGET} ..."
-$OF_APOTHECARY_PATH/apothecary/apothecary -v -j16 -d $ADDON_PATH/libs update $ADDON_NAME
+$OF_APOTHECARY_PATH/apothecary/apothecary -v -j10 -d $ADDON_PATH/libs update $ADDON_NAME
 
 echo "Build of ${ADDON_NAME} complete for ${TARGET}."
