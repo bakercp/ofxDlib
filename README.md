@@ -39,7 +39,8 @@ Visual Studio, MSYS [![Build status](https://ci.appveyor.com/api/projects/status
 
 ## Compatibility
 
-The `stable` branch of this repository is meant to be compatible with the openFrameworks [stable branch](https://github.com/openframeworks/openFrameworks/tree/stable), which corresponds to the latest official openFrameworks release.
+** Currently NOT Compatible with < 0.10.0, thus we have no stable branch as noted below. **
+~~The `stable` branch of this repository is meant to be compatible with the openFrameworks [stable branch](https://github.com/openframeworks/openFrameworks/tree/stable), which corresponds to the latest official openFrameworks release.~~
 
 The `master` branch of this repository is meant to be compatible with the openFrameworks [master branch](https://github.com/openframeworks/openFrameworks/tree/master).
 
