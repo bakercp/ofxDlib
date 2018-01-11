@@ -1,2 +1,2 @@
-Crowd.jpg https://upload.wikimedia.org/wikipedia/commons/b/be/July_4_crowd_at_Vienna_Metro_station.jpg
-RobertCornelius.jpg https://upload.wikimedia.org/wikipedia/commons/9/90/RobertCornelius.jpg
+Crowd.jpg|https://upload.wikimedia.org/wikipedia/commons/b/be/July_4_crowd_at_Vienna_Metro_station.jpg
+RobertCornelius.jpg|https://upload.wikimedia.org/wikipedia/commons/9/90/RobertCornelius.jpg

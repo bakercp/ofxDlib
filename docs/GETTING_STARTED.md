@@ -29,13 +29,11 @@ From the `scripts/` directory, call `./install.sh`
 ### On Windows
 - Untested, but dlib is compatible, so it should be possible.
 
-
-
 ### Build Notes
 From the `scripts/` directory ...
 - Install `coreutils` for `realpath` support (required for apothecary).
   - OSX `brew install coreutils`
-  - Ubuntu ` sudo apt-get intall coreutils`
+  - Ubuntu ` sudo apt-get install coreutils`
 - Compile and install `dlib` _This uses `apothecary` and runs the dlib cmake scripts._
   - `./build.sh`
   - Pay attention to what options were detected during the compilation process (e.g. did it detect `CUDA` / `cuDNN`?) as your `addons_config.mk` file may require minor changes to make everything compile / link correctly.

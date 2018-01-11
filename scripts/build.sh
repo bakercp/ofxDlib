@@ -57,7 +57,7 @@ fi
 
 # Install or update apothecary.
 echo "Installing apothecary ..."
-$ADDON_SCRIPTS_PATH/apothecary/install.sh
+$ADDON_SCRIPTS_PATH/install_apothecary.sh
 
 # # Clean any prior builds.
 # echo "Cleaning prior apothecary builds for ${ADDON_NAME} ..."
