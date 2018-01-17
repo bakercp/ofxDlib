@@ -7,10 +7,9 @@
 
 #pragma once
 
-
+#include <iostream>
 #include "ofx/Dlib/Types.h"
 #include "ofx/Dlib/Utils.h"
-#include <iostream>
 #include <dlib/clustering.h>
 #include <dlib/data_io.h>
 #include <dlib/dnn.h>
@@ -27,5 +26,3 @@
 
 
 namespace ofxDlib = ofx::Dlib;
-
-

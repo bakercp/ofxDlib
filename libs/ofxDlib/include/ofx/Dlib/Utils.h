@@ -316,6 +316,15 @@ inline ofPixels_<typename dlib::pixel_traits<pixel_type>::basic_pixel_type> toOf
 }
 
 
+template<typename pixel_type>
+inline ofPixels_<pixel_type> toOf(const ofPixels_<pixel_type>& in)
+{
+    ofLogWarning("toOf") << "It is not needed to call toOf on ofPixels.";
+    return in;
+}
+
+
+
 /// \brief Scale the given object detection by the given amount.
 /// \param v The object to be scaled.
 /// \param scale The amount the scale the object by.
