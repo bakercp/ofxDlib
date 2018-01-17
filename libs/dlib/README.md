@@ -1,0 +1,1 @@
+For instructions on how to generate or regenerate these libraries, see the README.md in the root directory of this addon.
