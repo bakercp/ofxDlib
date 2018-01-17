@@ -8,17 +8,17 @@ A wrapper for dlib.  http://dlib.net/
 
 ## Features
 
-- Toll-free `openFrameworks` ↔ `dlib` bridges using `dlib` `dlib/generic_image.h` interface.
-- `openFrameworks` ↔ `dlib` type conversions.
-- `dlib` helper functions.
+-  Toll-free `openFrameworks` ↔ `dlib` bridges using `dlib` `dlib/generic_image.h` interface.
+-  `openFrameworks` ↔ `dlib` type conversions.
+-  `dlib` helper functions.
 
 ## Getting Started
 
 ### TL;DR
-- From the `scripts/` directory ...
-  - `./install.sh`
-- From the `example_3d_point_cloud/` directory ...
-  - `make && make run`
+-  From the `scripts/` directory ...
+  -  `./install.sh`
+-  From the `example_3d_point_cloud/` directory ...
+  -  `make && make run`
 
 For more, see [docs/GETTING_STARTED.md](docs/GETTING_STARTED.md).
 
@@ -39,7 +39,7 @@ Visual Studio, MSYS [![Build status](https://ci.appveyor.com/api/projects/status
 
 ## Compatibility
 
-** Currently NOT Compatible with < 0.10.0, thus we have no stable branch as noted below. **
+**Currently NOT Compatible with < 0.10.0, thus we have no stable branch as noted below.**
 ~~The `stable` branch of this repository is meant to be compatible with the openFrameworks [stable branch](https://github.com/openframeworks/openFrameworks/tree/stable), which corresponds to the latest official openFrameworks release.~~
 
 The `master` branch of this repository is meant to be compatible with the openFrameworks [master branch](https://github.com/openframeworks/openFrameworks/tree/master).
@@ -58,9 +58,9 @@ See `LICENSE.md`.
 
 Pull Requests are always welcome, so if you make any improvements please feel free to float them back upstream :)
 
-1. Fork this repository.
-2. Create your feature branch (`git checkout -b my-new-feature`).
-3. Commit your changes (`git commit -am 'Add some feature'`).
-4. Push to the branch (`git push origin my-new-feature`).
-5. Create new Pull Request.
+1.  Fork this repository.
+2.  Create your feature branch (`git checkout -b my-new-feature`).
+3.  Commit your changes (`git commit -am 'Add some feature'`).
+4.  Push to the branch (`git push origin my-new-feature`).
+5.  Create new Pull Request.
 
