@@ -23,12 +23,11 @@ void ofApp::setup()
     // dlib::gaussian_blur function below).
     ofPixels pixBlurred;
 
+
     // Now we wrap the unallocated pixBlurred in an wrapper that will treat it
     // as an ofPixels object with a pixel type of OF_PIXELS_RGB. It will take
     // care of allocation, etc for us.
-    dlib::of_pixels_<unsigned char, dlib::rgb_pixel> wrappedBlurredPix(pixBlurred);
-
-//    dlib::of_pixels_<unsigned char, dlib::rgb_pixel> wrappedPix(pix);
+    auto wrappedBlurredPix = ofxDlib::toDlib(pixBlurred);
 
     // Now we will pass the allocated ofPixels (`pix`) and the unallocated
     // wrapped ofPixels (wrappedBlurredPix) to the dlib::gaussian_blur
@@ -38,15 +37,15 @@ void ofApp::setup()
     // This time, we want dlib to treat the output as grayscale.
     ofPixels pixBlurredGrayscale;
 
-//    // Now we wrap the unallocated pixBlurred in an wrapper that will treat it
-//    // as an ofPixels object with a pixel type of OF_PIXELS_GRAY. It will take
-//    // care of allocation, etc for us.
-//    dlib::of_image<unsigned char, unsigned char> wrappedBlurredPixGrayscale(pixBlurredGrayscale);
+    // Now we wrap the unallocated pixBlurred in an wrapper that will treat it
+    // as an ofPixels object with a pixel type of OF_PIXELS_GRAY. It will take
+    // care of allocation, etc for us.
+    auto wrappedPixBlurredGrayscale = ofxDlib::toDlib<ofPixels_, unsigned char, unsigned char>(pixBlurredGrayscale);
 
     // Now we will pass the allocated ofPixels (`pix`) and the unallocated
     // wrapped ofPixels (wrappedBlurredPix) to the dlib::gaussian_blur
     // function.
-//    dlib::gaussian_blur(pix, dlib::toDlib<dlib::rgb_pixel(pixBlurredGrayscale), 3);//wrappedBlurredPixGrayscale, 3);
+    dlib::gaussian_blur(pix, wrappedPixBlurredGrayscale, 3);
 
     pixTexture.loadData(pix);
     pixBlurredTexture.loadData(pixBlurred);

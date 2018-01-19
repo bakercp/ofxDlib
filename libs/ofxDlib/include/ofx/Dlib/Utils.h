@@ -15,6 +15,8 @@
 #include "ofPixels.h"
 #include "ofRectangle.h"
 #include "ofTypes.h"
+#include "dlib/of_adapter.h"
+#include "dlib/of_image.h"
 
 
 namespace ofx {
@@ -386,5 +388,17 @@ inline ofPixels_<PixelType> toGrayscale(const ofPixels_<PixelType>& pixels)
 
     return out;
 }
+
+
+
+template <template <class> class HasPixelsClass_,
+          typename PixelType,
+          typename dlib_pixel_type = dlib::rgb_pixel>
+dlib::of_pixels_<HasPixelsClass_, PixelType, dlib_pixel_type> toDlib(HasPixelsClass_<PixelType>& pix)
+{
+    return dlib::of_pixels_<HasPixelsClass_, PixelType, dlib_pixel_type>(pix);
+}
+
+
 
 } } // namespace ofx::Dlib

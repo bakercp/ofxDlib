@@ -29,8 +29,20 @@ namespace dlib
 //    class A<T, typename std::enable_if<std::is_floating_point<T>::value>::type> {
 
 
+//template <template <class> class HasPixelsClass_,
+//          typename PixelType,
+//          typename dlib_pixel_type,
+//          typename Enable = void>
+//class of_pixels_
+//{};
+
+
+//typename std::enable_if<std::is_integral<T>::value>::type
+
 // we have to have a pointer because this must be default constructable.
-template <typename PixelType, typename dlib_pixel_type>
+template <template <class> class HasPixelsClass_,
+          typename PixelType,
+          typename dlib_pixel_type>
 class of_pixels_
 {
 public:
@@ -38,8 +50,8 @@ public:
     typedef default_memory_manager mem_manager_type;
 
     of_pixels_(): of_pixels_(nullptr) {}
-    of_pixels_(ofPixels_<PixelType>& pixels): of_pixels_(&pixels) {}
-    of_pixels_(ofPixels_<PixelType>* pPixels): _pPixels(pPixels) {}
+    of_pixels_(HasPixelsClass_<PixelType>& pixels): of_pixels_(&pixels) {}
+    of_pixels_(HasPixelsClass_<PixelType>* pPixels): _pPixels(pPixels) {}
 
     unsigned long size () const
     {
@@ -136,7 +148,7 @@ public:
         return *this;
     }
 
-    of_pixels_& operator=(ofPixels_<PixelType>* pPixels)
+    of_pixels_& operator=(HasPixelsClass_<PixelType>* pPixels)
     {
         _pPixels = pPixels;
         return *this;
@@ -190,16 +202,16 @@ public:
 
 
 private:
-    ofPixels_<PixelType>* _pPixels = nullptr;
+    HasPixelsClass_<PixelType>* _pPixels = nullptr;
 
 };
 
 // ----------------------------------------------------------------------------------------
 
-template<typename PixelType, typename dlib_pixel_type>
-const matrix_op<op_array2d_to_mat<of_pixels_<PixelType, dlib_pixel_type>>> mat (const of_pixels_<PixelType, dlib_pixel_type>& m)
+template <template <class> class HasPixelsClass_, typename PixelType, typename dlib_pixel_type>
+const matrix_op<op_array2d_to_mat<of_pixels_<HasPixelsClass_, PixelType, dlib_pixel_type>>> mat (const of_pixels_<HasPixelsClass_, PixelType, dlib_pixel_type>& m)
 {
-    typedef op_array2d_to_mat<of_pixels_<PixelType, dlib_pixel_type>> op;
+    typedef op_array2d_to_mat<of_pixels_<HasPixelsClass_, PixelType, dlib_pixel_type>> op;
     return matrix_op<op>(op(m));
 }
 
@@ -207,19 +219,19 @@ const matrix_op<op_array2d_to_mat<of_pixels_<PixelType, dlib_pixel_type>>> mat (
 
 // Define the global functions that make of_pixels_ a proper "generic image" according to
 // ../image_processing/generic_image.h
-template <typename PixelType, typename dlib_pixel_type>
-struct image_traits<of_pixels_<PixelType, dlib_pixel_type> >
+template <template <class> class HasPixelsClass_, typename PixelType, typename dlib_pixel_type>
+struct image_traits<of_pixels_<HasPixelsClass_, PixelType, dlib_pixel_type> >
 {
     typedef dlib_pixel_type pixel_type;
 };
 
-template <typename PixelType, typename dlib_pixel_type>
-inline long num_rows( const of_pixels_<PixelType, dlib_pixel_type>& img) { return img.nr(); }
-template <typename PixelType, typename dlib_pixel_type>
-inline long num_columns( const of_pixels_<PixelType, dlib_pixel_type>& img) { return img.nc(); }
+template <template <class> class HasPixelsClass_, typename PixelType, typename dlib_pixel_type>
+inline long num_rows( const of_pixels_<HasPixelsClass_, PixelType, dlib_pixel_type>& img) { return img.nr(); }
+template <template <class> class HasPixelsClass_, typename PixelType, typename dlib_pixel_type>
+inline long num_columns( const of_pixels_<HasPixelsClass_, PixelType, dlib_pixel_type>& img) { return img.nc(); }
 
-template <typename PixelType, typename dlib_pixel_type>
-inline void* image_data(of_pixels_<PixelType, dlib_pixel_type>& img)
+template <template <class> class HasPixelsClass_, typename PixelType, typename dlib_pixel_type>
+inline void* image_data(of_pixels_<HasPixelsClass_, PixelType, dlib_pixel_type>& img)
 {
     if (img.size() != 0)
         return &img[0][0];
@@ -227,8 +239,8 @@ inline void* image_data(of_pixels_<PixelType, dlib_pixel_type>& img)
         return 0;
 }
 
-template <typename PixelType, typename dlib_pixel_type>
-inline const void* image_data(const of_pixels_<PixelType, dlib_pixel_type>& img)
+template <template <class> class HasPixelsClass_, typename PixelType, typename dlib_pixel_type>
+inline const void* image_data(const of_pixels_<HasPixelsClass_, PixelType, dlib_pixel_type>& img)
 {
     if (img.size() != 0)
         return &img[0][0];
@@ -236,17 +248,19 @@ inline const void* image_data(const of_pixels_<PixelType, dlib_pixel_type>& img)
         return 0;
 }
 
-template <typename PixelType, typename dlib_pixel_type>
-inline long width_step(const of_pixels_<PixelType, dlib_pixel_type>& img)
+template <template <class> class HasPixelsClass_, typename PixelType, typename dlib_pixel_type>
+inline long width_step(const of_pixels_<HasPixelsClass_, PixelType, dlib_pixel_type>& img)
 {
     return img.width_step();
 }
 
-template <typename PixelType, typename dlib_pixel_type>
-inline void set_image_size(of_pixels_<PixelType, dlib_pixel_type>& img, long rows, long cols)
+template <template <class> class HasPixelsClass_, typename PixelType, typename dlib_pixel_type>
+inline void set_image_size(of_pixels_<HasPixelsClass_, PixelType, dlib_pixel_type>& img, long rows, long cols)
 {
     img.set_image_size(rows, cols);
 }
+
+
 
 
 // ----------------------------------------------------------------------------------------
