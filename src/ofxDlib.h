@@ -7,9 +7,13 @@
 
 #pragma once
 
-#include <iostream>
-#include "ofx/Dlib/Types.h"
+
+#include "dlib/of_adapter.h"
+#include "dlib/of_image.h"
+//#include "ofx/Dlib/Types.h"
 #include "ofx/Dlib/Utils.h"
+
+#include <iostream>
 #include <dlib/clustering.h>
 #include <dlib/data_io.h>
 #include <dlib/dnn.h>

@@ -7,72 +7,63 @@
 
 #pragma once
 
-#include "ofConstants.h"
+
 #include "ofPixels.h"
-#include <dlib/matrix.h>
+#include <dlib/pixel.h>
+//#include <dlib/matrix.h>
+
 
 /// \sa http://dlib.net/dlib/image_processing/generic_image.h.html
 namespace dlib
 {
 
-template <typename T>
+
+template <typename PixelType>
 struct image_traits;
 
-template <>
-struct image_traits<ofPixels_<unsigned char>>
-{
-    typedef rgb_pixel pixel_type;
-};
 
-template <>
-struct image_traits<const ofPixels_<unsigned char>>
+template <typename PixelType>
+struct image_traits<ofPixels_<PixelType>>
 {
-    typedef rgb_pixel pixel_type;
-};
-
-template <typename T>
-struct image_traits<ofPixels_<T>>
-{
-    typedef T pixel_type;
-};
-
-template <typename T>
-struct image_traits<const ofPixels_<T>>
-{
-    typedef rgb_pixel pixel_type;
+    typedef PixelType pixel_type;
 };
 
 
-template <>
-inline void set_image_size(ofPixels_<unsigned char>& img, long rows, long cols)
+template <typename PixelType>
+struct image_traits<const ofPixels_<PixelType>>
 {
-    // We force rgb_pixel for generic ofPixels_<unsigned char> aka ofPixels.
-    img.allocate(std::size_t(cols), std::size_t(rows), OF_PIXELS_RGB);
+    typedef PixelType pixel_type;
+};
+
+
+template <typename PixelType>
+inline void set_image_size(ofPixels_<PixelType>& img, long rows, long cols)
+{
+    if (img.getPixelFormat() != OF_PIXELS_GRAY)
+    {
+        ofLogWarning("set_image_size") << "Reallocating ofPixels_<PixelType> with pixelFormat = OF_PIXELS_GRAY.";
+    }
+
+    img.allocate(std::size_t(cols), std::size_t(rows), OF_PIXELS_GRAY);
 }
 
-template <typename T>
-inline long num_rows(const ofPixels_<T>& img)
+
+template <typename PixelType>
+inline long num_rows(const ofPixels_<PixelType>& img)
 {
     return img.getHeight();
 }
 
-template <typename T>
-inline long num_columns(const ofPixels_<T>& img)
+
+template <typename PixelType>
+inline long num_columns(const ofPixels_<PixelType>& img)
 {
     return img.getWidth();
 }
 
-template <typename T>
-inline void* image_data(ofPixels_<T>& img)
-{
-    if (img.isAllocated())
-        return img.getData();
 
-    return nullptr;
-}
-
-template <typename T>
-inline const void* image_data(const ofPixels_<T>& img)
+template <typename PixelType>
+inline void* image_data(ofPixels_<PixelType>& img)
 {
     if (img.isAllocated())
         return img.getData();
@@ -81,8 +72,18 @@ inline const void* image_data(const ofPixels_<T>& img)
 }
 
 
-template <typename T>
-inline long width_step(const ofPixels_<T>& img)
+template <typename PixelType>
+inline const void* image_data(const ofPixels_<PixelType>& img)
+{
+    if (img.isAllocated())
+        return img.getData();
+
+    return nullptr;
+}
+
+
+template <typename PixelType>
+inline long width_step(const ofPixels_<PixelType>& img)
 {
     return img.getBytesStride();
 }
@@ -96,12 +97,39 @@ void swap(ofPixels_<PixelType> & src, ofPixels_<PixelType> & dst){
 */
 
 
+//template <typename PixelType>
+//const matrix_op<op_array2d_to_mat<ofPixels_<PixelType>>> mat (const ofPixels_<PixelType>& m)
+//{
+//    typedef op_array2d_to_mat<ofPixels_<PixelType>> op;
+//    return matrix_op<op>(op(m));
+//}
 
- }
+
+template <>
+struct image_traits<const ofPixels_<unsigned char>>
+{
+    typedef rgb_pixel pixel_type;
+};
 
 
-namespace ofx {
-namespace Dlib {
+template <>
+struct image_traits<ofPixels_<unsigned char>>
+{
+    typedef rgb_pixel pixel_type;
+};
 
 
-} } // namespace ofx::Dlib
+template <>
+inline void set_image_size(ofPixels_<unsigned char>& img, long rows, long cols)
+{
+    if (img.getPixelFormat() != OF_PIXELS_RGB)
+    {
+        ofLogWarning("set_image_size") << "Reallocating ofPixels_<unsigned char> with pixelFormat = OF_PIXELS_RGB.";
+    }
+
+    // We force rgb_pixel for generic ofPixels_<unsigned char> aka ofPixels.
+    img.allocate(std::size_t(cols), std::size_t(rows), OF_PIXELS_RGB);
+}
+
+
+} // namespace dlib

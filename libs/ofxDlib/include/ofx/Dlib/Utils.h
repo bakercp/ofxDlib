@@ -167,9 +167,9 @@ inline ofColor toOf(const dlib::rgb_alpha_pixel& v)
 //}            img.load("Puppy.jpg");
 
 
-/// \brief Deterimne the best openFrameworks ofPixelFormat.
+/// \brief Determine the best openFrameworks ofPixelFormat given a dlib::pixel_type.
 /// \returns the best pixel format given the templated parameter.
-/// \tparam The pixel_type called like getPixelFormat<MY_FORMAT>();
+/// \tparam The pixel_type called like getPixelFormat<pixel_type>();
 template<typename pixel_type>
 inline ofPixelFormat getPixelFormat()
 {
@@ -197,13 +197,12 @@ inline ofPixelFormat getPixelFormat()
     }
     else if (dlib::pixel_traits<pixel_type>::num == 1)
     {
+        // All other values are considered single-plane grayscale values.
         return OF_PIXELS_GRAY;
     }
-    else
-    {
-        ofLogWarning("getPixelFormat") << "Unknown pixel format.";
-        return OF_PIXELS_UNKNOWN;
-    }
+
+    static_assert(dlib::pixel_traits<pixel_type>::num != 1, "This is an unhandled dlib::pixel_type. Something is probably wrong.");
+    return OF_PIXELS_UNKNOWN;
 }
 
 
@@ -253,8 +252,11 @@ inline ofPixels_<typename dlib::pixel_traits<typename dlib::matrix_traits<E>::ty
 
 
 
+/// \brief A transparent converter from dlib::array2d to ofPixels.
+///
+/// This
 template<typename pixel_type>
-inline ofPixels_<typename dlib::pixel_traits<pixel_type>::basic_pixel_type> toOf(dlib::array2d<pixel_type>& in)
+inline const ofPixels_<typename dlib::pixel_traits<pixel_type>::basic_pixel_type> toOf(dlib::array2d<pixel_type>& in)
 {
     typedef typename dlib::pixel_traits<pixel_type>::basic_pixel_type basic_pixel_type;
 
@@ -285,7 +287,7 @@ inline ofPixels_<typename dlib::pixel_traits<pixel_type>::basic_pixel_type> toOf
 
 
 template<typename pixel_type>
-inline ofPixels_<typename dlib::pixel_traits<pixel_type>::basic_pixel_type> toOf(dlib::matrix<pixel_type>& in)
+inline const ofPixels_<typename dlib::pixel_traits<pixel_type>::basic_pixel_type> toOf(dlib::matrix<pixel_type>& in)
 {
     typedef typename dlib::pixel_traits<pixel_type>::basic_pixel_type basic_pixel_type;
 
@@ -361,17 +363,28 @@ inline void scale(dlib::mmod_rect& in, double scaler)
 }
 
 /// \brief A helper function to convert an ofPixels object to grayscale.
+///
+/// This function is not particularly optimized.
+///
 /// \param pixels The pixels to convert.
 /// \returns A grayscale version of the image.
-inline ofPixels toGrayscale(const ofPixels& pixels)
+template <typename PixelType>
+inline ofPixels_<PixelType> toGrayscale(const ofPixels_<PixelType>& pixels)
 {
-    // Quick and dirty hack to use existing FreeImage algorithm.
-    ofImage img;
-    img.setUseTexture(false);
-    img.setFromPixels(pixels);
-    img.setImageType(OF_IMAGE_GRAYSCALE);
-    return img.getPixels();;
-}
+    if (pixels.getPixelFormat() == OF_PIXELS_GRAY) return pixels;
 
+    ofPixels_<PixelType> out;
+    out.allocate(pixels.getWidth(), pixels.getHeight(), OF_PIXELS_GRAY);
+
+    for (std::size_t x = 0; x < pixels.getWidth(); ++x)
+    {
+        for (std::size_t y = 0; y < pixels.getHeight(); ++y)
+        {
+            out.setColor(x, y, pixels.getColor(x, y).getBrightness());
+        }
+    }
+
+    return out;
+}
 
 } } // namespace ofx::Dlib
