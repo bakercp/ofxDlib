@@ -8,6 +8,8 @@
 #include "ofApp.h"
 
 
+
+
 void ofApp::setup()
 {
     // Here we declare an unallocated ofPixels instance.
@@ -23,11 +25,10 @@ void ofApp::setup()
     // dlib::gaussian_blur function below).
     ofPixels pixBlurred;
 
-
     // Now we wrap the unallocated pixBlurred in an wrapper that will treat it
     // as an ofPixels object with a pixel type of OF_PIXELS_RGB. It will take
     // care of allocation, etc for us.
-    auto wrappedBlurredPix = ofxDlib::toDlib(pixBlurred);
+    auto wrappedBlurredPix = ofxDlib::toDlib<dlib::rgb_pixel>(pixBlurred);
 
     // Now we will pass the allocated ofPixels (`pix`) and the unallocated
     // wrapped ofPixels (wrappedBlurredPix) to the dlib::gaussian_blur
@@ -40,7 +41,7 @@ void ofApp::setup()
     // Now we wrap the unallocated pixBlurred in an wrapper that will treat it
     // as an ofPixels object with a pixel type of OF_PIXELS_GRAY. It will take
     // care of allocation, etc for us.
-    auto wrappedPixBlurredGrayscale = ofxDlib::toDlib<ofPixels_, unsigned char, unsigned char>(pixBlurredGrayscale);
+    auto wrappedPixBlurredGrayscale = ofxDlib::toDlib<unsigned char>(pixBlurredGrayscale);
 
     // Now we will pass the allocated ofPixels (`pix`) and the unallocated
     // wrapped ofPixels (wrappedBlurredPix) to the dlib::gaussian_blur

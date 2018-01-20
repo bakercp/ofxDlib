@@ -169,45 +169,6 @@ inline ofColor toOf(const dlib::rgb_alpha_pixel& v)
 //}            img.load("Puppy.jpg");
 
 
-/// \brief Determine the best openFrameworks ofPixelFormat given a dlib::pixel_type.
-/// \returns the best pixel format given the templated parameter.
-/// \tparam The pixel_type called like getPixelFormat<pixel_type>();
-template<typename pixel_type>
-inline ofPixelFormat getPixelFormat()
-{
-    if (std::is_same<pixel_type, dlib::rgb_pixel>::value)
-    {
-        return OF_PIXELS_RGB;
-    }
-    else if (std::is_same<pixel_type, dlib::rgb_alpha_pixel>::value)
-    {
-        return OF_PIXELS_RGBA;
-    }
-    else if (std::is_same<pixel_type, dlib::bgr_pixel>::value)
-    {
-        return OF_PIXELS_BGR;
-    }
-    else if (std::is_same<pixel_type, dlib::hsi_pixel>::value)
-    {
-        ofLogWarning("getPixelFormat") << "HSI pixel format not supported, using RGB.";
-        return OF_PIXELS_RGB;
-    }
-    else if (std::is_same<pixel_type, dlib::lab_pixel>::value)
-    {
-        ofLogWarning("getPixelFormat") << "LAB pixel format not supported, using RGB.";
-        return OF_PIXELS_BGR;
-    }
-    else if (dlib::pixel_traits<pixel_type>::num == 1)
-    {
-        // All other values are considered single-plane grayscale values.
-        return OF_PIXELS_GRAY;
-    }
-
-    static_assert(dlib::pixel_traits<pixel_type>::num != 1, "This is an unhandled dlib::pixel_type. Something is probably wrong.");
-    return OF_PIXELS_UNKNOWN;
-}
-
-
 // TODO:
 //
 // - hsi_pixel, lab_pixel do not have a corresponding OF_PIXELS_* type.
@@ -247,7 +208,7 @@ inline ofPixels_<typename dlib::pixel_traits<typename dlib::matrix_traits<E>::ty
     pixels.setFromPixels(reinterpret_cast<const basic_pixel_type*>(dlib::image_data(m)),
                          dlib::num_columns(m),
                          dlib::num_rows(m),
-                         getPixelFormat<pixel_type>());
+                         dlib::get_of_pixel_format<pixel_type>());
 
     return pixels;
 }
@@ -267,7 +228,7 @@ inline const ofPixels_<typename dlib::pixel_traits<pixel_type>::basic_pixel_type
     out.setFromExternalPixels(reinterpret_cast<basic_pixel_type*>(dlib::image_data(in)),
                               dlib::num_columns(in),
                               dlib::num_rows(in),
-                              getPixelFormat<pixel_type>());
+                              dlib::get_of_pixel_format<pixel_type>());
     return out;
 }
 
@@ -282,7 +243,7 @@ inline ofPixels_<typename dlib::pixel_traits<pixel_type>::basic_pixel_type> toOf
     out.setFromPixels(reinterpret_cast<const basic_pixel_type*>(dlib::image_data(in)),
                       dlib::num_columns(in),
                       dlib::num_rows(in),
-                      getPixelFormat<pixel_type>());
+                      dlib::get_of_pixel_format<pixel_type>());
 
     return out;
 }
@@ -298,7 +259,7 @@ inline const ofPixels_<typename dlib::pixel_traits<pixel_type>::basic_pixel_type
     out.setFromExternalPixels(reinterpret_cast<basic_pixel_type*>(dlib::image_data(in)),
                               dlib::num_columns(in),
                               dlib::num_rows(in),
-                              getPixelFormat<pixel_type>());
+                              dlib::get_of_pixel_format<pixel_type>());
 
     return out;
 }
@@ -314,7 +275,7 @@ inline ofPixels_<typename dlib::pixel_traits<pixel_type>::basic_pixel_type> toOf
     out.setFromPixels(reinterpret_cast<const basic_pixel_type*>(dlib::image_data(in)),
                       dlib::num_columns(in),
                       dlib::num_rows(in),
-                      getPixelFormat<pixel_type>());
+                      dlib::get_of_pixel_format<pixel_type>());
 
     return out;
 }
@@ -390,15 +351,34 @@ inline ofPixels_<PixelType> toGrayscale(const ofPixels_<PixelType>& pixels)
 }
 
 
-
-template <template <class> class HasPixelsClass_,
-          typename PixelType,
-          typename dlib_pixel_type = dlib::rgb_pixel>
-dlib::of_pixels_<HasPixelsClass_, PixelType, dlib_pixel_type> toDlib(HasPixelsClass_<PixelType>& pix)
+template <typename dlib_pixel_type,
+          template <class> class HasPixelsClass_,
+          typename PixelType>
+dlib::of_pixels_<dlib_pixel_type, HasPixelsClass_, PixelType> toDlib(HasPixelsClass_<PixelType>& pix)
 {
-    return dlib::of_pixels_<HasPixelsClass_, PixelType, dlib_pixel_type>(pix);
+    return dlib::of_pixels_<dlib_pixel_type, HasPixelsClass_, PixelType>(pix);
 }
 
+
+template <template <class> class HasPixelsClass_>
+dlib::of_pixels_<dlib::rgb_pixel, HasPixelsClass_, unsigned char> toDlib(HasPixelsClass_<unsigned char>& pix)
+{
+    return dlib::of_pixels_<dlib::rgb_pixel, HasPixelsClass_, unsigned char>(pix);
+}
+
+
+template <template <class> class HasPixelsClass_>
+dlib::of_pixels_<float, HasPixelsClass_, float> toDlib(HasPixelsClass_<float>& pix)
+{
+    return dlib::of_pixels_<float, HasPixelsClass_, float>(pix);
+}
+
+
+template <template <class> class HasPixelsClass_>
+dlib::of_pixels_<unsigned short, HasPixelsClass_, unsigned short> toDlib(HasPixelsClass_<unsigned short>& pix)
+{
+    return dlib::of_pixels_<unsigned short, HasPixelsClass_, unsigned short>(pix);
+}
 
 
 } } // namespace ofx::Dlib

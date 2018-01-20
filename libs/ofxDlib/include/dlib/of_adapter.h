@@ -41,7 +41,7 @@ inline void set_image_size(ofPixels_<PixelType>& img, long rows, long cols)
 {
     if (img.getPixelFormat() != OF_PIXELS_GRAY)
     {
-        ofLogWarning("set_image_size") << "Reallocating ofPixels_<PixelType> with pixelFormat = OF_PIXELS_GRAY.";
+        ofLogVerbose("set_image_size") << "Reallocating ofPixels_<PixelType> with pixelFormat = OF_PIXELS_GRAY.";
     }
 
     img.allocate(std::size_t(cols), std::size_t(rows), OF_PIXELS_GRAY);
@@ -49,8 +49,7 @@ inline void set_image_size(ofPixels_<PixelType>& img, long rows, long cols)
 
 
 template <typename PixelType>
-inline long num_rows(const ofPixels_<PixelType>& img)
-{
+inline long num_rows(const ofPixels_<PixelType>& img) {
     return img.getHeight();
 }
 
@@ -124,7 +123,7 @@ inline void set_image_size(ofPixels_<unsigned char>& img, long rows, long cols)
 {
     if (img.getPixelFormat() != OF_PIXELS_RGB)
     {
-        ofLogWarning("set_image_size") << "Reallocating ofPixels_<unsigned char> with pixelFormat = OF_PIXELS_RGB.";
+        ofLogVerbose("set_image_size") << "Reallocating ofPixels_<unsigned char> with pixelFormat = OF_PIXELS_RGB.";
     }
 
     // We force rgb_pixel for generic ofPixels_<unsigned char> aka ofPixels.

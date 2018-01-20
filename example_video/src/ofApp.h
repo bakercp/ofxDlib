@@ -22,12 +22,10 @@ class ofApp: public ofBaseApp
 {
 public:
     void setup() override;
+    void update() override;
     void draw() override;
 
-    ofPixels p;
-
-    ofTexture pixTexture;
-    ofTexture pixBlurredTexture;
-    ofTexture pixBlurredGrayscaleTexture;
+    ofVideoGrabber grabber;
+    ofImage blurredImage;
 
 };
