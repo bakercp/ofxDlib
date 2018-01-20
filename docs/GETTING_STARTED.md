@@ -7,6 +7,8 @@
   - NVIDIA 375+ graphics driver.
   - NVIDIA Cuda 8.0+
   - NVIDIA cuDNN 5.1+
+  - Intel® Math Kernel Library (Intel® MKL)
+    - Download, untar, ./install.sh
 
 Efforts have been made to make everything run on OSX and Linux, with and without modern NVidia graphics cards.
 
@@ -15,6 +17,7 @@ Efforts have been made to make everything run on OSX and Linux, with and without
 Highly Recommended for DNN examples
   - Install CUDA 8+ and NVIDIA drivers if needed.
   - Install cuDNN 6+.
+  - Intel® Math Kernel Library (Intel® MKL)
 
 #### Install
 From the `scripts/` directory, call `./install.sh`
