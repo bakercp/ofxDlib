@@ -21,5 +21,5 @@ do
   if ! [ -f ${INSTALL_PATH}/${DST} ]; then
     curl -L --progress-bar ${SRC} > ${INSTALL_PATH}/${DST}
   fi
-  echo "✔ ${INSTALL_PATH}/${DST}"
+  echo "✅ ${INSTALL_PATH}/${DST}"
 done

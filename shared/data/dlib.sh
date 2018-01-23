@@ -13,12 +13,13 @@ if ! [ -d ${INSTALL_PATH}/examples ]; then
   mv .tmp/examples ${INSTALL_PATH}/
   rm -rf .tmp/
 fi
-echo "✔ ${INSTALL_PATH}/examples"
+echo "✅ ${INSTALL_PATH}/examples"
 
 
 INSTALL_PATH=${INSTALL_PATH}/models
 mkdir -p ${INSTALL_PATH}
-BASE_URL="http://dlib.net/files"
+# BASE_URL="http://dlib.net/files"
+BASE_URL="https://github.com/bakercp/ofxDlib/releases/download/models/"
 FILES=(
   #"dlib_face_recognition_resnet_model_v1.dat.bz2"
   #"dlib_face_recognition_resnet_model_v1_lfw_test_scripts.tar.bz2"
@@ -29,7 +30,7 @@ FILES=(
   "mmod_human_face_detector.dat"
   "mmod_rear_end_vehicle_detector.dat"
   "resnet34_1000_imagenet_classifier.dnn"
-  #"semantic_segmentation_voc2012net.dnn"
+  "semantic_segmentation_voc2012net.dnn"
   "shape_predictor_5_face_landmarks.dat"
   "shape_predictor_68_face_landmarks.dat"
 )
@@ -39,5 +40,5 @@ do
   if ! [ -f ${INSTALL_PATH}/${file} ]; then
     curl -L --progress-bar ${BASE_URL}/${file}.bz2 | bunzip2 > ${INSTALL_PATH}/${file}
   fi
-  echo "✔ ${INSTALL_PATH}/${file}"
+  echo "✅ ${INSTALL_PATH}/${file}"
 done

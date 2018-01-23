@@ -20,5 +20,5 @@ do
   if ! [ -f ${INSTALL_PATH}/${file} ]; then
     curl -L --progress-bar ${BASE_URL}/${file}.gz | gunzip > ${INSTALL_PATH}/${file}
   fi
-  echo "✔ ${INSTALL_PATH}/${file}"
+  echo "✅ ${INSTALL_PATH}/${file}"
 done
