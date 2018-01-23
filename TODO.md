@@ -18,7 +18,7 @@
 | [Deep Learning Face Detection](http://dlib.net/dnn_mmod_face_detection_ex.cpp.html) | ❌ | N/A |
 | [Deep Learning Imagenet Classifier](http://dlib.net/dnn_imagenet_ex.cpp.html) | ❌ | N/A |
 | [Deep Learning Imagenet Trainer](http://dlib.net/dnn_imagenet_train_ex.cpp.html) | ❌ | N/A |
-| [Deep Learning Inception](http://dlib.net/dnn_inception_ex.cpp.html) | ❌ | N/A |
+| [Deep Learning Inception](http://dlib.net/dnn_inception_ex.cpp.html) | example_dnn_inception | N/A |
 | [Deep Learning Introduction Part 1](http://dlib.net/dnn_introduction_ex.cpp.html) | example_dnn_introduction_1 | N/A |
 | [Deep Learning Introduction Part 2](http://dlib.net/dnn_introduction2_ex.cpp.html) | example_dnn_introduction_2 | N/A |
 | [Deep Learning Max-Margin Object Detection](http://dlib.net/dnn_mmod_ex.cpp.html) | ❌ | N/A |
