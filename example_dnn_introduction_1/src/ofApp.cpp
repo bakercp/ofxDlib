@@ -143,7 +143,7 @@ void ofApp::setup()
     // Finally, you can also save network parameters to XML files if you want to do
     // something with the network in another tool.  For example, you could use dlib's
     // tools/convert_dlib_nets_to_caffe to convert the network to a caffe model.
-    dlib::net_to_xml(net, ofToDataPath("lenet.xml", true));
+    // dlib::net_to_xml(net, ofToDataPath("lenet.xml", true));
 
     // Finish benchmarking.
     auto end = std::chrono::system_clock::now();
@@ -153,6 +153,9 @@ void ofApp::setup()
     std::cout << "Finished computation at " << std::ctime(&end_time);
     std::cout << "Elapsed time: " << elapsed_seconds.count() << "s";
     std::cout << std::endl;
+
+    // Took many many hours on MacBook Pro (15-inch, Mid 2012), no CUDA support.
+    // 7 seconds on i7 7700 + Nvidia 1080, CUDA support + MKL libs.
 
     ofExit();
 }
