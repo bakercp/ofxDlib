@@ -40,11 +40,11 @@ function build() {
             # Disable JPEG support because it conflicts with FreeImage's libjpeg (duplicate symbols).
             # This means we can't use dlib::load_image. Instead we just use ofLoadImage(...).
             # -D DLIB_ENABLE_ASSERTS=ON \
+            # -D DLIB_JPEG_SUPPORT=OFF \
             cmake \
               -DUSE_SSE2_INSTRUCTIONS=ON \
               -DUSE_SSE4_INSTRUCTIONS=ON \
               -DUSE_AVX_INSTRUCTIONS=ON \
-              -D DLIB_JPEG_SUPPORT=OFF \
               -D CMAKE_OSX_DEPLOYMENT_TARGET=10.9 \
               -D DLIB_NO_GUI_SUPPORT=YES \
               -D CMAKE_INSTALL_PREFIX="${LIBS_DIR}/dlib/install" \
@@ -97,7 +97,7 @@ function copy() {
 # executed inside the lib src dir
 function clean() {
     if [ "$TYPE" == "osx" ] || [ "$TYPE" == "linux64" ] ; then
-        cd "dlib/build" || exit 1
+        cd "${BUILD_DIR}/dlib/build" || exit 1
         cmake clean .
         cd ..
         rm -rf build
