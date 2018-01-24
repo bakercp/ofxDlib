@@ -2,7 +2,7 @@ meta:
 	ADDON_NAME = ofxDlib
 	ADDON_DESCRIPTION = An dlib wrapper.
 	ADDON_AUTHOR = Christopher Baker
-	ADDON_TAGS = "computer vision" "machine learning"
+	ADDON_TAGS = "computer vision" "machine learning" "deep learning"
 	ADDON_URL = http://github.com/bakercp/ofxDlib
 
 common:
