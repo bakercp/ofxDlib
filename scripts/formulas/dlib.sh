@@ -54,7 +54,6 @@ function build() {
               -DUSE_SSE2_INSTRUCTIONS=ON \
               -DUSE_SSE4_INSTRUCTIONS=ON \
               -DUSE_AVX_INSTRUCTIONS=ON \
-              -D DLIB_JPEG_SUPPORT=OFF \
               -D DLIB_NO_GUI_SUPPORT=YES \
               -D CMAKE_INSTALL_PREFIX="${LIBS_DIR}/dlib/install" \
               ..
