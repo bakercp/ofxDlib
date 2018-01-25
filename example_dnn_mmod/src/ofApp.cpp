@@ -60,7 +60,7 @@ void ofApp::setup()
     // pick a good sliding window width and height.  It will also automatically set the
     // non-max-suppression parameters to something reasonable.  For further details see the
     // mmod_options documentation.
-    mmod_options options(face_boxes_train, 40,40);
+    mmod_options options(face_boxes_train, 40, 40);
     // The detector will automatically decide to use multiple sliding windows if needed.
     // For the face data, only one is needed however.
     cout << "num detector windows: "<< options.detector_windows.size() << endl;
@@ -131,16 +131,16 @@ void ofApp::setup()
     cout << trainer << cropper << endl;
 
 
-    for (auto&& img : images_test)
-    {
-        pyramid_up(img);
-        auto dets = net(img);
+//    for (auto&& img : images_test)
+//    {
+//        pyramid_up(img);
+//        auto dets = net(img);
 
-        TestImage i;
-        i.image = ofxDlib::toOf(img);
-        for (auto&& d : dets)
-            i.faceRects.push_back(d);
-    }
+//        TestImage i;
+//        i.image = ofxDlib::toOf(img);
+//        for (auto&& d : dets)
+//            i.faceRects.push_back(d);
+//    }
 
 
 
