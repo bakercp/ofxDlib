@@ -19,6 +19,7 @@ echo "✅ ${INSTALL_PATH}/examples"
 INSTALL_PATH=${INSTALL_PATH}/models
 mkdir -p ${INSTALL_PATH}
 # BASE_URL="http://dlib.net/files"
+# BASE_URL=https://github.com/davisking/dlib-models/raw/master/"
 BASE_URL="https://github.com/bakercp/ofxDlib/releases/download/models/"
 FILES=(
   #"dlib_face_recognition_resnet_model_v1.dat.bz2"
