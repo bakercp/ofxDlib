@@ -14,7 +14,7 @@
 | [Config File Reader](http://dlib.net/config_reader_ex.cpp.html) | ❌ | N/A | N/A |
 | [Custom Trainers](http://dlib.net/custom_trainer_ex.cpp.html) | ❌ | N/A | N/A |
 | [Deep Face Recognition](http://dlib.net/dnn_face_recognition_ex.cpp.html) | dnn_face_recognition | N/A | N/A |
-| [Deep Learning Dog Hipsterizer](http://dlib.net/dnn_mmod_dog_hipsterizer.cpp.html) | example_mmod_dnn_dog_hipsterizer | N/A | N/A |
+| [Deep Learning Dog Hipsterizer](http://dlib.net/dnn_mmod_dog_hipsterizer.cpp.html) | example_mmod_dnn_dog_hipsterizer | N/A | Not finished. |
 | [Deep Learning Face Detection](http://dlib.net/dnn_mmod_face_detection_ex.cpp.html) | ❌ | N/A | N/A |
 | [Deep Learning Imagenet Classifier](http://dlib.net/dnn_imagenet_ex.cpp.html) | ❌ | N/A | N/A |
 | [Deep Learning Imagenet Trainer](http://dlib.net/dnn_imagenet_train_ex.cpp.html) | ❌ | N/A | N/A |

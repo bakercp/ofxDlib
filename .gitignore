@@ -9,10 +9,15 @@ models/
 data/
 libs/dlib/
 
+build-example*
+
 .compiler*
 Project.xcconfig
 *.xcodeproj
 *.plist
+
+example*/Makefile
+example*/config.make
 
 *.swp
 *.bg
