@@ -22,10 +22,10 @@ mkdir -p ${INSTALL_PATH}
 # BASE_URL=https://github.com/davisking/dlib-models/raw/master/"
 BASE_URL="https://github.com/bakercp/ofxDlib/releases/download/models/"
 FILES=(
-  #"dlib_face_recognition_resnet_model_v1.dat.bz2"
   #"dlib_face_recognition_resnet_model_v1_lfw_test_scripts.tar.bz2"
   #"dlib_kitti_submission_mmodCNN_basic7convModel.tar.bz2"
   #"imagenet2015_validation_images.txt.bz2"
+  "dlib_face_recognition_resnet_model_v1.dat"
   "mmod_dog_hipsterizer.dat"
   "mmod_front_and_rear_end_vehicle_detector.dat"
   "mmod_human_face_detector.dat"
@@ -39,6 +39,7 @@ FILES=(
 for file in "${FILES[@]}"
 do
   if ! [ -f ${INSTALL_PATH}/${file} ]; then
+    echo "Downloading ${file}.bz2"
     curl -L --progress-bar ${BASE_URL}/${file}.bz2 | bunzip2 > ${INSTALL_PATH}/${file}
   fi
   echo "✅ ${INSTALL_PATH}/${file}"
