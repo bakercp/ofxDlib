@@ -39,8 +39,10 @@ function build() {
         if [ "$TYPE" == "osx" ] ; then
             # Disable JPEG support because it conflicts with FreeImage's libjpeg (duplicate symbols).
             # This means we can't use dlib::load_image. Instead we just use ofLoadImage(...).
-            # -D DLIB_ENABLE_ASSERTS=ON \
             # -D DLIB_JPEG_SUPPORT=OFF \
+            #
+            # Strangely, it works in Xcode but not w/ makefiles or QTCreator.
+            # -D DLIB_ENABLE_ASSERTS=ON \
             cmake \
               -DUSE_SSE2_INSTRUCTIONS=ON \
               -DUSE_SSE4_INSTRUCTIONS=ON \

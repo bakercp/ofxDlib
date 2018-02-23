@@ -155,7 +155,8 @@ void ofApp::setup()
     std::cout << std::endl;
 
     // Took many many hours on MacBook Pro (15-inch, Mid 2012), no CUDA support.
+    // Took 1909.17s on Macbook Pro (15-inch, Mid 2017), no CUDA, with Intel MKL.
     // 7 seconds on i7 7700 + Nvidia 1080, CUDA support + MKL libs.
-
+    
     ofExit();
 }

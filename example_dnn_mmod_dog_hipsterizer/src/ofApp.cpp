@@ -102,7 +102,7 @@ void ofApp::setup()
 //    win_hipster.set_image(img);
     
 
-    ofLogNotice(__FUNCTION__) << "Hello";
+    ofLogNotice(__FUNCTION__) << "Hello";   
     std::cout << "DONE" << std::endl;
 }
 
