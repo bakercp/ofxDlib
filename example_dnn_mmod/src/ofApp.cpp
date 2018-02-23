@@ -74,7 +74,7 @@ void ofApp::setup()
     // The MMOD loss requires that the number of filters in the final network layer equal
     // options.detector_windows.size().  So we set that here as well.
     net.subnet().layer_details().set_num_filters(options.detector_windows.size());
-    dnn_trainer<net_type> trainer(net);
+    dnn_trainer<net_type> trainer(net, sgd(), { 0, 1 });
     trainer.set_learning_rate(0.1);
     trainer.be_verbose();
     trainer.set_synchronization_file(ofToDataPath("mmod_sync", true), std::chrono::minutes(5));
@@ -112,7 +112,6 @@ void ofApp::setup()
     net.clean();
     serialize(ofToDataPath("mmod_network.dat", true)) << net;
 
-
     // Now that we have a face detector we can test it.  The first statement tests it
     // on the training data.  It will print the precision, recall, and then average precision.
     // This statement should indicate that the network works perfectly on the
@@ -131,19 +130,21 @@ void ofApp::setup()
     cout << trainer << cropper << endl;
 
 
-//    for (auto&& img : images_test)
-//    {
-//        pyramid_up(img);
-//        auto dets = net(img);
+    for (auto&& img : images_test)
+    {
+        pyramid_up(img);
+        auto dets = net(img);
 
-//        TestImage i;
-//        i.image = ofxDlib::toOf(img);
-//        for (auto&& d : dets)
-//            i.faceRects.push_back(d);
-//    }
+        TestImage i;
+        i.image = ofxDlib::toOf(img);
+        for (auto&& d : dets)
+            i.faceRects.push_back(ofxDlib::toOf(d));
+
+        testImages.push_back(i);
+    }
 
 
-
+    std::cout << testImages.size() << std::endl;
 }
 
 
@@ -153,14 +154,22 @@ void ofApp::draw()
     ofNoFill();
     ofSetColor(ofColor::white);
 
-//    image.draw(0, 0);
+    auto now = ofGetElapsedTimeMillis();
 
-//    for (auto& faceRect: faceRects)
-//    {
-//        ofSetColor(ofColor::yellow);
-//        ofDrawRectangle(ofxDlib::toOf(faceRect));
-//    }
+    if (now > nextImage)
+    {
+        currentImage = (currentImage + 1) % testImages.size();
+        nextImage = now + 2000;
+    }
 
-//    ofDrawBitmapStringHighlight("Num. faces detected: " + ofToString(faceRects.size()), 14, 20);
+    if (testImages.size())
+    {
+        testImages[currentImage].image.draw(0, 0);
+        for (auto rect: testImages[currentImage].faceRects)
+        {
+            ofNoFill();
+            ofSetColor(ofColor::yellow);
+            ofDrawRectangle(rect);
+        }
+    }
 }
-

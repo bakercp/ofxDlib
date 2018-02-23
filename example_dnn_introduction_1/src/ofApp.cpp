@@ -67,7 +67,7 @@ void ofApp::setup()
 
     // And then train it using the MNIST data.  The code below uses mini-batch stochastic
     // gradient descent with an initial learning rate of 0.01 to accomplish this.
-    dlib::dnn_trainer<net_type> trainer(net);
+    dlib::dnn_trainer<net_type> trainer(net,dlib::sgd(),{0,1});
    
     // If you have CUDA access, you can make specific CUDA devices do the work.
     // dlib::dnn_trainer<net_type,dlib::sgd> trainer(net, dlib::sgd(), {1});
@@ -121,7 +121,7 @@ void ofApp::setup()
     }
     std::cout << "training num_right: " << num_right << std::endl;
     std::cout << "training num_wrong: " << num_wrong << std::endl;
-    std::cout << "training accuracy:  " << num_right/(double)(num_right+num_wrong) << std::endl;
+    std::cout << "training accuracy:  " << num_right/double(num_right+num_wrong) << std::endl;
 
     // Let's also see if the network can correctly classify the testing images.  Since
     // MNIST is an easy dataset, we should see at least 99% accuracy.
@@ -138,7 +138,7 @@ void ofApp::setup()
     }
     std::cout << "testing num_right: " << num_right << std::endl;
     std::cout << "testing num_wrong: " << num_wrong << std::endl;
-    std::cout << "testing accuracy:  " << num_right/(double)(num_right+num_wrong) << std::endl;
+    std::cout << "testing accuracy:  " << num_right/double(num_right+num_wrong) << std::endl;
 
     // Finally, you can also save network parameters to XML files if you want to do
     // something with the network in another tool.  For example, you could use dlib's

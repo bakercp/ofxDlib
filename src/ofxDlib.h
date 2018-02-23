@@ -12,6 +12,8 @@
 #include "dlib/of_image.h"
 //#include "ofx/Dlib/Types.h"
 #include "ofx/Dlib/Utils.h"
+#include "ofx/Dlib/Network/LeNet.h"
+
 
 #include <iostream>
 #include <dlib/clustering.h>

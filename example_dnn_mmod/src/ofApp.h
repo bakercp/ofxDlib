@@ -90,8 +90,12 @@ public:
         ofImage image;
 
         // Our face detection bounding boxes.
-        std::vector<dlib::rectangle> faceRects;
+        std::vector<ofRectangle> faceRects;
     };
 
     std::vector<TestImage> testImages;
+
+    std::size_t currentImage = 0;
+
+    uint64_t nextImage = 0;
 };

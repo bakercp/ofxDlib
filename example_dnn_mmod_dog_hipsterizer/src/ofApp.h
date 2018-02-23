@@ -78,10 +78,18 @@ public:
     void setup() override;
     void draw() override;
 
+    struct ColoredLine
+    {
+        ofPoint p0;
+        ofPoint p1;
+        ofColor color;
+    };
+
+
     // Our image.
     ofImage image;
 
     // Our face detection bounding boxes.
-    std::vector<dlib::rectangle> faceRects;
+    std::vector<ColoredLine> lines;
 
 };

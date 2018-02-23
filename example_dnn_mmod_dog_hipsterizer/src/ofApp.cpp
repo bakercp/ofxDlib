@@ -21,10 +21,6 @@ void ofApp::setup()
     pyramid_up(glasses);
     pyramid_up(mustache);
 
-//    image_window win1(glasses);
-//    image_window win2(mustache);
-//    image_window win_wireframe, win_hipster;
-
     // Now process each image, find dogs, and hipsterize them by drawing glasses and a
     // mustache on each dog :)
     matrix<rgb_pixel> img;
@@ -36,11 +32,6 @@ void ofApp::setup()
     //pyramid_up(img);
 
     auto dets = net(img);
-//    win_wireframe.clear_overlay();
-//    win_wireframe.set_image(img);
-    // We will also draw a wireframe on each dog's face so you can see where the
-    // shape_predictor is identifying face landmarks.
-//    std::vector<image_window::overlay_line> lines;
 
     for (auto&& d : dets)
     {
@@ -87,6 +78,9 @@ void ofApp::setup()
             }
         }
 
+        //ColoredLine line { ofxDlib::toOf(leye), ofxDlib::toOf(leye), ofxDlib::toOf(color) };
+
+        // In progress.
 
         // Record the lines needed for the face wire frame.
 //        lines.push_back(image_window::overlay_line(leye, nose, color));
@@ -98,12 +92,6 @@ void ofApp::setup()
 //        lines.push_back(image_window::overlay_line(lear, leye,  color));
     }
 
-//    win_wireframe.add_overlay(lines);
-//    win_hipster.set_image(img);
-    
-
-    ofLogNotice(__FUNCTION__) << "Hello";   
-    std::cout << "DONE" << std::endl;
 }
 
 
