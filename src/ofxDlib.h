@@ -8,8 +8,9 @@
 #pragma once
 
 
-#include "dlib/of_adapter.h"
+#include "dlib/of_default_adapter.h"
 #include "dlib/of_image.h"
+#include "dlib/to_of.h"
 //#include "ofx/Dlib/Types.h"
 #include "ofx/Dlib/Utils.h"
 #include "ofx/Dlib/Network/LeNet.h"

@@ -49,7 +49,8 @@ inline void set_image_size(ofPixels_<PixelType>& img, long rows, long cols)
 
 
 template <typename PixelType>
-inline long num_rows(const ofPixels_<PixelType>& img) {
+inline long num_rows(const ofPixels_<PixelType>& img)
+{
     return img.getHeight();
 }
 
@@ -88,22 +89,14 @@ inline long width_step(const ofPixels_<PixelType>& img)
 }
 
 
-/*
 // defined in ofPixels.h
-void swap(ofPixels_<PixelType> & src, ofPixels_<PixelType> & dst){
-    src.swap(dst);
-}
-*/
-
-
-//template <typename PixelType>
-//const matrix_op<op_array2d_to_mat<ofPixels_<PixelType>>> mat (const ofPixels_<PixelType>& m)
-//{
-//    typedef op_array2d_to_mat<ofPixels_<PixelType>> op;
-//    return matrix_op<op>(op(m));
+//void swap(ofPixels_<PixelType> & src, ofPixels_<PixelType> & dst){
+//    src.swap(dst);
 //}
 
 
+
+/// \brief Specialization to automatically use RGB pixels by default with ofPixels.
 template <>
 struct image_traits<const ofPixels_<unsigned char>>
 {
@@ -111,6 +104,7 @@ struct image_traits<const ofPixels_<unsigned char>>
 };
 
 
+/// \brief Specialization to automatically use RGB pixels by default with ofPixels.
 template <>
 struct image_traits<ofPixels_<unsigned char>>
 {
@@ -118,6 +112,7 @@ struct image_traits<ofPixels_<unsigned char>>
 };
 
 
+/// \brief Specialization to automatically use RGB pixels by default with ofPixels.
 template <>
 inline void set_image_size(ofPixels_<unsigned char>& img, long rows, long cols)
 {

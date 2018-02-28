@@ -15,8 +15,8 @@
 #include "ofPixels.h"
 #include "ofRectangle.h"
 #include "ofTypes.h"
-#include "dlib/of_adapter.h"
 #include "dlib/of_image.h"
+#include "dlib/to_of.h"
 
 
 namespace ofx {
@@ -88,208 +88,6 @@ inline ofColor toOf(const dlib::rgb_alpha_pixel& v)
 }
 
 
-///// \todo Re-work.
-//inline void toDlib(const ofPixels& input,
-//                   dlib::array2d<dlib::rgb_pixel>& output)
-//{
-//    auto width = input.getWidth();
-//    auto height = input.getHeight();
-//    auto chans = input.getNumChannels();
-//
-//    const unsigned char* data = input.getData();
-//
-//    output.set_size(static_cast<long>(height), static_cast<long>(width));
-//
-//    for (std::size_t n = 0; n < height; ++n)
-//    {
-//        const unsigned char* v =  &data[n * width *  chans];
-//
-//        for (std::size_t m = 0; m < width; ++m)
-//        {
-//            if (chans == 1)
-//            {
-//                auto p = v[m];
-//                dlib::assign_pixel(output[n][m], p);
-//            }
-//            else
-//            {
-//                dlib::rgb_pixel p;
-//                p.red = v[m * 3];
-//                p.green = v[m * 3 + 1];
-//                p.blue = v[m * 3 + 2];
-//                dlib::assign_pixel(output[n][m], p);
-//            }
-//        }
-//    }
-//}
-
-
-///// \todo Re-work.
-//inline ofPixels toOf(const dlib::matrix<unsigned char>& input)
-//{
-//    auto w = std::size_t(input.nc());
-//    auto h = std::size_t(input.nr());
-
-//    ofPixels output;
-
-//    output.allocate(w, h, 1);
-
-//    for (std::size_t y = 0; y < h; ++y)
-//    {
-//        for (std::size_t x = 0; x < w; ++x)
-//        {
-//            output.setColor(x, y, ofColor(input(y, x)));
-//        }
-//    }
-
-//    return output;
-//}
-
-
-//template<typename T>
-//inline ofPixels copy(const dlib::matrix<T>& in)
-//{
-//    ofPixels pixels;
-//
-//    auto channels = dlib::pixel_traits<T>::num;
-//    auto height = dlib::num_rows(in);
-//    auto width = dlib::num_columns(in);
-//
-//    pixels.allocate(width, height, channels);
-//
-//    for (auto y = 0; y < height; ++y)
-//    {
-//        for (auto x = 0; x < width; ++x)
-//        {
-//            pixels.setColor(x, y, toOf(in(y, x)));
-//        }
-//    }
-//
-//    return pixels;
-//}            img.load("Puppy.jpg");
-
-
-// TODO:
-//
-// - hsi_pixel, lab_pixel do not have a corresponding OF_PIXELS_* type.
-// - When converting from a non-char pixel type, the dlib values stay in 0-255
-//   range.
-// - reduce ...
-// - reduce return type lengths
-
-
-/// \brief Convert const dlib::matrix_exp to an ofPixels object.
-/// \tparam E the underlying expression type.
-template<typename E>
-inline ofPixels_<typename dlib::pixel_traits<typename dlib::matrix_traits<E>::type>::basic_pixel_type> toOf(const dlib::matrix_exp<E>& in)
-{
-    // Extract the underlying type from stored in the dlib::matrix_exp.
-    typedef typename dlib::matrix_traits<E>::type pixel_type;
-
-    // For dlib::matrix_exp, we must assign the expression to a concrete type
-    // in order to resolve the expression. We cannot use an `auto` here.
-    //
-    // We can now instantiate our dlib::matrix.
-    dlib::matrix<pixel_type> m = in;
-
-    // Extract the underlying basic_pixel_type from the pixel_type.
-    // In some cases, this may be the same, but in cases with custom-defined
-    // dlib::pixel_traits, this will be different. For example, a data_type
-    // of dlib::rgb_pixel has a basic_pixel_type of unsigned char, which we
-    // need to know to correctly template our ofPixels_<unsigned char> object.
-    typedef typename dlib::pixel_traits<pixel_type>::basic_pixel_type basic_pixel_type;
-
-    // We can now instantiate our ofPixels_ type.
-    ofPixels_<basic_pixel_type> pixels;
-
-    // Since a dlib::matrix also implements the dlib::generic_image template
-    // interface, we can use the dlib::generic_image helpers to determine our
-    // pixel allocation.
-    pixels.setFromPixels(reinterpret_cast<const basic_pixel_type*>(dlib::image_data(m)),
-                         dlib::num_columns(m),
-                         dlib::num_rows(m),
-                         dlib::get_of_pixel_format<pixel_type>());
-
-    return pixels;
-}
-
-
-
-/// \brief A transparent converter from dlib::array2d to ofPixels.
-///
-/// This
-template<typename pixel_type>
-inline const ofPixels_<typename dlib::pixel_traits<pixel_type>::basic_pixel_type> toOf(dlib::array2d<pixel_type>& in)
-{
-    typedef typename dlib::pixel_traits<pixel_type>::basic_pixel_type basic_pixel_type;
-
-    ofPixels_<basic_pixel_type> out;
-
-    out.setFromExternalPixels(reinterpret_cast<basic_pixel_type*>(dlib::image_data(in)),
-                              dlib::num_columns(in),
-                              dlib::num_rows(in),
-                              dlib::get_of_pixel_format<pixel_type>());
-    return out;
-}
-
-
-template<typename pixel_type>
-inline ofPixels_<typename dlib::pixel_traits<pixel_type>::basic_pixel_type> toOf(const dlib::array2d<pixel_type>& in)
-{
-    typedef typename dlib::pixel_traits<pixel_type>::basic_pixel_type basic_pixel_type;
-
-    ofPixels_<basic_pixel_type> out;
-
-    out.setFromPixels(reinterpret_cast<const basic_pixel_type*>(dlib::image_data(in)),
-                      dlib::num_columns(in),
-                      dlib::num_rows(in),
-                      dlib::get_of_pixel_format<pixel_type>());
-
-    return out;
-}
-
-
-template<typename pixel_type>
-inline const ofPixels_<typename dlib::pixel_traits<pixel_type>::basic_pixel_type> toOf(dlib::matrix<pixel_type>& in)
-{
-    typedef typename dlib::pixel_traits<pixel_type>::basic_pixel_type basic_pixel_type;
-
-    ofPixels_<basic_pixel_type> out;
-
-    out.setFromExternalPixels(reinterpret_cast<basic_pixel_type*>(dlib::image_data(in)),
-                              dlib::num_columns(in),
-                              dlib::num_rows(in),
-                              dlib::get_of_pixel_format<pixel_type>());
-
-    return out;
-}
-
-
-template<typename pixel_type>
-inline ofPixels_<typename dlib::pixel_traits<pixel_type>::basic_pixel_type> toOf(const dlib::matrix<pixel_type>& in)
-{
-    typedef typename dlib::pixel_traits<pixel_type>::basic_pixel_type basic_pixel_type;
-
-    ofPixels_<basic_pixel_type> out;
-
-    out.setFromPixels(reinterpret_cast<const basic_pixel_type*>(dlib::image_data(in)),
-                      dlib::num_columns(in),
-                      dlib::num_rows(in),
-                      dlib::get_of_pixel_format<pixel_type>());
-
-    return out;
-}
-
-
-template<typename pixel_type>
-inline ofPixels_<pixel_type> toOf(const ofPixels_<pixel_type>& in)
-{
-    ofLogWarning("toOf") << "It is not needed to call toOf on ofPixels.";
-    return in;
-}
-
-
-
 /// \brief Scale the given object detection by the given amount.
 /// \param v The object to be scaled.
 /// \param scale The amount the scale the object by.
@@ -351,33 +149,105 @@ inline ofPixels_<PixelType> toGrayscale(const ofPixels_<PixelType>& pixels)
 }
 
 
-template <typename dlib_pixel_type,
-          template <class> class HasPixelsClass_,
-          typename PixelType>
-dlib::of_pixels_<dlib_pixel_type, HasPixelsClass_, PixelType> toDlib(HasPixelsClass_<PixelType>& pix)
+/// \brief A helper function to convert an ofPixels object to grayscale.
+///
+/// When loading images into dlib array2d, matrix, etc with non 8-bit values,
+/// dlib does not rescale values. Thus to get ofFloatPixels and ofShortPixels
+/// to work as expected in openFrameworks, we need to rescale the values loaded
+/// by dlib into the range expected by openFrameworks.
+///
+/// This function is not optimized and certainly could be with simd.
+///
+/// \param pixels The pixels to map.
+/// \param inMin The input minimum. Usually 0.
+/// \param inMax The input maximum. Often 255 for 8-bit images.
+/// \param outMin The output minimum. Usually 0.
+/// \param outMax The output maximum. Usually equal to ofColor_<PixelType>::limit().
+/// \returns A value remapped version of the input image.
+/// \tparam PixelType The openFrameworks ofPixels internal pixel type.
+template <typename PixelType>
+inline ofPixels_<PixelType> map(const ofPixels_<PixelType>& pixels,
+                                PixelType inMin, PixelType inMax,
+                                PixelType outMin = 0, PixelType outMax = ofColor_<PixelType>::limit())
 {
-    return dlib::of_pixels_<dlib_pixel_type, HasPixelsClass_, PixelType>(pix);
+    ofPixels_<PixelType> _pixels = pixels;
+    map(_pixels, inMin, inMax, outMin, outMax);
+    return _pixels;
 }
 
 
-template <template <class> class HasPixelsClass_>
-dlib::of_pixels_<dlib::rgb_pixel, HasPixelsClass_, unsigned char> toDlib(HasPixelsClass_<unsigned char>& pix)
+/// \brief A helper function to convert an ofPixels object to grayscale.
+///
+/// When loading images into dlib array2d, matrix, etc with non 8-bit values,
+/// dlib does not rescale values. Thus to get ofFloatPixels and ofShortPixels
+/// to work as expected in openFrameworks, we need to rescale the values loaded
+/// by dlib into the range expected by openFrameworks.
+///
+/// This function is not optimized and certainly could be with simd.
+///
+/// \param pixels The pixels to map.
+/// \param inMin The input minimum. Usually 0.
+/// \param inMax The input maximum. Often 255 for 8-bit images.
+/// \param outMin The output minimum. Usually 0.
+/// \param outMax The output maximum. Usually equal to ofColor_<PixelType>::limit().
+/// \returns A value remapped version of the input image.
+/// \tparam PixelType The openFrameworks ofPixels internal pixel type.
+template <typename PixelType>
+inline void map(ofPixels_<PixelType>& pixels,
+                PixelType inMin, PixelType inMax,
+                PixelType outMin = 0, PixelType outMax = ofColor_<PixelType>::limit())
 {
-    return dlib::of_pixels_<dlib::rgb_pixel, HasPixelsClass_, unsigned char>(pix);
+    for (std::size_t i = 0; i < pixels.size(); ++i)
+    {
+        pixels[i] = static_cast<PixelType>(ofMap(double(pixels[i]), inMin, inMax, outMin, outMax, true));
+    }
 }
 
 
-template <template <class> class HasPixelsClass_>
-dlib::of_pixels_<float, HasPixelsClass_, float> toDlib(HasPixelsClass_<float>& pix)
+/// \brief Wrap ofPixels_<> in an of_image to use with dlib functions.
+///
+/// This function makes a shallow wrapper for pixels. The returned value will
+/// contain a pointer to the \p pixels. The passed pixels must remain valid
+/// for the life the the returned value.
+///
+/// \tparam dlib_pixel_type The destination dlib pixel type.
+/// \tparam of_pixel_type The source ofPixels pixel type (typically inferred).
+/// \param pixels The pixels to wrap.
+/// \returns an of_image object that wraps the passed pixels.
+template <typename dlib_pixel_type, typename of_pixel_type>
+inline dlib::of_image<dlib_pixel_type, of_pixel_type> toDlib(ofPixels_<of_pixel_type>& pixels)
 {
-    return dlib::of_pixels_<float, HasPixelsClass_, float>(pix);
+    return dlib::of_image<dlib_pixel_type, of_pixel_type>(pixels);
 }
 
 
-template <template <class> class HasPixelsClass_>
-dlib::of_pixels_<unsigned short, HasPixelsClass_, unsigned short> toDlib(HasPixelsClass_<unsigned short>& pix)
+/// \brief Wrap a dlib image_type as ofPixels_<>
+///
+/// This function makes a shallow wrapper for dlib pixels. The returned ofPixels
+/// will point to the data in the passed dlib pixels. Thus, the passed dlib
+/// pixels must remain valid for the life the the returned ofPixels.
+///
+/// \tparam image_type Any dlib compatible generic image_type.
+/// \param pixels The pixels to wrap.
+/// \returns an ofPixels_ object pointing to the passed dlib image.
+template <typename image_type>
+ofPixels_<typename dlib::pixel_traits<typename dlib::image_traits<image_type>::pixel_type>::basic_pixel_type> toOf(image_type& img)
 {
-    return dlib::of_pixels_<unsigned short, HasPixelsClass_, unsigned short>(pix);
+    return dlib::to_of_pixels<image_type>(img);
+}
+
+
+/// \brief Wrap a dlib image_type as ofPixels_<>
+///
+/// This function makes a deep copy of dlib pixels.
+///
+/// \tparam image_type Any dlib compatible generic image_type.
+/// \param pixels The pixels to wrap.
+/// \returns an ofPixels_ object representing the passed dlib image.
+template <typename image_type>
+ofPixels_<typename dlib::pixel_traits<typename dlib::image_traits<image_type>::pixel_type>::basic_pixel_type> toOf(const image_type& img)
+{
+    return dlib::to_of_pixels<image_type>(img);
 }
 
 
