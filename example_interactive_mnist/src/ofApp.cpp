@@ -46,7 +46,6 @@ void ofApp::update()
         dlib::resizable_tensor t = dlib::layer<1>(net).get_output();
 
 
-        dlib::resizable_tensor t = dlib::layer<1>(net).get_output();
 
         
         //        std::cout << "size: " << t.size() << std::endl;
