@@ -30,14 +30,14 @@ osx:
 	ADDON_CPPFLAGS += -mavx
 
 	# If dlib is compiled with MKL support, you may need to add an include here.
-	ADDON_INCLUDES += /opt/intel/mkl/include
-	ADDON_INCLUDES += /opt/intel/include
+#	ADDON_INCLUDES += /opt/intel/mkl/include
+#	ADDON_INCLUDES += /opt/intel/include
 
-	ADDON_LDFLAGS += /opt/intel/mkl/lib/libmkl_intel_ilp64.a
-	ADDON_LDFLAGS += /opt/intel/mkl/lib/libmkl_sequential.a
-	ADDON_LDFLAGS += /opt/intel/mkl/lib/libmkl_core.a
-	ADDON_LDFLAGS += -lm -ldl
-	ADDON_DEFINES += MKL_ILP64
+#	ADDON_LDFLAGS += /opt/intel/mkl/lib/libmkl_intel_ilp64.a
+#	ADDON_LDFLAGS += /opt/intel/mkl/lib/libmkl_sequential.a
+#	ADDON_LDFLAGS += /opt/intel/mkl/lib/libmkl_core.a
+#	ADDON_LDFLAGS += -lm -ldl
+#	ADDON_DEFINES += MKL_ILP64
 
 linux64:
 	ADDON_LIBS = libs/dlib/lib/linux64/libdlib.a
