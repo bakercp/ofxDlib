@@ -34,6 +34,7 @@ FILES=(
   "semantic_segmentation_voc2012net.dnn"
   "shape_predictor_5_face_landmarks.dat"
   "shape_predictor_68_face_landmarks.dat"
+  "mnist_network.dat"
 )
 
 for file in "${FILES[@]}"

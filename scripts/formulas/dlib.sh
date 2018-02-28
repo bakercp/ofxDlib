@@ -44,6 +44,7 @@ function build() {
             # Strangely, it works in Xcode but not w/ makefiles or QTCreator.
             # -D DLIB_ENABLE_ASSERTS=ON \
             cmake \
+             -D DLIB_JPEG_SUPPORT=OFF \
               -DUSE_SSE2_INSTRUCTIONS=ON \
               -DUSE_SSE4_INSTRUCTIONS=ON \
               -DUSE_AVX_INSTRUCTIONS=ON \

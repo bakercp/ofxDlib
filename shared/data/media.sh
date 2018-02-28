@@ -11,6 +11,8 @@ entries=(
   "https://upload.wikimedia.org/wikipedia/commons/b/be/July_4_crowd_at_Vienna_Metro_station.jpg Crowd.jpg"
   "https://upload.wikimedia.org/wikipedia/commons/9/90/RobertCornelius.jpg Selfie.jpg"
   "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Golde33443.jpg/160px-Golde33443.jpg Puppy.jpg"
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Carpenter_portrait_of_Ada_Lovelace_-_detail.png/256px-Carpenter_portrait_of_Ada_Lovelace_-_detail.png Ada.png"
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Carpenter_portrait_of_Ada_Lovelace_-_detail.png/128px-Carpenter_portrait_of_Ada_Lovelace_-_detail.png TinyAda.png"
 )
 
 for entry in "${entries[@]}"
