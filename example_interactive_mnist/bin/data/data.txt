@@ -1,0 +1,2 @@
+mnist/
+dlib/models/mnist_network.dat mnist_network.dat
