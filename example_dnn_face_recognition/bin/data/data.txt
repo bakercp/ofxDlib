@@ -1,3 +1,0 @@
-dlib/models/dlib_face_recognition_resnet_model_v1.dat dlib_face_recognition_resnet_model_v1.dat
-dlib/models/shape_predictor_5_face_landmarks.dat shape_predictor_5_face_landmarks.dat
-dlib/examples/faces/bald_guys.jpg bald_guys.jpg
