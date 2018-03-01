@@ -4,21 +4,21 @@ _This is under development currently so, your please post questions to the [issu
 
 ## Description
 
-A wrapper for dlib.  http://dlib.net/
+A wrapper for [dlib](http://dlib.net/).
 
 ## Features
 
--  Toll-free `openFrameworks` ↔ `dlib` bridges using `dlib` `dlib/generic_image.h` interface.
--  `openFrameworks` ↔ `dlib` type conversions.
--  `dlib` helper functions.
+-   Toll-free `openFrameworks` ↔ `dlib` bridges using `dlib` `dlib/generic_image.h` interface.
+-   `openFrameworks` ↔ `dlib` type conversions.
+-   `dlib` helper functions.
 
 ## Getting Started
 
 ### TL;DR
--  From the `scripts/` directory ...
-  -  `./install.sh`
--  From the `example_3d_point_cloud/` directory ...
-  -  `make && make run`
+-   From the `scripts/` directory ...
+    -   `./boostrap.sh`
+-   From the `example_dlib_3d_point_cloud/` directory ...
+    -   `make && make run`
 
 For more, see [docs/GETTING_STARTED.md](docs/GETTING_STARTED.md).
 
@@ -63,4 +63,3 @@ Pull Requests are always welcome, so if you make any improvements please feel fr
 3.  Commit your changes (`git commit -am 'Add some feature'`).
 4.  Push to the branch (`git push origin my-new-feature`).
 5.  Create new Pull Request.
-
