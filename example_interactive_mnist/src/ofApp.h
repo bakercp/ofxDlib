@@ -23,7 +23,8 @@ public:
 
     void loadData();
 
-    ofxDlib::Network::LeNet net;
+    ofxDlib::Network::TaggedLeNet net;
+
 
     ofFbo drawingArea;
     ofTexture brush;
@@ -33,13 +34,17 @@ public:
 
     std::size_t predictedLabel = 0;
     std::vector<float> lastLayer;
-//    std::l
     
     
     // All MNIST data (training and testing) in a map.
     std::map<unsigned long, std::vector<ofTexture>> mnistTrainingData;
     std::map<unsigned long, std::vector<ofTexture>> mnistTestingData;
 
+    std::vector<ofTexture> layer11Kernels;
+    std::vector<ofTexture> layer11Convolutions;
+    std::vector<ofTexture> layer11ManualConvolutions;
+
+    
     enum
     {
         MNIST_WIDTH = 28,

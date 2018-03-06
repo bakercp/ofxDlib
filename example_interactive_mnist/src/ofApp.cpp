@@ -15,51 +15,165 @@ void ofApp::setup()
     // Load the program data.
     loadData();
 
-//    cout << "The pnet has " << net.num_layers << " layers in it." << endl;
-//    cout << net << endl;
+    cout << "The pnet has " << net.num_layers << " layers in it." << endl;
+    cout << net << endl;
+
+    std::cout << "#layers: " << net.num_layers<< " #complayers: " << net.num_computational_layers << std::endl;
+
+    auto& layer = dlib::layer<ofxDlib::Network::tlnet11,1>(net);
+    auto& layer_details = layer.layer_details();
+    auto& layer_output = layer.get_output();
+    auto& layer_parameters = layer_details.get_layer_params();
+
+    auto filter_nr = layer_details.nr();
+    auto filter_nc = layer_details.nc();
+    auto filter_k = 1;
+    auto filter_ns = layer_details.num_filters();
+
+    for (std::size_t i = 0; i < filter_ns; ++i)
+    {
+        std::size_t offset = i * filter_k * filter_nr * filter_nc;
+        dlib::alias_tensor a(1, 1, filter_nr, filter_nc);
+//        dlib::matrix<float, 5, 5> m = dlib::mat(a(layer_params, offset));
+        dlib::matrix<float, 5, 5> m = dlib::mat(a(layer_parameters, offset));
+        std::cout << i << ": " << ofToString(std::vector<float>(m.begin(), m.end())) << std::endl;
+
+        auto mm = std::minmax(m.begin(), m.end());
+        std::cout << "---- " << *mm.first << "," << *mm.second << std::endl;
+        ofFloatPixels p = ofxDlib::toOf(m);
+        ofxDlib::map(p, *mm.first, *mm.second);
 
 
+
+        layer11Kernels.push_back(ofTexture());
+        layer11Kernels.back().loadData(p);
+        layer11Kernels.back().setTextureMinMagFilter(GL_NEAREST, GL_NEAREST);
+    }
+    
+    
+    
+//    auto& layer = dlib::layer<ofxDlib::Network::tlnet8>(net);
+//    auto& layer_details = layer.layer_details();
+//    auto& layer_parameters = layer_details.get_layer_params();
+//
+//    auto nr = layer_details.nr();
+//    auto nc = layer_details.nc();
+//    auto k = 1;
+//    auto nf = layer_details.num_filters();
+//
+//    for (std::size_t i = 0; i < nf; ++i)
+//    {
+//        std::size_t offset = i * k * nr * nc;
+//        dlib::alias_tensor a(1, 1, nr, nc);
+//        //        dlib::matrix<float, 5, 5> m = dlib::mat(a(layer_params, offset));
+//        dlib::matrix<float, 5, 5> m = dlib::mat(a(layer_parameters, offset));
+//        std::cout << i << ": " << ofToString(std::vector<float>(m.begin(), m.end())) << std::endl;
+//
+//        auto mm = std::minmax_element(m.begin(), m.end());
+//        std::cout << "---- " << *mm.first << "," << *mm.second << std::endl;
+//        std::cout << std::endl;
+//        ofFloatPixels p = ofxDlib::toOf(m);
+//        ofxDlib::map(p, *mm.first, *mm.second);
+//
+//        layer11Kernels.push_back(ofTexture());
+//        layer11Kernels.back().loadData(p);
+//        layer11Kernels.back().setTextureMinMagFilter(GL_NEAREST, GL_NEAREST);
+//    }
+////    n_*k_*nr_*nc_
+//
+////    dlib::alias_tensor
+//
 }
-
-
+//
+//
 void ofApp::update()
 {
-    if (needsClear)
-    {
-        drawingArea.begin();
-        ofClear(0);
-        drawingArea.end();
-        needsClear = false;
-    }
-
-    if (needsPrediction)
-    {
-        ofPixels pixels;
-        drawingArea.readToPixels(pixels);
-        pixels = ofxDlib::toGrayscale(pixels);
-        pixels.resize(MNIST_WIDTH, MNIST_HEIGHT);
-        auto dlib_img = ofxDlib::toDlib<unsigned char>(pixels);
-        dlib::matrix<unsigned char> dlib_mat = dlib::mat(dlib_img);
-
-        predictedLabel = net(dlib_mat);
+//    if (needsClear)
+//    {
+//        drawingArea.begin();
+//        ofClear(0);
+//        drawingArea.end();
+//        needsClear = false;
+//    }
+//
+//    if (needsPrediction)
+//    {
+//        ofPixels pixels;
+//        drawingArea.readToPixels(pixels);
+//        pixels = ofxDlib::toGrayscale(pixels);
+//        pixels.resize(MNIST_WIDTH, MNIST_HEIGHT);
+//        auto dlib_img = ofxDlib::toDlib<unsigned char>(pixels);
+//        dlib::matrix<unsigned char> dlib_mat = dlib::mat(dlib_img);
+//
+//        predictedLabel = net(dlib_mat);
+//
+//
+////        dlib::resizable_tensor p = dlib::layer<11>(net).layer_details().
+////
+////        dlib::alias_tensor_instance t = dlib::layer<1>(net).layer_details().get_weights();
+//        dlib::resizable_tensor t = dlib::layer<1>(net).get_output();
+//
+////        dlib::resizable_tensor t0 = dlib::layer<11>(net).layer_details().get_layer_params();
+//
+////        std::cout << "lp: " << ofToString(std::vector<float>(t0.begin(), t0.end())) << std::endl;
+//
+//        lastLayer = std::vector<float>(t.begin(), t.end());
+//
+//        std::cout << "ll: " << ofToString(lastLayer) << std::endl;
+//
+//        needsPrediction = false;
+//
+//
+//
+//        {
+////            dlib::layer<11>(net)
+////            net.
+//
+//            auto& layer = dlib::layer<11>(net);
+//            auto& layer_details = layer.layer_details();
+//            auto& layer_output = layer.get_output();
+//            auto& layer_parameters = layer_details.get_layer_params();
+//
+//            auto filter_nr = layer_details.nr();
+//            auto filter_nc = layer_details.nc();
+//            auto filter_k = 1;
+//            auto filter_ns = layer_details.num_filters();
+//
+//            auto output_nr = layer_output.nr();
+//            auto output_nc = layer_output.nr();
+//            auto output_k = layer_output.k();
+//            auto output_ns = layer_output.num_samples();
+//
+//            std::cout << "# out: " << output_ns << " fns: " << filter_ns << std::endl;
+//
+//
+////            for (std::size_t i = 0; i < nf; ++i)
+////            {
+////                std::size_t offset = i * k * nr * nc;
+////                dlib::alias_tensor a(1, 1, nr, nc);
+////                //        dlib::matrix<float, 5, 5> m = dlib::mat(a(layer_params, offset));
+////                dlib::matrix<float, 5, 5> m = dlib::mat(a(layer_parameters, offset));
+////                std::cout << i << ": " << ofToString(std::vector<float>(m.begin(), m.end())) << std::endl;
+////
+////                auto mm = std::minmax_element(m.begin(), m.end());
+////                std::cout << "---- " << *mm.first << "," << *mm.second << std::endl;
+////                std::cout << std::endl;
+////                ofFloatPixels p = ofxDlib::toOf(m);
+////                ofxDlib::map(p, *mm.first, *mm.second);
+////
+////                layer11Kernels.push_back(ofTexture());
+////                layer11Kernels.back().loadData(p);
+////                layer11Kernels.back().setTextureMinMagFilter(GL_NEAREST, GL_NEAREST);
+////            }
+//
+//        }
+//
+//
+//
+    
         
-        dlib::resizable_tensor t = dlib::layer<1>(net).get_output();
-
-
-
         
-        //        std::cout << "size: " << t.size() << std::endl;
-        //        std::cout << "num_samples: " << t.num_samples() << std::endl;
-        //        std::cout << "nr: " << t.nr() << std::endl;
-        //        std::cout << "nc: " << t.nc() << std::endl;
-        //        std::cout << "k: " << t.k() << std::endl;
-
-        
-        
-        lastLayer = std::vector<float>(t.begin(), t.end());
-
-        needsPrediction = false;
-    }
+//    }
 }
 
 
@@ -91,24 +205,24 @@ void ofApp::draw()
         ofDrawCircle(x + drawingAreaDisplay.x,
                      y + drawingAreaDisplay.y, brushRadius);
     }
-    
+
     ofSetColor(255);
     ofFill();
-    
+
     ofPushMatrix();
     ofTranslate(0, 0);
     drawingArea.draw(drawingAreaDisplay);
     ofPopMatrix();
-    
+
     ofSetColor(255, 127);
     ofNoFill();
     ofDrawRectangle(drawingAreaDisplay);
-    
-    
+
+
     ofPushMatrix();
     ofTranslate(drawingAreaDisplay.x + drawingAreaDisplay.width,
                 drawingAreaDisplay.y);
-    
+
     float xOffset = 0;
     float yOffset = 0;
 
@@ -122,12 +236,12 @@ void ofApp::draw()
         ofSetColor(255);
         ofFill();
         entry.second[index].draw(xOffset, yOffset, MNIST_WIDTH, MNIST_HEIGHT);
-        
+
         if (label == predictedLabel) ofSetColor(255, 255, 0);
         else ofSetColor(255);
-        
+
         float value = ofMap(lastLayer[label], 0, 30, 0, 100, true);
-        
+
         if (fabs(value) > 0.01)
         {
             ofDrawRectangle(MNIST_WIDTH + xOffset, yOffset, value, MNIST_HEIGHT);
@@ -137,6 +251,20 @@ void ofApp::draw()
     }
 
     ofPopMatrix();
+    
+    {
+    ofPushMatrix();
+    ofTranslate(ofGetMouseX(), ofGetMouseY());
+    float yy = 0;
+    float v = 30;
+    for (auto& t: layer11Kernels)
+    {
+        t.draw(0, yy, v, v);
+        yy += (v * 1.1);
+    }
+    
+    ofPopMatrix();
+    }
 }
 
 
@@ -160,8 +288,16 @@ void ofApp::keyPressed(int key)
 void ofApp::loadData()
 {
     // Load trained network data.
-    dlib::deserialize(ofToDataPath("mnist_network.dat", true)) >> net;
+    ofxDlib::Network::LeNet _net;
+    dlib::deserialize(ofToDataPath("mnist_network.dat", true)) >> _net;
+    net = _net;
+    net.clean();
+    dlib::serialize(ofToDataPath("tagged_mnist_network.dat", true)) << net;
+    dlib::deserialize(ofToDataPath("tagged_mnist_network.dat", true)) >> net;
 
+    
+//    dlib::deserialize(ofToDataPath("mnist_network.dat", true)) >> net2;
+    
     // MNIST is broken into two parts, a training set of 60000 images and a test set of
     // 10000 images.  Each image is labeled so that we know what hand written digit is
     // depicted.  These next statements load the dataset into memory.

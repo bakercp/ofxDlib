@@ -113,22 +113,22 @@ void ofApp::setup()
 
 void ofApp::draw()
 {
-    float w = 128;
-    float h = 164;
-
     ofColor fg(255);
     ofColor bg(0, 200);
+    glm::vec2 size(128, 164);
     glm::vec2 textOffset(10, 20);
     glm::vec2 pos(0, 0);
-
+    float margin = 20;
+    
     for (const auto& texture: textures)
     {
         ofSetColor(255);
-        texture.second.draw(pos, w, h);
+        texture.second.draw(pos, size.x, size.y);
         ofDrawBitmapStringHighlight(texture.first, pos + textOffset, bg);
 
-        if (pos.x + (2 * w) > ofGetWidth()) pos = { 0, pos.y + h };
-        else pos.x += w;
+        if (pos.x + (2 * (size.x + margin)) > ofGetWidth())
+            pos = { 0, pos.y + size.y + margin };
+        else pos.x += (size.x + margin);
     }
 }
 

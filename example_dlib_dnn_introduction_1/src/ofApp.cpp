@@ -47,14 +47,20 @@ void ofApp::setup()
     // network output is largest is the predicted label.  So for example, if the first
     // network output is largest then the predicted digit is 0, if the last network output
     // is largest then the predicted digit is 9.
-    using net_type = dlib::loss_multiclass_log<
-                                            dlib::fc<10,
-                                            dlib::relu<dlib::fc<84,
-                                            dlib::relu<dlib::fc<120,
-                                            dlib::max_pool<2,2,2,2,dlib::relu<dlib::con<16,5,5,1,1,
-                                            dlib::max_pool<2,2,2,2,dlib::relu<dlib::con<6,5,5,1,1,
-                                            dlib::input<dlib::matrix<unsigned char>>
-                                            >>>>>>>>>>>>;
+    //
+    //    using net_type = dlib::loss_multiclass_log<
+    //                                            dlib::fc<10,
+    //                                            dlib::relu<dlib::fc<84,
+    //                                            dlib::relu<dlib::fc<120,
+    //                                            dlib::max_pool<2,2,2,2,dlib::relu<dlib::con<16,5,5,1,1,
+    //                                            dlib::max_pool<2,2,2,2,dlib::relu<dlib::con<6,5,5,1,1,
+    //                                            dlib::input<dlib::matrix<unsigned char>>
+    //                                            >>>>>>>>>>>>;
+    
+    using net_type = ofx::Dlib::Network::TaggedLeNet;
+
+    
+    
     // This net_type defines the entire network architecture.  For example, the block
     // dlib::relu<dlib::fc<84,SUBNET>> means we take the output from the subnetwork, pass it through a
     // fully connected layer with 84 outputs, then apply ReLU.  Similarly, a block of
@@ -67,10 +73,10 @@ void ofApp::setup()
 
     // And then train it using the MNIST data.  The code below uses mini-batch stochastic
     // gradient descent with an initial learning rate of 0.01 to accomplish this.
-    dlib::dnn_trainer<net_type> trainer(net,dlib::sgd(),{0,1});
+    dlib::dnn_trainer<net_type> trainer(net,dlib::sgd());
    
     // If you have CUDA access, you can make specific CUDA devices do the work.
-    // dlib::dnn_trainer<net_type,dlib::sgd> trainer(net, dlib::sgd(), {1});
+    // dlib::dnn_trainer<net_type,dlib::sgd> trainer(net, dlib::sgd(), {0, 1});
     trainer.set_learning_rate(0.01);
     trainer.set_min_learning_rate(0.00001);
     trainer.set_mini_batch_size(128);
