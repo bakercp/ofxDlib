@@ -278,7 +278,7 @@ inline long width_step(const of_image<dlib_pixel_type, of_pixel_type>& img)
 
 
 template <typename dlib_pixel_type, typename of_pixel_type>
-inline long swap(of_image<dlib_pixel_type, of_pixel_type>& a,
+inline void swap(of_image<dlib_pixel_type, of_pixel_type>& a,
                  of_image<dlib_pixel_type, of_pixel_type>& b)
 {
     std::swap(a, b);
