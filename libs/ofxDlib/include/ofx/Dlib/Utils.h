@@ -9,8 +9,9 @@
 
 
 #include <vector>
-#include <dlib/geometry.h>
-#include <dlib/image_processing/full_object_detection.h>
+#include "dlib/geometry.h"
+#include "dlib/image_processing/full_object_detection.h"
+#include "dlib/dnn.h"
 #include "ofImage.h"
 #include "ofPixels.h"
 #include "ofRectangle.h"
@@ -249,6 +250,93 @@ ofPixels_<typename dlib::pixel_traits<typename dlib::image_traits<image_type>::p
 {
     return dlib::to_of_pixels<image_type>(img);
 }
+    
+    
+    
+    
+/// DNN
 
+enum ImageMapType
+{
+    IMAGE_MAP_NONE,
+    IMAGE_MAP_LAYER,
+    IMAGE_MAP_SAMPLE
+};
+    
+template <template<typename> class TAG_TYPE, std::size_t NR, std::size_t NC, typename NET>
+inline std::vector<dlib::matrix<float, NR, NC>> layerOutputsToMatrices(const NET& net)
+{
+    std::vector<dlib::matrix<float, NR, NC>> matrices;
+
+    // Get the layer tag + 1.
+    auto& layer = dlib::layer<TAG_TYPE, 1>(net);
+    auto& lo = layer.get_output();
+    
+    auto output_nr = lo.nr();
+    auto output_nc = lo.nc();
+    auto output_k = lo.k();
+    auto output_ns = lo.num_samples();
+    
+    for (std::size_t k = 0; k < output_k; ++k)
+    {
+        std::size_t offset = output_ns * k * output_nr * output_nc;
+        dlib::alias_tensor a(1, 1, output_nr, output_nc);
+        dlib::matrix<float, NR, NC> m = dlib::mat(a(lo, offset));
+        matrices.push_back(m);
+    }
+}
+
+    
+    
+template <template<typename> class TAG_TYPE, std::size_t NR, std::size_t NC, typename NET>
+inline std::vector<ofTexture> layerOutputsToTextures(const NET& net)
+{
+    //auto matrices = layerOutputsToMatrices<TAG_TYPE, NR, NC, NET>(net);
+
+    std::vector<ofTexture> textures;
+    
+    // Get the layer tag + 1.
+    auto& layer = dlib::layer<TAG_TYPE, 1>(net);
+    auto& layer_details = layer.layer_details();
+    auto& layer_output = layer.get_output();
+    auto& layer_parameters = layer_details.get_layer_params();
+    
+    auto output_nr = layer_output.nr();
+    auto output_nc = layer_output.nr();
+    auto output_k = layer_output.k();
+    auto output_ns = layer_output.num_samples();
+    
+    for (std::size_t k = 0; k < output_k; ++k)
+    {
+        std::size_t offset = 1 * k * output_nr * output_nc;
+        dlib::alias_tensor a(1, 1, output_nr, output_nc);
+        dlib::matrix<float, NR, NC> m = dlib::mat(a(layer_output, offset));
+        
+        auto mm = std::minmax_element(m.begin(), m.end());
+        std::cout << "---- " << *mm.first << "," << *mm.second << std::endl;
+        std::cout << std::endl;
+        ofFloatPixels p = toOf(m);
+        
+        map(p, *mm.first, *mm.second);
+
+        textures.push_back(ofTexture());
+        textures.back().loadData(p);
+        textures.back().setTextureMinMagFilter(GL_NEAREST, GL_NEAREST);
+    }
+    
+    return textures;
+}
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 
 } } // namespace ofx::Dlib

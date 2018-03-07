@@ -13,8 +13,7 @@
 
 namespace ofx {
 namespace Dlib {
-namespace Network {
-
+namespace LeNet5 {
 
 // From dlib:
 // Now let's define the LeNet.  Broadly speaking, there are 3 parts to a network
@@ -38,42 +37,54 @@ namespace Network {
 // network output is largest then the predicted digit is 0, if the last network output
 // is largest then the predicted digit is 9.
 
-using LeNet = dlib::loss_multiclass_log<
-                                        dlib::fc<10,
-                                        dlib::relu<dlib::fc<84,
-                                        dlib::relu<dlib::fc<120,
-                                        dlib::max_pool<2,2,2,2,dlib::relu<dlib::con<16,5,5,1,1,
-                                        dlib::max_pool<2,2,2,2,dlib::relu<dlib::con<6,5,5,1,1,
-                                        dlib::input<dlib::matrix<unsigned char>>
-                                        >>>>>>>>>>>>;
- 
-template <typename SUBNET> using tlnet0  = dlib::add_tag_layer< 1100 + 0, SUBNET>;
-template <typename SUBNET> using tlnet1  = dlib::add_tag_layer< 1100 + 1, SUBNET>;
-template <typename SUBNET> using tlnet2  = dlib::add_tag_layer< 1100 + 2, SUBNET>;
-template <typename SUBNET> using tlnet3  = dlib::add_tag_layer< 1100 + 3, SUBNET>;
-template <typename SUBNET> using tlnet4  = dlib::add_tag_layer< 1100 + 4, SUBNET>;
-template <typename SUBNET> using tlnet5  = dlib::add_tag_layer< 1100 + 5, SUBNET>;
-template <typename SUBNET> using tlnet6  = dlib::add_tag_layer< 1100 + 6, SUBNET>;
-template <typename SUBNET> using tlnet7  = dlib::add_tag_layer< 1100 + 7, SUBNET>;
-template <typename SUBNET> using tlnet8  = dlib::add_tag_layer< 1100 + 8, SUBNET>;
-template <typename SUBNET> using tlnet9  = dlib::add_tag_layer< 1100 + 9, SUBNET>;
-template <typename SUBNET> using tlnet10  = dlib::add_tag_layer< 1100 + 10, SUBNET>;
+using Net = dlib::loss_multiclass_log<dlib::fc<10,
+                                      dlib::relu<dlib::fc<84,
+                                      dlib::relu<dlib::fc<120,
+                                      dlib::max_pool<2,2,2,2,dlib::relu<dlib::con<16,5,5,1,1,
+                                      dlib::max_pool<2,2,2,2,dlib::relu<dlib::con<6,5,5,1,1,
+                                      dlib::input<dlib::matrix<unsigned char>>
+                                      >>>>>>>>>>>>;
 
-using TaggedLeNet = dlib::loss_multiclass_log<
-                    tlnet0<dlib::fc<10,
-                    tlnet1<dlib::relu<
-                    tlnet2<dlib::fc<84,
-                    tlnet3<dlib::relu<
-                    tlnet4<dlib::fc<120,
-                    tlnet5<dlib::max_pool<2,2,2,2,
-                    tlnet6<dlib::relu<
-                    tlnet7<dlib::con<16,5,5,1,1,
-                    tlnet8<dlib::max_pool<2,2,2,2,
-                    tlnet9<dlib::relu<
-                    tlnet10<dlib::con<6,5,5,1,1,
+static const std::size_t ln_base    = 1100;
+static const std::size_t fc_0       = ln_base + 0;
+static const std::size_t relu_0     = ln_base + 1;
+static const std::size_t fc_1       = ln_base + 2;
+static const std::size_t relu_1     = ln_base + 3;
+static const std::size_t fc_2       = ln_base + 4;
+static const std::size_t max_pool_0 = ln_base + 5;
+static const std::size_t relu_2     = ln_base + 6;
+static const std::size_t con_0      = ln_base + 7;
+static const std::size_t max_pool_1 = ln_base + 8;
+static const std::size_t relu_3     = ln_base + 9;
+static const std::size_t con_1      = ln_base + 10;
+
+template <typename SUBNET> using tag_0_fc_0       = dlib::add_tag_layer<fc_0,       SUBNET>;
+template <typename SUBNET> using tag_1_relu_0     = dlib::add_tag_layer<relu_0,     SUBNET>;
+template <typename SUBNET> using tag_2_fc_1       = dlib::add_tag_layer<fc_1,       SUBNET>;
+template <typename SUBNET> using tag_3_relu_1     = dlib::add_tag_layer<relu_2,     SUBNET>;
+template <typename SUBNET> using tag_4_fc_2       = dlib::add_tag_layer<fc_2,       SUBNET>;
+template <typename SUBNET> using tag_5_max_pool_0 = dlib::add_tag_layer<max_pool_0, SUBNET>;
+template <typename SUBNET> using tag_6_relu_2     = dlib::add_tag_layer<relu_2,     SUBNET>;
+template <typename SUBNET> using tag_7_con_0      = dlib::add_tag_layer<con_0,      SUBNET>;
+template <typename SUBNET> using tag_8_max_pool_1 = dlib::add_tag_layer<max_pool_1, SUBNET>;
+template <typename SUBNET> using tag_9_relu_3     = dlib::add_tag_layer<relu_3,     SUBNET>;
+template <typename SUBNET> using tag_10_con_1     = dlib::add_tag_layer<con_1,      SUBNET>;
+
+using TaggedNet = dlib::loss_multiclass_log<
+                    tag_0_fc_0<dlib::fc<10,
+                    tag_1_relu_0<dlib::relu<
+                    tag_2_fc_1<dlib::fc<84,
+                    tag_3_relu_1<dlib::relu<
+                    tag_4_fc_2<dlib::fc<120,
+                    tag_5_max_pool_0<dlib::max_pool<2,2,2,2,
+                    tag_6_relu_2<dlib::relu<
+                    tag_7_con_0<dlib::con<16,5,5,1,1,
+                    tag_8_max_pool_1<dlib::max_pool<2,2,2,2,
+                    tag_9_relu_3<dlib::relu<
+                    tag_10_con_1<dlib::con<6,5,5,1,1,
                     dlib::input<dlib::matrix<unsigned char>
                     >>>>>>>>>>>>>>>>>>>>>>>>;
-
-
     
-} } } // namespace ofx::Dlib::Network
+    
+    
+} } } // namespace ofx::Dlib::LeNet5
