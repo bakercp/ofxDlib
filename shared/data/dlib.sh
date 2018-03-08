@@ -8,10 +8,20 @@ mkdir -p ${INSTALL_PATH}
 echo "Installing ${THIS_NAME} data ..."
 
 if ! [ -d ${INSTALL_PATH}/examples ]; then
-  git clone --depth=1 https://github.com/davisking/dlib.git .tmp/
-  rm .tmp/examples/*.{h,cpp,txt}
+  # We are using the modified version that has everything converted to libpng
+  # to get around the macOS libjpeg dulicate symbols problem.
+  # git clone --depth=1 https://github.com/davisking/dlib.git .tmp/
+  # rm .tmp/examples/*.{h,cpp,txt}
+  # mv .tmp/examples ${INSTALL_PATH}/
+  # rm -rf .tmp/
+  mkdir -p .tmp/
+  curl -L --progress-bar https://github.com/bakercp/ofxDlib/releases/download/models/examples.zip > .tmp/examples.zip
+  cd .tmp/
+  unzip examples.zip
+  cd -
   mv .tmp/examples ${INSTALL_PATH}/
   rm -rf .tmp/
+
 fi
 echo "✅ ${INSTALL_PATH}/examples"
 
