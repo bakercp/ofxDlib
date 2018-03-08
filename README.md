@@ -4,7 +4,7 @@ _This is under development currently so, your please post questions to the [issu
 
 ## Description
 
-A wrapper for [dlib](http://dlib.net/).
+An [openFrameworks](http://openframeworks.cc) wrapper for [dlib](http://dlib.net/).
 
 ## Features
 
