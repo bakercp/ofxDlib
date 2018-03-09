@@ -41,9 +41,9 @@ void ofApp::setup()
     deserialize(ofToDataPath("dlib_face_recognition_resnet_model_v1.dat", true)) >> net;
 
     matrix<rgb_pixel> img;
-    load_image(img, ofToDataPath("bald_guys.jpg", true));
+    load_image(img, ofToDataPath("bald_guys.png", true));
 
-    image.load( "bald_guys.jpg");
+    image.load( "bald_guys.png");
 
     // Display the raw image on the screen
 //    image_window win(img);

@@ -25,7 +25,7 @@ void ofApp::setup()
     // mustache on each dog :)
     matrix<rgb_pixel> img;
 
-    load_image(img, ofToDataPath("dogs.jpg", true));
+    load_image(img, ofToDataPath("dogs.png", true));
 
     // Upsampling the image will allow us to find smaller dog faces but will use more
     // computational resources.
@@ -111,4 +111,3 @@ void ofApp::draw()
 
     ofDrawBitmapStringHighlight("Num. faces detected: " + ofToString(faceRects.size()), 14, 20);
 }
-
