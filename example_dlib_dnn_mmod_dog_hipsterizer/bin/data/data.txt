@@ -1,2 +1,2 @@
-dlib/examples/faces/dogs.jpg dogs.jpg
+dlib/examples/faces/dogs.png dogs.png
 dlib/models/mmod_dog_hipsterizer.dat mmod_dog_hipsterizer.dat

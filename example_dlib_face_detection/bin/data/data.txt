@@ -1,1 +1,1 @@
-dlib/examples/faces/2007_007763.jpg people.jpg
+dlib/examples/faces/2007_007763.png people.png
