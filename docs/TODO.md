@@ -1,6 +1,6 @@
 | Dlib Example  | ofxDlib Example | Description | Notes |
 | ----- | ---- | ---- | ---- |
-| [3D Point Cloud](http://dlib.net/3d_point_cloud_ex.cpp.html) | example_dlib_3d_point_cloud | N/A | N/A |
+| [3D Point Cloud](http://dlib.net/3d_point_cloud_ex.cpp.html) | [example_dlib_3d_point_cloud](../example_dlib_3d_point_cloud) | N/A | N/A |
 | [Assignment Learning](http://dlib.net/assignment_learning_ex.cpp.html) | ❌ | N/A | N/A |
 | [Base64 Encoder](http://dlib.net/file_to_code_ex.cpp.html) | ❌ | N/A | N/A |
 | [Bayesian Network From Disk](http://dlib.net/bayes_net_from_disk_ex.cpp.html) | ❌ | N/A | N/A |
