@@ -2,6 +2,7 @@ _This is under development currently so, your please post questions to the [issu
 
 # ofxDlib
 
+
 ## Description
 
 An [openFrameworks](http://openframeworks.cc) wrapper for [dlib](http://dlib.net/).
@@ -55,6 +56,10 @@ This project uses Semantic Versioning, although strict adherence will only come 
 See `LICENSE.md`.
 
 ## Contributing
+
+Check out the [Help Wanted](https://github.com/bakercp/ofxDlib/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22) tag in the issues section for specific ideas or propose your own new ideas.
+
+You can also take a look at the [TODO](docs/TODO.md) for more ideas.
 
 Pull Requests are always welcome, so if you make any improvements please feel free to float them back upstream :)
 
