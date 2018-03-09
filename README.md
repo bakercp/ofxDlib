@@ -53,7 +53,7 @@ This project uses Semantic Versioning, although strict adherence will only come 
 
 ## Licensing
 
-See [LICENSE.md](LICENSE.md)`.
+See [LICENSE.md](LICENSE.md).
 
 ## Contributing
 
