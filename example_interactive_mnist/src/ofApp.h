@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2017 Christopher Baker <https://christopherbaker.net>
+// Copyright (c) 2018 Christopher Baker <https://christopherbaker.net>
 //
 // SPDX-License-Identifier:	MIT
 //
@@ -23,7 +23,7 @@ public:
 
     void loadData();
 
-    ofxDlib::Network::TaggedLeNet net;
+    ofx::Dlib::LeNet5::TaggedNet net;
 
 
     ofFbo drawingArea;
@@ -43,6 +43,7 @@ public:
     std::vector<ofTexture> layer11Kernels;
     std::vector<ofTexture> layer11Convolutions;
     std::vector<ofTexture> layer11ManualConvolutions;
+
 
     
     enum

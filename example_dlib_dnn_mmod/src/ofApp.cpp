@@ -74,7 +74,10 @@ void ofApp::setup()
     // The MMOD loss requires that the number of filters in the final network layer equal
     // options.detector_windows.size().  So we set that here as well.
     net.subnet().layer_details().set_num_filters(options.detector_windows.size());
-    dnn_trainer<net_type> trainer(net, sgd(), { 0, 1 });
+    dnn_trainer<net_type> trainer(net, sgd());
+    
+    // To select multiple CUDA graphics cards.
+    // dnn_trainer<net_type> trainer(net, sgd(), { 0, 1 });
     trainer.set_learning_rate(0.1);
     trainer.be_verbose();
     trainer.set_synchronization_file(ofToDataPath("mmod_sync", true), std::chrono::minutes(5));
@@ -129,17 +132,23 @@ void ofApp::setup()
     // the screen.
     cout << trainer << cropper << endl;
 
-
+    // Here we iterate through our test images and run the detector.
     for (auto&& img : images_test)
     {
+        // This will scale our images up to make detection easier.
         pyramid_up(img);
+        
+        // This is where we pass our image to do the detection.
+        // The `dets` is a collection of detection rectangles.
         auto dets = net(img);
 
+        // Here we create a small object to save the detections along with our image.
         TestImage i;
         i.image = ofxDlib::toOf(img);
         for (auto&& d : dets)
             i.faceRects.push_back(ofxDlib::toOf(d));
 
+        // We collect the images here to view them in the draw loop.
         testImages.push_back(i);
     }
 
@@ -150,6 +159,8 @@ void ofApp::setup()
 
 void ofApp::draw()
 {
+    // This is essentially a slide show of our detected faces.
+
     ofBackground(0);
     ofNoFill();
     ofSetColor(ofColor::white);

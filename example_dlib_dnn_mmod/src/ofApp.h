@@ -85,7 +85,9 @@ public:
     void draw() override;
 
 
-    struct TestImage {
+    // A custom class for associating images and their detection rectangles.
+    struct TestImage
+    {
         // Our image.
         ofImage image;
 
@@ -93,9 +95,8 @@ public:
         std::vector<ofRectangle> faceRects;
     };
 
+    // These will be used for our slideshow.
     std::vector<TestImage> testImages;
-
     std::size_t currentImage = 0;
-
     uint64_t nextImage = 0;
 };
