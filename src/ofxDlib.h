@@ -14,6 +14,7 @@
 //#include "ofx/Dlib/Types.h"
 #include "ofx/Dlib/Utils.h"
 #include "ofx/Dlib/Network/LeNet.h"
+#include "ofx/Dlib/PCA.h"
 
 
 #include <iostream>
@@ -27,6 +28,7 @@
 #if !defined(DLIB_NO_GUI_SUPPORT)
 #include <dlib/gui_widgets.h>
 #endif
+#include <dlib/matrix.h>
 #if defined(OPENCV)
 #include <dlib/opencv.h>
 #endif
