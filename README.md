@@ -17,7 +17,7 @@ An [openFrameworks](http://openframeworks.cc) wrapper for [dlib](http://dlib.net
 
 ### TL;DR
 -   From the `scripts/` directory ...
-    -   `./boostrap.sh`
+    -   `./bootstrap.sh`
 -   From the `example_dlib_3d_point_cloud/` directory ...
     -   `make && make run`
 
