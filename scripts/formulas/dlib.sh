@@ -12,7 +12,7 @@ GIT_URL="https://github.com/davisking/dlib"
 GIT_TAG="v$VER"
 GIT_TAG=
 
-FORMULA_TYPES=( "osx" "android" "linux64")
+FORMULA_TYPES=( "osx" "android" "linux64" "linuxarmv6l")
 
 # download the source code and unpack it into LIB_NAME
 function download() {
@@ -32,10 +32,14 @@ function prepare() {
 
 # executed inside the lib src dir
 function build() {
-    if [ "$TYPE" == "osx" ] || [ "$TYPE" == "linux64" ] ; then
+    if [ "$TYPE" == "osx" ] || [ "$TYPE" == "linux64" ] || [ "$TYPE" == "linuxarmv6l" ] ; then
         mkdir -p "build"
         pushd "build" || return
-        export MAKEFLAGS="-j$PARALLEL_MAKE -s"
+        if [ "$TYPE" == "linuxarmv6l" ] ; then
+            export MAKEFLAGS="-j3 -s"
+        else
+            export MAKEFLAGS="-j$PARALLEL_MAKE -s"
+        fi
         if [ "$TYPE" == "osx" ] ; then
             # Disable JPEG support because it conflicts with FreeImage's libjpeg (duplicate symbols).
             # This means we can't use dlib::load_image. Instead we just use ofLoadImage(...).
@@ -79,7 +83,7 @@ function copy() {
     mkdir -p $1/include
     mkdir -p $1/lib/$TYPE
 
-    if [ "$TYPE" == "osx" ] || [ "$TYPE" == "linux64" ] ; then
+    if [ "$TYPE" == "osx" ] || [ "$TYPE" == "linux64" || [ "$TYPE" == "linuxarmv6l" ] ; then
         cd "${BUILD_DIR}/dlib/build" || exit 1
         make install
         cd - || exit 1
@@ -98,7 +102,7 @@ function copy() {
 
 # executed inside the lib src dir
 function clean() {
-    if [ "$TYPE" == "osx" ] || [ "$TYPE" == "linux64" ] ; then
+    if [ "$TYPE" == "osx" ] || [ "$TYPE" == "linux64" ] || [ "$TYPE" == "linuxarmv6l" ] ; then
         cd "${BUILD_DIR}/dlib/build" || exit 1
         cmake clean .
         cd ..
