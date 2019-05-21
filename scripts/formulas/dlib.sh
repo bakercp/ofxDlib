@@ -83,7 +83,7 @@ function copy() {
     mkdir -p $1/include
     mkdir -p $1/lib/$TYPE
 
-    if [ "$TYPE" == "osx" ] || [ "$TYPE" == "linux64" || [ "$TYPE" == "linuxarmv6l" ] ; then
+    if [ "$TYPE" == "osx" ] || [ "$TYPE" == "linux64" ] || [ "$TYPE" == "linuxarmv6l" ] ; then
         cd "${BUILD_DIR}/dlib/build" || exit 1
         make install
         cd - || exit 1
