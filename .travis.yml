@@ -1,42 +1,126 @@
 language: c++
 compiler: gcc
 sudo: true
+git:
+  depth: 1
+  quiet: true
+
+# matrix:
+#   include:
+  # fully specify builds, include can't dynamically expand matrix entries
+  # relative order of sudo and env is important so that addons: is recognized
+
+
 matrix:
   include:
+    # - os: linux
+    #   dist: trusty
+    #   sudo: required
+    #   cache: ccache
+    #   env: TARGET="linux64"
+    #   addons:
+    #     apt:
+    #       sources:
+    #         - ubuntu-toolchain-r-test
+    #       packages:
+    #         - realpath
+    #         - gcc-4.9
+    #         - g++-4.9
+    #         - gdb
+
+    - os: linux
+      dist: trusty
+      sudo: required
+      cache: ccache
+      env: 
+        - TARGET=linuxarmv6l
+
   # fully specify builds, include can't dynamically expand matrix entries
   # relative order of sudo and env is important so that addons: is recognized
 
 # Linux 64bit, OF master
-  - os: linux
-    dist: trusty
-    sudo: required
-    env: TARGET="linux64" OF_BRANCH="master"
-    addons:
-      apt:
-        sources:
-          - ubuntu-toolchain-r-test
-        packages:
-          - gcc-4.9
-          - g++-4.9
-          - gdb
+
+
+  # - os: linux
+  #   dist: trusty
+  #   sudo: required
+  #   cache: ccache
+  #   env: 
+  #     - TARGET=linuxarmv6l
+  #     - OTHER_VAR=blah
+
+
+  # - os: linux
+  #   sudo: required
+  #   dist: trusty
+  #   env: TARGET="linuxarmv7l"
+  #   cache:
+  #     directories:
+  #       - ~/.ccache
+  #       #- ~/rpi2_toolchain
+  #       # - ~/firmware-master
+  #       #- ~/archlinux
 
 # OSX, OF master
-  - os: osx
-    osx_image: xcode8
-    compiler: clang
-    env: TARGET="osx" OF_BRANCH="master"
-
-  # Exclude the default build that would otherwise be generated
-  # see https://github.com/travis-ci/travis-ci/issues/1228
-  exclude:
-    - compiler: gcc
-before_install:
-  - curl -SLsO https://raw.githubusercontent.com/bakercp/ofxAddonScripts/${OF_BRANCH}/scripts/ci/tools/install.sh
-  - source install.sh
+  # - os: osx
+  #   osx_image: xcode9.4
+  #   compiler: clang
+  #   env: TARGET="osx"
+  #   cache: ccache
+        
+# before_install:
 install:
-  - do_install
+  - git clone --depth=1 --branch=master https://github.com/openFrameworks/openFrameworks.git ~/openFrameworks
+  - echo $TARGET
+  - /usr/bin/env bash ~/openFrameworks/scripts/ci/addons/install.sh
+  - git clone https://github.com/bakercp/ofx.git ~/openFrameworks/scripts/ofx
 script:
-  - do_script
+  - ccache -z
+  - ccache -s
+  # - if [ "$TARGET" = "linux64" ] || [ "$TARGET" = "linuxarmv6l" ] || [ "$TARGET" = "linuxarmv7l" ]; then
+  #     wget http://ci.openframeworks.cc/ccache_3.3.4-1_amd64.deb;
+  #     sudo dpkg -i ccache_3.3.4-1_amd64.deb;
+  #   fi
 
-git:
-  depth: 10
+  # - if [ "$TARGET" == "linuxarmv6l" ]; then
+  #     export CXXFLAGS="${CXXFLAGS} -ftrack-macro-expansion=0";
+  #     sed -i "s/PLATFORM_OPTIMIZATION_CFLAGS_DEBUG = .*/PLATFORM_OPTIMIZATION_CFLAGS_DEBUG = -g0/" ${OF_ROOT}/libs/openFrameworksCompiled/project/makefileCommon/config.linux.common.mk;
+  #     export GCC_PREFIX=arm-linux-gnueabihf;
+  #     export GST_VERSION=1.0;
+  #     export RPI_ROOT=${OF_ROOT}/scripts/ci/${TARGET}/raspbian;
+  #     export TOOLCHAIN_ROOT=${OF_ROOT}/scripts/ci/${TARGET}/rpi_toolchain;
+  #     export PLATFORM_OS=Linux;
+  #     export PLATFORM_ARCH=armv6l;
+  #     export PKG_CONFIG_LIBDIR=${RPI_ROOT}/usr/lib/pkgconfig:${RPI_ROOT}/usr/lib/${GCC_PREFIX}/pkgconfig:${RPI_ROOT}/usr/share/pkgconfig;
+  #   fi
+
+  - /usr/bin/env bash ~/openFrameworks/scripts/ci/addons/build.sh
+
+  # - /usr/bin/env bash ~/openFrameworks/scripts/ofx/ofx ci script ${TRAVIS_REPO_SLUG#*/}
+  - ccache -s
+# after_script:
+# after_success:
+# after_failure:
+
+# jobs:
+#   include:
+#     - stage: Deploy Documentation
+#       script: 
+#         # Install a more recent version of Doxygen.
+#         - git clone --depth=1 --branch Release_1_8_15 https://github.com/doxygen/doxygen.git; cd doxygen; mkdir build; cd build; cmake -G "Unix Makefiles" ..; make -s && sudo make install; cd ../..
+#         # Copy all markdown docs to the docs folder.
+#         - cp *.md docs/
+#         - cd docs # Switch to the documentation directory.
+#         - sed -i'.bak' -e 's|docs/||g' *.md # Remove docs/ prefix from all .md files for linking.
+#         - sed -i'.bak' -e 's|../../..|https://github.com/'"$TRAVIS_REPO_SLUG"'|g' *.md # Fix any links to the Github pages.
+#         - doxygen Doxyfile # Generate the documentation.
+#         - touch html/.nojekyll # Github pages will discard files beginning w/ underscores without this.
+#       deploy:
+#         provider: pages
+#         skip_cleanup: true
+#         github_token: $GITHUB_TOKEN  # Set in the settings page of your repository, as a secure variable
+#         keep_history: false
+#         local_dir: docs/html
+#         on:
+#           branch: master
+  
