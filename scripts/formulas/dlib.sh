@@ -54,6 +54,7 @@ function build() {
               -DUSE_AVX_INSTRUCTIONS=ON \
               -D CMAKE_OSX_DEPLOYMENT_TARGET=10.9 \
               -D DLIB_NO_GUI_SUPPORT=YES \
+              -D DLIB_GIF_SUPPORT=OFF \
               -D CMAKE_INSTALL_PREFIX="${LIBS_DIR}/dlib/install" \
               ..
         else
