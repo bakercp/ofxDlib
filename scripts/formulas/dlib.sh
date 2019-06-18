@@ -5,7 +5,7 @@
 # uses CMake
 
 # define the version
-VER=19.6
+VER=19.17
 
 # tools for git use
 GIT_URL="https://github.com/davisking/dlib"
