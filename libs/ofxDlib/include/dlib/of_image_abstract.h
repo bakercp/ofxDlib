@@ -86,6 +86,7 @@ public:
 template <typename pixel_type, typename of_pixel_type>
 const matrix_exp<pixel_type> mat (const of_image<pixel_type, of_pixel_type>& img);
 
+
 } // namespace dlib
 
 

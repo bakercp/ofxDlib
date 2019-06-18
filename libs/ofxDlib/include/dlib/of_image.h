@@ -16,9 +16,9 @@
 #include <dlib/image_processing.h>
 
 
-
 namespace dlib
 {
+
 
 /// \brief Determine the best openFrameworks ofPixelFormat given a dlib::pixel_type.
 /// \returns the best pixel format given the templated parameter.
