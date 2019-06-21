@@ -1,7 +1,7 @@
 //
 // Copyright (c) 2018 Christopher Baker <https://christopherbaker.net>
 //
-// SPDX-License-Identifier:    MIT
+// SPDX-License-Identifier: MIT
 //
 
 
@@ -21,8 +21,8 @@
 
 namespace ofx {
 namespace Dlib {
-    
-    
+
+
 /// \brief A class that finds faces.
 ///
 /// There are lots of ways to find faces in an image.  This class provides a
@@ -34,31 +34,33 @@ class FaceFinder
 {
 public:
     struct Settings;
-    
+
     typedef std::vector<Face> Faces;
-    
+
     enum class FaceDetector
     {
         /// \brief The standard HOG based face detector.
         ///
         /// Appropriate for CPU-based applications.
         FACE_DETECTOR_HOG,
-        
+
         /// \brief The MMOD Deep Neural-Network face detector.
         ///
         /// More accurate than the FACE_DETECTOR_HOG, but slower on CPU.
         /// Runs very fast on GPUs.
-        FACE_DETECTOR_MMOD,
+        FACE_DETECTOR_MMOD
+
     };
-    
+
     enum class FaceShapePredictor
     {
         /// \brief The fast 5 landmark face shape predictor.
         FACE_SHAPE_PREDICTOR_5_LANDMARKS,
+
         /// \brief The precise 68 landmark face shape predictor.
         FACE_SHAPE_PREDICTOR_68_LANDMARKS
     };
-    
+
     /// \brief Create a default FaceFinder.
     FaceFinder();
 
@@ -72,10 +74,10 @@ public:
     ///
     /// \param settings The Settings to use.
     bool setup(const Settings& settings);
-    
+
     /// \returns true if the FaceFinder has been set up successfully.
     bool isLoaded() const;
-    
+
     /// \brief Find all faces.
     ///
     /// Find all faces and return their location in pixel coordinates and
@@ -124,7 +126,7 @@ public:
             dlib::matrix<dlib::rgb_pixel> fc = dlib::mat(faceChip);
             std::size_t nJitters = std::max(std::size_t(0), _settings.jitterIterations);
             dlib::matrix<float, 0, 1> faceCodes;
-            
+
             if (nJitters > 0)
                 faceCodes = dlib::mean(dlib::mat((*_faceCoder)(jitter_image(fc, nJitters))));
             else
@@ -136,10 +138,10 @@ public:
 
         return faces;
     }
-    
-    
+
+
 //    dlib::matrix<float, 0, 1> getEmbeddings(
-    
+
 //
 //    /// \brief Find all faces in batch mode.
 //    ///
@@ -190,7 +192,7 @@ public:
 //
     /// \returns the current settings.
     Settings settings() const;
-    
+
     struct Settings
     {
         /// \brief Set the back-end detection algorithm.
@@ -198,41 +200,41 @@ public:
 
         /// \brief Set the shape predictor algorithm.
         FaceShapePredictor shapePredictorType = FaceShapePredictor::FACE_SHAPE_PREDICTOR_5_LANDMARKS;
-        
+
         /// \brief Set the number of threads for parallel execution.
         ///
         /// A value of 0 will use the maximum threads available to the system.
         std::size_t numThreads = 1;
-        
+
         /// \brief The path where any models will be found.
         ///
-        /// This addon cxan use the mmod_human_face_detector.dat
+        /// This addon can use the mmod_human_face_detector.dat
         /// shape_predictor_5_face_landmarks.dat and
         /// shape_predictor_68_face_landmarks.dat. By default it will search
         /// for these files in the bin/data/. The user can specify an alternate
         /// location by modifying this variable.
         std::string modelsPath;
-        
+
         /// \brief The size of the extracted face chips.
         ///
         /// The default used by
         std::size_t faceChipSize = 150;
-        
+
         /// \brief The padding of the extracted face chips.
         float faceChipPadding = 0.25;
-        
+
         std::size_t jitterIterations = 1;
-        
+
         enum
         {
             MAX_THREADS = 0
         };
     };
-    
+
 private:
     /// \brief The current Settings.
     Settings _settings;
-    
+
     /// \brief True if the FaceFinder is loaded.
     bool _isLoaded = false;
 
@@ -241,7 +243,7 @@ private:
     /// The number of instances will match the number of threads specified in
     /// the settings.
     std::vector<dlib::frontal_face_detector> _faceDetectorHOG;
-    
+
     /// \brief A pointer to the MMOD face detector.
     std::unique_ptr<MMODFaceDetector::Net> _faceDetectorMMOD = nullptr;
 
@@ -252,7 +254,7 @@ private:
     // each face to a "face code" (i.e. 128 numbers).
     std::unique_ptr<FaceRecognitionResnetModelV1::Net> _faceCoder;
 
-    
+
     template<typename image_type>
     std::vector<image_type> jitter_image(const image_type& img, int n)
     {
@@ -260,18 +262,18 @@ private:
         // zoomed, rotated, and translated a little bit differently. They are also randomly
         // mirrored left to right.
         thread_local dlib::rand rnd;
-        
+
         std::vector<image_type> crops;
-        
+
         for (int i = 0; i < n; ++i)
             crops.push_back(dlib::jitter_image(img, rnd));
-        
+
         return crops;
     }
 };
-    
-    
-    
+
+
+
 class FaceDatabase
 {
 public:
@@ -279,32 +281,33 @@ public:
     {
     public:
         Entry();
-        
+
 //        float distance(const Entry& entry);
         float distance(const Face& face);
-        
+
         /// \brief Determine if two faces
 //        bool matches(const Entry& entry, float maxDistance);
         bool matches(const Face& face, float maxDistance);
 
         void add(const Face& face);
+
         void add(const std::vector<Face>& faces);
-        
+
         std::vector<float> meanFaceCode() const;
 
         void draw(float x, float y, float width, float height) const;
-        
-        
+
         void setLabel(const std::string& label);
+
         std::string getLabel() const;
-        
+
     private:
         std::string _label;
         std::size_t _numSamples = 0;
         std::vector<dlib::running_stats<double>> _faceCode;
 
         mutable std::vector<float> _meanFaceCode;
-        
+
         float _faceChipAlpha = 0.99;
         ofFloatPixels _faceChip;
         mutable ofTexture _faceChipTexture;
@@ -313,11 +316,10 @@ public:
 
     FaceDatabase();
 
-    
     void add(const FaceFinder::Faces& faces);
 
     std::vector<Entry> entries();
-    
+
     void draw(float x,
               float y,
               float width,
@@ -325,11 +327,11 @@ public:
 
 private:
     std::vector<Entry> _entries;
-    
+
 };
 
-    
-    
+
+
 class FaceLandmarks
 {
 public:
@@ -340,14 +342,14 @@ public:
         /// \brief The precise 68 landmark face shape predictor.
         MODEL_68_LANDMARKS
     };
-    
+
    // enum class Model_5_Features
-    
-    
+
+
 };
-    
-//    
-//    
+
+//
+//
 //class LandmarkMapper
 //{
 //public:
@@ -369,7 +371,7 @@ public:
 //        FACE_OUTLINE,
 //        ALL_FEATURES
 //    };
-//    
+//
 //    std::vector<std::size_t> getFeatureIndices(Feature feature) {
 //        switch(feature) {
 //            case LEFT_EYE_TOP: return consecutive(36, 40);
@@ -392,8 +394,8 @@ public:
 //            case ALL_FEATURES: return consecutive(0, 68);
 //        }
 //    }
-//    
-//    
+//
+//
 //    template <class T>
 //    ofPolyline ofxFaceTracker2Landmarks::getFeature(Feature feature, vector<T> points) const {
 //        ofPolyline polyline;
@@ -414,10 +416,10 @@ public:
 //            default:
 //                break;
 //        }
-//        
+//
 //        return polyline;
 //    }
-//    
+//
 //    std::vector<std::size_t> consecutive(std::size_t start, std::size_t end)
 //    {
 //        if (end < start)
@@ -430,10 +432,10 @@ public:
 //        std::iota(l.begin(), l.end(), start);
 //        return l;
 //    }
-//    
+//
 //};
-//    
-    
-    
-    
+//
+
+
+
 } } // namespace ofx::Dlib

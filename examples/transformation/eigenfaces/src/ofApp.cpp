@@ -1,7 +1,7 @@
 //
 // Copyright (c) 2018 Christopher Baker <https://christopherbaker.net>
 //
-// SPDX-License-Identifier:	MIT
+// SPDX-License-Identifier: MIT
 //
 
 
@@ -14,7 +14,7 @@ void ofApp::setup()
     std::string imagesDataPath = "images.json";
 
     ofJson imagesJson = ofLoadJson(imagesDataPath);
-    
+
     if (!pca.load(pcaDataPath) || imagesJson.empty())
     {
         // Load our image database. Many additional parameters can be used
@@ -30,25 +30,25 @@ void ofApp::setup()
             img.mirror(false, true);
             augmentedImages.push_back(img);
         }
-        
+
         // Load the image collection into a matrix where each row represents
         // one image and each column and the columns represent pixel data.
         dlib::matrix<float> imageData = ofxDlib::to_rows(augmentedImages);
-        
-        
+
+
         // Train the PCA with the image data.
         pca.train(imageData);
-        
+
         // Save the PCA data.
         pca.save(pcaDataPath);
-        
+
         // Save the data.
         imagesJson["width"] = images.width();
         imagesJson["height"] = images.height();
         imagesJson["pixel_format"] = images.pixelFormat();
         ofSaveJson(imagesDataPath, imagesJson);
     }
-    
+
     imageWidth = imagesJson["width"].get<std::size_t>();
     imageHeight = imagesJson["height"].get<std::size_t>();
     imageFormat = imagesJson["pixel_format"].get<ofPixelFormat>();
@@ -57,7 +57,7 @@ void ofApp::setup()
                                      imageWidth,
                                      imageHeight,
                                      imageFormat, true);
-    
+
     for (std::size_t row = 0; row < pca.eigenvectors().nr(); ++row)
     {
         dlib::matrix<float> eigenface = dlib::rowm(pca.eigenvectors(), row);
@@ -77,10 +77,10 @@ void ofApp::update()
 void ofApp::draw()
 {
     meanTexture.draw(0, 0);
-    
+
     std::size_t x = meanTexture.getWidth();
     std::size_t y = 0;
-    
+
     for (auto& t: eigenTextures)
     {
         std::cout << x << ", " << y << std::endl;
@@ -97,8 +97,5 @@ void ofApp::draw()
 
 void ofApp::keyPressed(int key)
 {
-    
+
 }
-
-
-

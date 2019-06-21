@@ -163,8 +163,8 @@ struct example_op_add_scalar
     // Unlike the transpose expression.  This expression only destructively aliases something if m does.
     // So this expression has the regular non-destructive kind of aliasing.
     template <typename U> bool destructively_aliases ( const dlib::matrix_exp<U>& item) const { return m.destructively_aliases(item); }
-    
-}; 
+
+};
 
 
 template < typename M, typename T >

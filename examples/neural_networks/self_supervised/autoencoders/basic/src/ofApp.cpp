@@ -1,7 +1,7 @@
 //
 // Copyright (c) 2017 Christopher Baker <https://christopherbaker.net>
 //
-// SPDX-License-Identifier:	MIT
+// SPDX-License-Identifier: MIT
 //
 
 
@@ -27,8 +27,6 @@ void ofApp::setup()
                              testing_images,
                              testing_labels);
 
-
-    
     for (std::size_t i = 0; i < training_images.size(); ++i)
     {
         trainingImages.push_back(dlib::reshape(dlib::matrix_cast<float>(training_images[i]) / 255.0, training_images[i].size(), 1));

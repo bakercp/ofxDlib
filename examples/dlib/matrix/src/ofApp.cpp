@@ -1,7 +1,7 @@
 //
 // Copyright (c) 2017 Christopher Baker <https://christopherbaker.net>
 //
-// SPDX-License-Identifier:	MIT
+// SPDX-License-Identifier: MIT
 //
 
 
@@ -250,21 +250,19 @@ void ofApp::setup()
 
     // MATLAB: C = pinv(E)
     C = dlib::pinv(E);
-    
+
     // MATLAB: C = inv(E)
     C = dlib::inv(E);
-    
+
     // MATLAB: [A,B,C] = svd(E)
     dlib::svd(E,A,B,C);
-    
-    // MATLAB: A = chol(E,'lower') 
+
+    // MATLAB: A = chol(E,'lower')
     A = dlib::chol(E);
-    
+
     // MATLAB: var = min(min(A))
     var = dlib::min(A);
 
     // The end.
     ofExit();
 }
-
-

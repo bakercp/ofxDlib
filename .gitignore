@@ -6,10 +6,10 @@
 # Intro
 ################################################################################
 
-# We start by ignoring everything, then selectively make exceptions for items 
+# We start by ignoring everything, then selectively make exceptions for items
 # and structures that are part of the standard addon structure. Basically, if it
 # is not explicitly allowed or manually forced, it won't be tracked.
-# 
+#
 # To do this, we we must first un-exclude parent directories
 #
 # !/docs
@@ -19,11 +19,11 @@
 # /docs/*
 #
 # then unexclude specific items.
-# 
+#
 # !/docs/Doxyfile
 # !/docs/*.md
 #
-# Items cannot be un-excluded using `!` unless the parent directory has been 
+# Items cannot be un-excluded using `!` unless the parent directory has been
 # unexcluded.
 
 ################################################################################
@@ -54,7 +54,7 @@
 # Don't ignore Doxygen configurations.
 !/docs/Doxyfile
 
-# Don't ignore markdown documentation files. Any images, etc must be 
+# Don't ignore markdown documentation files. Any images, etc must be
 # added manually by force. This keeps the repository size smaller by default.
 !/docs/*.md
 

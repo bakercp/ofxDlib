@@ -9,7 +9,7 @@
     -   NVIDIA cuDNN 5.1+
     -   Intel® Math Kernel Library (Intel® MKL)
 
-Efforts have been made to make everything run on OSX and Linux, with and without modern NVidia graphics cards.
+Efforts have been made to make everything run on macOS and Linux, with and without modern NVidia graphics cards.
 
 ### On All Platforms
 

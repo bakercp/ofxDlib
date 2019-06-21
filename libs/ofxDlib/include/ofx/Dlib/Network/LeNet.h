@@ -1,7 +1,7 @@
 //
 // Copyright (c) 2018 Christopher Baker <https://christopherbaker.net>
 //
-// SPDX-License-Identifier:	MIT
+// SPDX-License-Identifier: MIT
 //
 
 
@@ -84,7 +84,5 @@ using TaggedNet = dlib::loss_multiclass_log<
                     tag_10_con_1<dlib::con<6,5,5,1,1,
                     dlib::input<dlib::matrix<unsigned char>
                     >>>>>>>>>>>>>>>>>>>>>>>>;
-    
-    
-    
+
 } } } // namespace ofx::Dlib::LeNet5

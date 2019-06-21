@@ -32,7 +32,7 @@ matrix:
       dist: trusty
       sudo: required
       cache: ccache
-      env: 
+      env:
         - TARGET=linuxarmv6l
 
   # fully specify builds, include can't dynamically expand matrix entries
@@ -45,7 +45,7 @@ matrix:
   #   dist: trusty
   #   sudo: required
   #   cache: ccache
-  #   env: 
+  #   env:
   #     - TARGET=linuxarmv6l
   #     - OTHER_VAR=blah
 
@@ -67,7 +67,7 @@ matrix:
   #   compiler: clang
   #   env: TARGET="osx"
   #   cache: ccache
-        
+
 # before_install:
 install:
   - git clone --depth=1 --branch=master https://github.com/openFrameworks/openFrameworks.git ~/openFrameworks
@@ -105,7 +105,7 @@ script:
 # jobs:
 #   include:
 #     - stage: Deploy Documentation
-#       script: 
+#       script:
 #         # Install a more recent version of Doxygen.
 #         - git clone --depth=1 --branch Release_1_8_15 https://github.com/doxygen/doxygen.git; cd doxygen; mkdir build; cd build; cmake -G "Unix Makefiles" ..; make -s && sudo make install; cd ../..
 #         # Copy all markdown docs to the docs folder.
@@ -123,4 +123,3 @@ script:
 #         local_dir: docs/html
 #         on:
 #           branch: master
-  

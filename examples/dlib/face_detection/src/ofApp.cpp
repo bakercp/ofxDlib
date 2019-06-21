@@ -1,7 +1,7 @@
 //
 // Copyright (c) 2017 Christopher Baker <https://christopherbaker.net>
 //
-// SPDX-License-Identifier:	MIT
+// SPDX-License-Identifier: MIT
 //
 
 
@@ -57,4 +57,3 @@ void ofApp::draw()
 
     ofDrawBitmapStringHighlight("Num. faces detected: " + ofToString(faceRects.size()), 14, 20);
 }
-

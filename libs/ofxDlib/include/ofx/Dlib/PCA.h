@@ -11,7 +11,7 @@
 namespace ofx {
 namespace Dlib {
 
-    
+
 /// \brief A class for caculating PCA.
 ///
 /// The class calculates the principal components of a given 2D data matrix. By
@@ -22,10 +22,10 @@ class PCA
 {
 public:
     struct Settings;
-    
+
     /// \brief Create an empty PCA.
     PCA();
-    
+
     /// \brief Create a PCA with the given parameters.
     ///
     /// \param data The data matrix. Features are in columns. Samples are in rows.
@@ -41,17 +41,17 @@ public:
 
     /// \brief Destroy the PCA.
     ~PCA();
-    
+
     /// \brief Project the given row matrix onto the PCA representation.
     /// \param data The matrix to project.
     /// \returns the projection of the given mat onto the PCA.
     dlib::matrix<T> project(const dlib::matrix<T>& data) const;
-    
+
     /// \brief Unproject the given projection using the PCA representation.
     /// \param mat The matrix to unproject.
     /// \returns the unprojection of the given mat from the PCA.
     dlib::matrix<T> unproject(const dlib::matrix<T>& mat) const;
-    
+
     /// \brief Calculate the PCA for the given matrix.
     ///
     /// \param data The data matrix. Features are in columns. Samples are in rows.
@@ -63,12 +63,12 @@ public:
     /// \param data The data matrix. Features are in columns. Samples are in rows.
     /// \param settings The settings to use.
     void train(const dlib::matrix<T>& data, Settings settings = Settings());
-    
+
     /// \brief Save the PCA to the given path.
     /// \param path The path to save to.
     /// \returns true if the save was successful.
     bool save(const std::string& path) const;
-    
+
     /// \brief Load the PCA from the given path.
     /// \param path The path to load from.
     /// \returns true if the load was successful.
@@ -93,25 +93,25 @@ public:
         /// \brief The default method.
         DEFAULT = EIGEN
     };
-    
+
     struct Settings
     {
         /// \brief The computation method.
         Method method = Method::DEFAULT;
-        
+
         /// \brief Subtract the mean from the input data.
         ///
         /// Set to false if the data is already centered.
         bool centerData = true;
-        
+
         /// \brief Divide the data by its standard deviation.
         ///
         /// Set to false if the data is pre-scaled or shares a common scale.
         bool scaleData = true;
-        
+
         /// \brief The default number of output dimensions.
         std::size_t targetOutputDimensions = 0;
-        
+
         /// \brief The target amount of variance to capture (0 - 1).
         ///
         //  e.g. 0.99 will attempt to use enough output dimensions to capture
@@ -119,19 +119,19 @@ public:
         /// If <= 0, the minimum of data rows or columns will be used.
         double targetVariance = 1.00;
     };
-    
+
     /// \brief Clear all data.
     void clear();
-    
+
     /// \returns true if the data is loaded.
     bool isLoaded() const;
-    
+
     /// \returns the current settings.
     Settings settings() const;
 
     /// \returns the mean row matrix.
     const dlib::matrix<T>& mean() const;
-    
+
     /// \returns the real eigenvectors, sorted by descending eigenvalue.
     const dlib::matrix<T>& eigenvectors() const;
 
@@ -141,39 +141,39 @@ public:
 private:
     /// \brief The settings used to create this analysis.
     Settings _settings;
-    
+
     /// \brief The mean of the training data.
     dlib::matrix<T> _mean;
-    
+
     /// \brief The real eigenvectors, sorted by descending eigenvalue.
     dlib::matrix<T> _eigenvectors;
-    
+
     /// \brief The eigenvalues of the correlation matrix, in descending order.
     dlib::matrix<T> _eigenvalues;
 
 };
 
-    
+
 template<typename T>
 PCA<T>::PCA()
 {
 }
-    
+
 
 template<typename T>
 PCA<T>::PCA(const dlib::matrix<T>& data, std::size_t targetOutputDimensions)
 {
     train(data, targetOutputDimensions);
 }
-    
-    
+
+
 template<typename T>
 PCA<T>::PCA(const std::string& path)
 {
     load(path);
 }
 
-    
+
 template<typename T>
 PCA<T>::~PCA()
 {
@@ -187,7 +187,7 @@ dlib::matrix<T> PCA<T>::project(const dlib::matrix<T>& data) const
     return result;
 }
 
-    
+
 template<typename T>
 dlib::matrix<T> PCA<T>::unproject(const dlib::matrix<T>& mat) const
 {
@@ -204,24 +204,24 @@ void PCA<T>::train(const dlib::matrix<T>& data, std::size_t targetOutputDimensio
     train(data, settings);
 }
 
-    
+
 template<typename T>
 void PCA<T>::train(const dlib::matrix<T>& _data, Settings settings)
 {
     dlib::matrix<T> data = _data;
-    
+
     std::size_t numSamples = data.nr();
     std::size_t dimensionsIn = data.nc();
     std::size_t dimensionsOut = 0;
-    
+
     bool useScrambled = data.nc() > data.nr();
-    
+
     if (settings.centerData)
     {
         // First, we center and normalize our data. For a more discussion see:
         // See Part XI: Principal components analysis
         //    http://cs229.stanford.edu/notes/cs229-notes10.pdf
-        
+
         // First we "center" the data by subtracting its mean. For data that has
         // a known mean of zero (e.g. most audio signals) this can be skipped.
         // 8-bit images, for example have values that range from 0-255, thus they
@@ -229,12 +229,12 @@ void PCA<T>::train(const dlib::matrix<T>& _data, Settings settings)
 
         // Calculate the sum, divide it by the number of rows.
         _mean = dlib::sum_rows(data) / data.nr();
-        
+
         // Center the data by subtracting the mean.
         for (std::size_t row = 0; row < data.nr(); ++row)
             dlib::set_rowm(data, row) -= _mean;
     }
-    
+
     if (settings.scaleData)
     {
         // If your vector features are measured using different units (i.e. they
@@ -246,7 +246,7 @@ void PCA<T>::train(const dlib::matrix<T>& _data, Settings settings)
         // by dividing each value by the standard deviaion (or another appropriate
         // measure of variance (e.g. max - min).
         dlib::matrix<T> stdev = dlib::zeros_matrix<T>(dimensionsIn, 0);
-        
+
         // Calculate the mean of xs. First calculate the sums.
         // We have already subtracted the means in this case (i.e. the mean
         // is already zero, so we just square values).
@@ -255,21 +255,21 @@ void PCA<T>::train(const dlib::matrix<T>& _data, Settings settings)
             // Add the square of the current row to the variance.
             stdev += dlib::squared(dlib::rowm(data, row));
         }
-        
+
         // Divide the sum by the number of rows to get the variance.
         stdev /= data.nr();
-        
+
         // Take the square root to get the standard deviation.
         stdev = dlib::sqrt(stdev);
-        
+
         // Normalize the data by dividing by the standard deviation.
         for (std::size_t row = 0; row < data.nr(); ++row)
             set_rowm(data, row) = dlib::pointwise_multiply(dlib::rowm(data, row), 1.0 / stdev);
     }
-    
+
     // Caculate the correlation matrix.
     dlib::matrix<T> cor;
-    
+
     if (useScrambled)
         cor = data * dlib::trans(data) / (data.nr() - 1);
     else
@@ -281,13 +281,13 @@ void PCA<T>::train(const dlib::matrix<T>& _data, Settings settings)
 
     // Get the real eigen vectors.
     _eigenvectors = E.get_pseudo_v();
-    
+
     // Get the real eigenvalues * an identity matrix.
     _eigenvalues = E.get_real_eigenvalues();
-    
+
     // Sort the eigenvectors and values by eigenvalue size.
     dlib::rsort_columns(_eigenvectors, _eigenvalues);
-    
+
     // No determine the number of output dimensions.
     if (settings.targetOutputDimensions != 0)
     {
@@ -298,23 +298,23 @@ void PCA<T>::train(const dlib::matrix<T>& _data, Settings settings)
         // Some of the eigenvalues might be negative. So first lets zero those
         // out so they won't get considered.
         _eigenvalues = dlib::pointwise_multiply(_eigenvalues > 0, _eigenvalues);
-        
+
         // Figure out how many eigenvectors we want.
         const double thresh = dlib::sum(_eigenvalues) * settings.targetVariance;
 
         double total = 0;
-        
+
         for (std::size_t r = 0; r < _eigenvalues.size() && total < thresh; ++r)
         {
             // Don't even think about looking at eigenvalues that are 0.
             // If we go this far then we have all we need.
             if (_eigenvalues(r) == 0)
                 break;
-            
+
             ++dimensionsOut;
             total += _eigenvalues(r);
         }
-        
+
         if (dimensionsOut == 0)
             ofLogError() << "While performing pca, all eigenvalues were negative or 0.";
     }
@@ -322,7 +322,7 @@ void PCA<T>::train(const dlib::matrix<T>& _data, Settings settings)
     {
         dimensionsOut = std::min(data.nr(), data.nc());
     }
-    
+
     // Unscramble the data if needed.
     if (useScrambled)
         _eigenvectors = dlib::trans(data) * _eigenvectors;
@@ -330,20 +330,20 @@ void PCA<T>::train(const dlib::matrix<T>& _data, Settings settings)
     // So now we know we want to use num_vectors of the first eigenvectors.  So
     // pull those out and discard the rest.
     _eigenvectors = dlib::trans(dlib::colm(_eigenvectors, dlib::range(0, dimensionsOut - 1)));
-    
+
     // also clip off the eigenvalues we aren't using
     _eigenvalues = dlib::rowm(_eigenvalues, dlib::range(0, dimensionsOut - 1));
-    
+
     // Normalize the eigenvectors.
     for (std::size_t row = 0; row < _eigenvectors.nr(); ++row)
         dlib::set_rowm(_eigenvectors, row) = dlib::normalize(dlib::rowm(_eigenvectors, row));
 
     // Save the settings.
     _settings = settings;
-    
+
 }
-    
-    
+
+
 template<typename T>
 bool PCA<T>::save(const std::string& path) const
 {
@@ -366,10 +366,10 @@ bool PCA<T>::save(const std::string& path) const
         ofLogError("PCA::save") << "Error loading: " << path << ", " << exc.what();
         return false;
     }
-    
+
     return true;
 }
-    
+
 
 template<typename T>
 bool PCA<T>::load(const std::string& path)
@@ -378,7 +378,7 @@ bool PCA<T>::load(const std::string& path)
     {
         typedef typename std::underlying_type<Method>::type safe_type;
         safe_type method;
-        
+
         dlib::deserialize(ofToDataPath(path, true))
         >> _mean
         >> _eigenvectors
@@ -388,7 +388,7 @@ bool PCA<T>::load(const std::string& path)
         >> _settings.scaleData
         >> _settings.targetOutputDimensions
         >> _settings.targetVariance;
-        
+
         _settings.method = static_cast<Method>(method);
 
     }
@@ -397,11 +397,11 @@ bool PCA<T>::load(const std::string& path)
         ofLogError("PCA::load") << "Error loading: " << path << ", " << exc.what();
         return false;
     }
-    
+
     return true;
 }
-    
-    
+
+
 template<typename T>
 void PCA<T>::clear()
 {
@@ -410,13 +410,13 @@ void PCA<T>::clear()
     _eigenvalues.clear();
 }
 
-    
+
 template<typename T>
 bool PCA<T>::isLoaded() const
 {
     return _mean.size() > 0 && _eigenvectors.size() > 0 && _eigenvalues.size() > 0;
 }
-    
+
 
 template<typename T>
 typename PCA<T>::Settings PCA<T>::settings() const
@@ -424,26 +424,26 @@ typename PCA<T>::Settings PCA<T>::settings() const
     return _settings;
 }
 
-    
+
 template<typename T>
 const dlib::matrix<T>& PCA<T>::mean() const
 {
     return _mean;
 }
 
-    
+
 template<typename T>
 const dlib::matrix<T>& PCA<T>::eigenvectors() const
 {
     return _eigenvectors;
 }
 
-    
+
 template<typename T>
 const dlib::matrix<T>& PCA<T>::eigenvalues() const
 {
     return _eigenvalues;
 }
 
-    
+
 } } // namespace ofx::Dlib

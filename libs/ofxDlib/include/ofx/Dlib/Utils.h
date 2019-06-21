@@ -1,7 +1,7 @@
 //
 // Copyright (c) 2018 Christopher Baker <https://christopherbaker.net>
 //
-// SPDX-License-Identifier:	MIT
+// SPDX-License-Identifier: MIT
 //
 
 
@@ -133,18 +133,15 @@ inline void scale(dlib::mmod_rect& in, double scaler)
 template <typename PixelType>
 inline ofPixels_<PixelType> toGrayscale(const ofPixels_<PixelType>& pixels)
 {
-    if (pixels.getPixelFormat() == OF_PIXELS_GRAY) return pixels;
+    if (pixels.getPixelFormat() == OF_PIXELS_GRAY)
+        return pixels;
 
     ofPixels_<PixelType> out;
     out.allocate(pixels.getWidth(), pixels.getHeight(), OF_PIXELS_GRAY);
 
     for (std::size_t x = 0; x < pixels.getWidth(); ++x)
-    {
         for (std::size_t y = 0; y < pixels.getHeight(); ++y)
-        {
             out.setColor(x, y, pixels.getColor(x, y).getBrightness());
-        }
-    }
 
     return out;
 }
@@ -250,10 +247,10 @@ ofPixels_<typename dlib::pixel_traits<typename dlib::image_traits<image_type>::p
 {
     return dlib::to_of_pixels<image_type>(img);
 }
-    
-    
-    
-    
+
+
+
+
 /// DNN
 
 enum ImageMapType
@@ -262,7 +259,7 @@ enum ImageMapType
     IMAGE_MAP_LAYER,
     IMAGE_MAP_SAMPLE
 };
-    
+
 template <template<typename> class TAG_TYPE, std::size_t NR, std::size_t NC, typename NET>
 inline std::vector<dlib::matrix<float, NR, NC>> layerOutputsToMatrices(const NET& net)
 {
@@ -271,12 +268,12 @@ inline std::vector<dlib::matrix<float, NR, NC>> layerOutputsToMatrices(const NET
     // Get the layer tag + 1.
     auto& layer = dlib::layer<TAG_TYPE, 1>(net);
     auto& lo = layer.get_output();
-    
+
     auto output_nr = lo.nr();
     auto output_nc = lo.nc();
     auto output_k = lo.k();
     auto output_ns = lo.num_samples();
-    
+
     for (std::size_t k = 0; k < output_k; ++k)
     {
         std::size_t offset = output_ns * k * output_nr * output_nc;
@@ -286,57 +283,194 @@ inline std::vector<dlib::matrix<float, NR, NC>> layerOutputsToMatrices(const NET
     }
 }
 
-    
-    
+
+
 template <template<typename> class TAG_TYPE, std::size_t NR, std::size_t NC, typename NET>
 inline std::vector<ofTexture> layerOutputsToTextures(const NET& net)
 {
     //auto matrices = layerOutputsToMatrices<TAG_TYPE, NR, NC, NET>(net);
 
     std::vector<ofTexture> textures;
-    
+
     // Get the layer tag + 1.
     auto& layer = dlib::layer<TAG_TYPE, 1>(net);
     auto& layer_details = layer.layer_details();
     auto& layer_output = layer.get_output();
     auto& layer_parameters = layer_details.get_layer_params();
-    
+
     auto output_nr = layer_output.nr();
     auto output_nc = layer_output.nr();
     auto output_k = layer_output.k();
     auto output_ns = layer_output.num_samples();
-    
+
     for (std::size_t k = 0; k < output_k; ++k)
     {
         std::size_t offset = 1 * k * output_nr * output_nc;
         dlib::alias_tensor a(1, 1, output_nr, output_nc);
         dlib::matrix<float, NR, NC> m = dlib::mat(a(layer_output, offset));
-        
+
         auto mm = std::minmax_element(m.begin(), m.end());
         std::cout << "---- " << *mm.first << "," << *mm.second << std::endl;
         std::cout << std::endl;
         ofFloatPixels p = toOf(m);
-        
+
         map(p, *mm.first, *mm.second);
 
         textures.push_back(ofTexture());
         textures.back().loadData(p);
         textures.back().setTextureMinMagFilter(GL_NEAREST, GL_NEAREST);
     }
-    
+
     return textures;
 }
 
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
+template <typename PixelType>
+std::vector<ofPixels_<PixelType>> loadImages(const std::string& path,
+                                             const std::vector<std::string>& extensions = { },
+                                             bool requireSameDimensions = true)
+
+{
+    std::vector<ofPixels_<PixelType>> images;
+
+    std::size_t imageWidth = 0;
+    std::size_t imageHeight = 0;
+    std::size_t imageNumChannels = 0;
+
+    ofDirectory dir(path);
+    for (auto&& ext: extensions) dir.allowExt(ext);
+
+    for (auto&& file: dir)
+    {
+        ofPixels_<PixelType> pix;
+
+        if (ofLoadImage(pix, file))
+        {
+            if (requireSameDimensions)
+            {
+                if (imageWidth == 0 && imageHeight == 0 && imageNumChannels == 0)
+                {
+                    imageWidth = pix.getWidth();
+                    imageHeight = pix.getHeight();
+                    imageNumChannels = pix.getNumChannels();
+                }
+                else if (imageWidth != pix.getWidth()
+                     || imageHeight != pix.getHeight()
+                     || imageNumChannels != pix.getNumChannels())
+                {
+                    ofLogError("loadImages") << "The first image was: " << imageWidth << " x " << imageHeight << " x " << imageNumChannels << " but this image was " << pix.getWidth() << " x " << pix.getHeight() << " x " << pix.getNumChannels() << ": " << file.getAbsolutePath();
+                    return images;
+                }
+            }
+
+            images.emplace_back(std::move(pix));
+        }
+        else
+        {
+            ofLogError("loadImages") << "Unable to load image: " << file.getAbsolutePath() << ", skipping.";
+        }
+    }
+
+    return images;
+
+}
+
+
+//  http://dlib.net/dlib/matrix/matrix.h.html
+template<typename T>
+std::string prettyPrint(const dlib::matrix_exp<T>& exp, const std::string& name = "")
+{
+    std::string result;
+
+    std::size_t len = ofUTF8Length(name);
+    static const std::string _eq = " = ";
+    static const std::string left_bracket = "⎡⎢⎣";
+    static const std::string right_bracket = "⎤⎥⎦";
+
+    std::size_t xOffset = len > 0 ? (len + _eq.length()) : 0;
+
+    for (std::size_t r = 0; r < exp.nr(); ++r)
+    {
+//        if (r == 0) {   }
+//        else if (r == mat.nr() - 1) {   }
+//        else {   }
+//
+//        for (std::size_t c = 0; c < mat.nc(); ++c)
+//        {
+////            result += ofToString(
+//        }
+//
+//        if (r == 0) {   }
+//        else if (r == mat.nr() - 1) {   }
+//        else {   }
+    }
+
+    return result;
+}
+
+
+
+template<typename PixelType>
+ofTexture toTexture(const dlib::matrix<PixelType>& _mat,
+                    std::size_t width,
+                    std::size_t height,
+                    std::size_t numChannels,
+                    bool normalize = false)
+{
+    dlib::matrix<PixelType> mat;
+
+    if (normalize)
+    {
+        double min = dlib::min(_mat);
+        double max = dlib::max(_mat);
+
+        mat = dlib::clamp((_mat - min) / (max - min), 0, 1);
+    }
+    else
+    {
+        mat = _mat;
+    }
+
+    ofPixels_<PixelType> pix;
+    pix.setFromExternalPixels(mat.begin(), width, height, numChannels);
+
+    ofTexture tex;
+    tex.loadData(pix);
+    return tex;
+}
+
+
+
+template<typename PixelType>
+ofTexture toTexture(const dlib::matrix<PixelType>& _mat,
+                    std::size_t width,
+                    std::size_t height,
+                    ofPixelFormat pixelFormat,
+                    bool normalize = false)
+{
+    dlib::matrix<PixelType> mat;
+
+    if (normalize)
+    {
+        double min = dlib::min(_mat);
+        double max = dlib::max(_mat);
+
+        mat = dlib::clamp((_mat - min) / (max - min), 0, 1);
+    }
+    else
+    {
+        mat = _mat;
+    }
+
+    ofPixels_<PixelType> pix;
+    pix.setFromExternalPixels(mat.begin(), width, height, pixelFormat);
+
+    ofTexture tex;
+    tex.loadData(pix);
+    return tex;
+}
+
+
 
 } } // namespace ofx::Dlib

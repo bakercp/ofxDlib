@@ -1,7 +1,7 @@
 //
 // Copyright (c) 2018 Christopher Baker <https://christopherbaker.net>
 //
-// SPDX-License-Identifier:	MIT
+// SPDX-License-Identifier: MIT
 //
 
 
@@ -25,7 +25,6 @@ public:
 
     ofx::Dlib::LeNet5::TaggedNet net;
 
-
     ofFbo drawingArea;
     ofTexture brush;
     float brushRadius = 20;
@@ -34,8 +33,7 @@ public:
 
     std::size_t predictedLabel = 0;
     std::vector<float> lastLayer;
-    
-    
+
     // All MNIST data (training and testing) in a map.
     std::map<unsigned long, std::vector<ofTexture>> mnistTrainingData;
     std::map<unsigned long, std::vector<ofTexture>> mnistTestingData;
@@ -44,8 +42,6 @@ public:
     std::vector<ofTexture> layer11Convolutions;
     std::vector<ofTexture> layer11ManualConvolutions;
 
-
-    
     enum
     {
         MNIST_WIDTH = 28,

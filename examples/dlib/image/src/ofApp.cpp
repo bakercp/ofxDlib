@@ -1,7 +1,7 @@
 //
 // Copyright (c) 2018 Christopher Baker <https://christopherbaker.net>
 //
-// SPDX-License-Identifier:	MIT
+// SPDX-License-Identifier: MIT
 //
 
 
@@ -53,10 +53,10 @@ void ofApp::setup()
 
     // We can also easily display the edge_image as a heatmap or using the
     // jet color scheme like so.
-    
+
     dlib::matrix<unsigned char> p = dlib::heatmap(edge_image);
-    
-    
+
+
 //    heatEdgeTexture.loadData(ofxDlib::toOf(dlib::heatmap(edge_image)));
 //    jetEdgeTexture.loadData(ofxDlib::toOf(dlib::jet(edge_image)));
 //    randomEdgeTexture.loadData(ofxDlib::toOf(dlib::randomly_color_image(edge_image)));
@@ -117,4 +117,3 @@ void ofApp::draw()
     ofPopMatrix();
 
 }
-

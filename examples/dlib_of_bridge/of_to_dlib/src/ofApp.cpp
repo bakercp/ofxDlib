@@ -1,7 +1,7 @@
 //
 // Copyright (c) 2018 Christopher Baker <https://christopherbaker.net>
 //
-// SPDX-License-Identifier:	MIT
+// SPDX-License-Identifier: MIT
 //
 
 
@@ -119,7 +119,7 @@ void ofApp::draw()
     glm::vec2 textOffset(10, 20);
     glm::vec2 pos(0, 0);
     float margin = 20;
-    
+
     for (const auto& texture: textures)
     {
         ofSetColor(255);
@@ -131,4 +131,3 @@ void ofApp::draw()
         else pos.x += (size.x + margin);
     }
 }
-
