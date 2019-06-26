@@ -147,6 +147,48 @@ inline ofPixels_<PixelType> toGrayscale(const ofPixels_<PixelType>& pixels)
 }
 
 
+/// \brief Rotate images by 90 degree increments.
+///
+/// This function is similar to ofPixels_::rotate90To(...).
+///
+/// In tests this function runs faster by as much as 3x when nClockwiseRotations
+/// is equal to 2 or 3.
+///
+/// The ouput image will be resized / reallocated as needed. Thus, to avoid
+/// reallocations, provide an image that is already correctly sized for the
+/// number of rotations desired.
+///
+/// \tparam input_image_type Any dlib compatible generic image_type.
+/// \tparam output_image_type Any dlib compatible generic image_type.
+/// \param input The input image.
+/// \param output The output image. The output image will be resized / reallocated as needed.
+template <typename input_image_type, typename output_image_type>
+void rotate_image_90(const input_image_type& input,
+                     output_image_type& output,
+                     std::size_t nClockwiseRotations)
+{
+    switch (nClockwiseRotations % 4)
+    {
+        // Rotate 90deg CW
+        case 1:
+            dlib::assign_image(output, dlib::trans(dlib::flipud(dlib::mat(input))));
+            return;
+        // Rotate 180deg CW
+        case 2:
+            dlib::assign_image(output, dlib::flip(dlib::mat(input)));
+            return;
+        // Rotate 270deg CW
+        case 3:
+            dlib::assign_image(output, dlib::flipud(dlib::trans(dlib::mat(input))));
+            return;
+    }
+
+    // Just copy.
+    output = input;
+    return;
+}
+
+
 /// \brief A helper function to convert an ofPixels object to grayscale.
 ///
 /// When loading images into dlib array2d, matrix, etc with non 8-bit values,
