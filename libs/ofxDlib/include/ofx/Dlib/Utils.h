@@ -219,6 +219,58 @@ inline dlib::of_image<dlib_pixel_type, of_pixel_type> toDlib(ofPixels_<of_pixel_
 }
 
 
+
+/// \brief Copy ofPixels to a row matrix.
+template <typename of_pixel_type>
+inline dlib::matrix<of_pixel_type> to_rowm(const ofPixels_<of_pixel_type>& pixels)
+{
+    return dlib::mat(pixels.getData(), 1, pixels.size());
+}
+
+
+/// \brief Copy ofPixels to a column matrix.
+template <typename of_pixel_type>
+inline dlib::matrix<of_pixel_type> to_colm(const ofPixels_<of_pixel_type>& pixels)
+{
+    return dlib::mat(pixels.getData(), pixels.size(), 1);
+}
+
+
+/// \brief Copy a std::vector of ofPixels to the rows in a dlib::matrix.
+template <typename of_pixel_type>
+inline dlib::matrix<of_pixel_type> to_rows(const std::vector<ofPixels_<of_pixel_type>>& pixels)
+{
+    dlib::matrix<of_pixel_type> results;
+
+    if (pixels.size() > 0)
+    {
+        results.set_size(pixels.size(), pixels[0].size());
+        for (std::size_t row = 0; row < pixels.size(); ++row)
+            dlib::set_rowm(results, row) = to_rowm(pixels[row]);
+    }
+    else ofLogWarning("to_rows") << "Empty vector, skipping.";
+
+    return results;
+}
+
+/// \brief Copy a std::vector of ofPixels to the columns in a dlib::matrix.
+template <typename of_pixel_type>
+inline dlib::matrix<of_pixel_type> to_cols(const std::vector<ofPixels_<of_pixel_type>>& pixels)
+{
+    dlib::matrix<of_pixel_type> results;
+
+    if (pixels.size() > 0)
+    {
+        results.set_size(pixels[0].size(), pixels.size());
+        for (std::size_t col = 0; col < pixels.size(); ++col)
+            dlib::set_colm(results, col) = to_colm(pixels[col]);
+    }
+    else ofLogWarning("to_cols") << "Empty vector, skipping.";
+
+    return results;
+}
+
+
 /// \brief Wrap a dlib image_type as ofPixels_<>
 ///
 /// This function makes a shallow wrapper for dlib pixels. The returned ofPixels
