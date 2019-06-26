@@ -236,7 +236,7 @@ const matrix_op<op_array2d_to_mat<of_image<dlib_pixel_type, of_pixel_type>>> mat
 
 // ----------------------------------------------------------------------------------------
 
-// Define the global functions that make cv_image a proper "generic image" according to
+// Define the global functions that make of_image a proper "generic image" according to
 // ../image_processing/generic_image.h
 template <typename dlib_pixel_type, typename of_pixel_type>
 struct image_traits<of_image<dlib_pixel_type, of_pixel_type>>
