@@ -188,6 +188,48 @@ void rotate_image_90(const input_image_type& input,
     return;
 }
 
+/// \brief Resize an image using dlib.
+///
+/// This function is similar to ofPixels_::resizeTo(...).
+///
+/// In tests this function runs faster than ofPixels_::resizeTo(...).
+///
+/// OF_INTERPOLATE_BICUBIC is not supported by dlib. dlib also offers
+/// dlib::interpolate_quadratic. To use this method, simply call,
+///
+///     dlib::resize_image(input, output, dlib::interpolate_quadratic());
+///
+/// The ouput image will be resized / reallocated as needed. Thus, to avoid
+/// reallocations, provide an image that is already correctly sized for the
+/// number of rotations desired.
+///
+/// \tparam input_image_type Any dlib compatible generic image_type.
+/// \tparam output_image_type Any dlib compatible generic image_type.
+/// \param input The input image.
+/// \param output The output image. The size of the output image size is the target size.
+template <typename input_image_type, typename output_image_type>
+void resize_image(const input_image_type& input,
+                  output_image_type& output,
+                  ofInterpolationMethod interp = OF_INTERPOLATE_NEAREST_NEIGHBOR)
+{
+    switch (interp)
+    {
+        case OF_INTERPOLATE_NEAREST_NEIGHBOR:
+            dlib::resize_image(input,
+                               output,
+                               dlib::interpolate_nearest_neighbor());
+            return;
+        case OF_INTERPOLATE_BILINEAR:
+            dlib::resize_image(input,
+                               output,
+                               dlib::interpolate_bilinear());
+            return;
+        case OF_INTERPOLATE_BICUBIC:
+            ofLogWarning("resize_image") << "OF_INTERPOLATE_BICUBIC not implemented. For bicubic interpolation, use ofPixels_::resizeTo(..., OF_INTERPOLATE_BICUBIC).";
+            return;
+    }
+}
+
 
 /// \brief A helper function to convert an ofPixels object to grayscale.
 ///
