@@ -5,8 +5,7 @@
 /openFrameworks/addons/ofxDlib/libs/dlib/include/dlib/dnn/../matrix/matrix_fft.h:12:22: fatal error: mkl_dfti.h: No such file or directory
 ```
 
-*Adjust your `addons_config.mk` file to include MKL.*
-
+*Your version of MKL was likely compiled with MKL support. This is probably because you already have MKL installed. If so, simply uncomment the relevant section in your  `addon_config.mk` file. If you do not have MKL support installed, you likely need to recompile dlib without MKL support.*
 
 ```
 /openFrameworks/addons/ofxDlib/libs/dlib/lib/linux64/libdlib.a(cudnn_dlibapi.cpp.o): In function `dlib::cuda::tensor_descriptor::set_size(int, int, int, int)':
@@ -19,7 +18,7 @@ cudnn_dlibapi.cpp:(.text+0x3de): undefined reference to `cudnnGetTensor4dDescrip
 cudnn_dlibapi.cpp:(.text+0x6ae): undefined reference to `cudnnDestroyFilterDescriptor'
 
 ```
-*Adjust your `addons_config.mk` file to include CUDA and / or cuDNN.*
+*Adjust your `addons_config.mk` file to include CUDA and / or cuDNN. See the commented sections in `addons_config.mk` for help.*
 
 ```
 Linking bin/example_face_landmark_detection for linux64
@@ -28,7 +27,7 @@ ofApp.cpp:(.text._ZN4dlib6lapack5gesvdIdLl0ELl3ELl0ELl3ELl3ELl1ELl3ELl3ENS_33mem
 ofApp.cpp:(.text._ZN4dlib6lapack5gesvdIdLl0ELl3ELl0ELl3ELl3ELl1ELl3ELl3ENS_33memory_manager_stateless_kernel_1IcEEEEiccRNS_6matrixIT_XT0_EXT4_ET8_NS_16row_major_layoutEEERNS4_IS5_XT1_EXT5_ES6_S7_EERNS4_IS5_XT2_EXT6_ES6_S7_EERNS4_IS5_XT3_EXT7_ES6_S7_EE[_ZN4dlib6lapack5gesvdIdLl0ELl3ELl0ELl3ELl3ELl1ELl3ELl3ENS_33memory_manager_stateless_kernel_1IcEEEEiccRNS_6matrixIT_XT0_EXT4_ET8_NS_16row_major_layoutEEERNS4_IS5_XT1_EXT5_ES6_S7_EERNS4_IS5_XT2_EXT6_ES6_S7_EERNS4_IS5_XT3_EXT7_ES6_S7_EE]+0x293): undefined reference to `dgesvd_'
 ```
 
-*Adjust your `addons_config.mk` file to `libblas` and `liblapack`.*
+*Adjust your `addons_config.mk` file to `libblas` and `liblapack`. See the commented sections in `addons_config.mk` for help.*
 
 ### Runtime Errors
 
