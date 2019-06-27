@@ -82,16 +82,6 @@ public:
         _type_check();
     }
 
-    of_image(ofBaseHasPixels_<of_pixel_type>& pixels): of_image(&pixels.getPixels())
-    {
-        _type_check();
-    }
-
-    of_image(ofBaseHasPixels_<of_pixel_type>* pPixels): _pPixels(pPixels->getPixels())
-    {
-        _type_check();
-    }
-
     unsigned long size() const
     {
         if (_pPixels)
