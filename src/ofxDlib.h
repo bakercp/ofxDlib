@@ -17,6 +17,7 @@
 #include "ofx/Dlib/Network/LeNet.h"
 #include "ofx/Dlib/Network/MMODFaceDetector.h"
 #include "ofx/Dlib/PCA.h"
+#include "ofx/Dlib/Tracker.h"
 
 
 #include <iostream>
