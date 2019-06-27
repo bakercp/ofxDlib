@@ -21,6 +21,8 @@ An [openFrameworks](http://openframeworks.cc) wrapper for [dlib](http://dlib.net
 -   From the `example_dlib_3d_point_cloud/` directory ...
     -   `make && make run`
 
+For performance, run in RELEASE mode. Running in DEBUG mode is _significantly_ slower. For more see [http://dlib.net/faq.html#Whyisdlibslow](http://dlib.net/faq.html#Whyisdlibslow).
+
 For more, see [docs/GETTING_STARTED.md](docs/GETTING_STARTED.md).
 
 ## Troubleshooting
