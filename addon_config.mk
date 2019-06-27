@@ -30,11 +30,9 @@ osx:
 	ADDON_CPPFLAGS += -mavx
 
 	# If dlib is compiled with MKL support, you need to add flags support MKL.
+	# By default, MKL is installed @ /opt/intel/mkl on macOS.
 	# These flags were chosen using the calculator here:
 	# https://software.intel.com/en-us/articles/intel-mkl-link-line-advisor.
-
-	# If dlib is compiled with MKL support, you need to add these.
-	# By default, MKL is installed @ /opt/intel/mkl on macOS.
 
 	# ADDON_INCLUDES += /opt/intel/mkl/include
 	# ADDON_INCLUDES += /opt/intel/include
@@ -60,19 +58,22 @@ linux64:
 	# If dlib is compiled with CUDA support, you need to include these.
 	# ADDON_LDFLAGS += -L/usr/local/cuda/lib64 -lcuda -lcudart -lcudnn -lcublas -lcurand -lcusolver
 
-	# If dlib is compiled with MKL support, you need to add these.
+	# If dlib is compiled with MKL support, you need to add flags support MKL.
 	# Typically, if installed with sudo, MKL is installed @ /opt/intel/mkl on Linux.
 	# If MKL is not installed with sudo, it is likely installed @ /home/USERNAME/intel
+	# These flags were chosen using the calculator here:
+	# https://software.intel.com/en-us/articles/intel-mkl-link-line-advisor.
 
-	# ADDON_INCLUDES += /opt/intel/mkl/include
-	# ADDON_INCLUDES += /opt/intel/include
-	# ADDON_LDFLAGS  += /opt/intel/lib/libiomp5.a
-	# ADDON_LDFLAGS  += /opt/intel/mkl/lib/libmkl_intel_ilp64.a
-	# ADDON_LDFLAGS  += /opt/intel/mkl/lib/libmkl_intel_thread.a
-	# ADDON_LDFLAGS  += /opt/intel/mkl/lib/libmkl_core.a
-	# ADDON_LDFLAGS  += -lpthread -lm -ldl
-	# ADDON_DEFINES  += MKL_ILP64
-	# ADDON_CPPFLAGS += -m64
+	ADDON_INCLUDES += /opt/intel/mkl/include
+	ADDON_INCLUDES += /opt/intel/include
+	ADDON_LDFLAGS  += -Wl,--start-group
+	ADDON_LDFLAGS  += /opt/intel/lib/intel64/libiomp5.a
+	ADDON_LDFLAGS  += /opt/intel/mkl/lib/intel64/libmkl_intel_lp64.a
+	ADDON_LDFLAGS  += /opt/intel/mkl/lib/intel64/libmkl_sequential.a
+	ADDON_LDFLAGS  += /opt/intel/mkl/lib/intel64/libmkl_core.a
+	ADDON_LDFLAGS  += -Wl,--end-group
+	ADDON_LDFLAGS  += -lpthread -lm -ldl
+	ADDON_CPPFLAGS += -m64
 
 android/armeabi-v7a:
 	ADDON_LIBS = libs/dlib/lib/android/armeabi-v7a/libdlib.a
