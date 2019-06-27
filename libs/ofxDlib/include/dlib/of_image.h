@@ -201,6 +201,7 @@ public:
             return;
         }
 
+        // If ofPixels_ is already allocated to match, it will return fast.
         _pPixels->allocate(std::size_t(cols),
                            std::size_t(rows),
                            get_of_pixel_format<dlib_pixel_type>());
