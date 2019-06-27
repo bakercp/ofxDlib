@@ -1,7 +1,6 @@
-_This is under development currently so, your please post questions to the [issues](https://github.com/bakercp/ofxDlib/issues) for now._
-
 # ofxDlib
 
+_This is under development currently so, your please post questions to the [issues](https://github.com/bakercp/ofxDlib/issues) for now._
 
 ## Description
 
@@ -9,17 +8,19 @@ An [openFrameworks](http://openframeworks.cc) wrapper for [dlib](http://dlib.net
 
 ## Features
 
--   Toll-free `openFrameworks` ↔ `dlib` bridges using `dlib` `dlib/generic_image.h` interface.
--   `openFrameworks` ↔ `dlib` type conversions.
--   `dlib` helper functions.
+- Toll-free `openFrameworks` ↔ `dlib` bridges using `dlib` `dlib/generic_image.h` interface.
+- `openFrameworks` ↔ `dlib` type conversions.
+- `opencv` ↔ `dlib` type conversions.
+- `dlib` helper functions.
 
 ## Getting Started
 
 ### TL;DR
--   From the `scripts/` directory ...
-    -   `./bootstrap.sh`
--   From the `example_dlib_3d_point_cloud/` directory ...
-    -   `make && make run`
+
+- From the `scripts/` directory ...
+  - `./bootstrap.sh`
+- From the `example_dlib_3d_point_cloud/` directory ...
+  - `make && make run`
 
 For performance, run in RELEASE mode. Running in DEBUG mode is _significantly_ slower. For more see [http://dlib.net/faq.html#Whyisdlibslow](http://dlib.net/faq.html#Whyisdlibslow).
 
@@ -39,11 +40,9 @@ Linux, macOS [![Build Status](https://travis-ci.org/bakercp/ofxDlib.svg?branch=m
 
 Visual Studio, MSYS [![Build status](https://ci.appveyor.com/api/projects/status/4rkeucq1y07qc3gr/branch/master?svg=true)](https://ci.appveyor.com/project/bakercp/ofxdlib/branch/master)
 
-
 ## Compatibility
 
-**Currently NOT Compatible with < 0.10.0, thus we have no stable branch as noted below.**
-~~The `stable` branch of this repository is meant to be compatible with the openFrameworks [stable branch](https://github.com/openframeworks/openFrameworks/tree/stable), which corresponds to the latest official openFrameworks release.~~
+~The `stable` branch of this repository is meant to be compatible with the openFrameworks [stable branch](https://github.com/openframeworks/openFrameworks/tree/stable), which corresponds to the latest official openFrameworks release.~
 
 The `master` branch of this repository is meant to be compatible with the openFrameworks [master branch](https://github.com/openframeworks/openFrameworks/tree/master).
 
@@ -65,8 +64,8 @@ You can also take a look at the [docs/TODO.md](docs/TODO.md) for more ideas.
 
 Pull Requests are always welcome, so if you make any improvements please feel free to float them back upstream :)
 
-1.  Fork this repository.
-2.  Create your feature branch (`git checkout -b my-new-feature`).
-3.  Commit your changes (`git commit -am 'Add some feature'`).
-4.  Push to the branch (`git push origin my-new-feature`).
-5.  Create new Pull Request.
+1. Fork this repository.
+2. Create your feature branch (`git checkout -b my-new-feature`).
+3. Commit your changes (`git commit -am 'Add some feature'`).
+4. Push to the branch (`git push origin my-new-feature`).
+5. Create new Pull Request.

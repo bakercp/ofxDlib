@@ -18,7 +18,7 @@ Efforts have been made to make everything run on macOS and Linux, with and witho
 
 ### CUDA / cuDNN
 
-CUDA/cuDNN can be installed easily on Linux, macOS and Windows with NVIDIA hardware. Take look [here](https://developer.nvidia.com/cudnn) for cuDNN and [here](https://developer.nvidia.com/cuda-zone) for CUDA.  Then run `scripts/bootstrap.sh` and recompile dlib with CUDA/cuDNN support.
+CUDA/cuDNN can be installed on Linux, macOS and Windows with NVIDIA hardware. Take look [here](https://developer.nvidia.com/cudnn) for cuDNN and [here](https://developer.nvidia.com/cuda-zone) for CUDA.  Then run `scripts/./bootstrap.sh` and recompile dlib with CUDA/cuDNN support.
 
 > CUDA/cuDNN will not work on OSX without Xcode 8+ due to missing `std::thread_local` support and it may not work after that depending on how old your hardware is. [reference](https://stackoverflow.com/questions/28094794/why-does-apple-clang-disallow-c11-thread-local-when-official-clang-supports).
 
