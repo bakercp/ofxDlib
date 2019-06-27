@@ -24,7 +24,7 @@ OFX_PATH=${OF_ROOT}/scripts/ofx
 
 if ! [ -f ${OFX_PATH}/ofx ] ; then
   echo "ofx if not installed, pulling latest version."
-  git clone https://github.com/openframeworks/apothecary.git ${OFX_PATH}
+  git clone https://github.com/bakercp/ofx.git ${OFX_PATH}
 else
   pushd "${OFX_PATH}" > /dev/null
   if git rev-parse --is-inside-work-tree ; then
