@@ -175,7 +175,7 @@ void ofApp::setup()
     // MATLAB: E = B' * B
     E = dlib::trans(B)*B;
 
-    double var;
+    double var = 0.0;
     // MATLAB: var = A(1,2)
     var = A(0,1); // dlib::matrix is 0 indexed rather than starting at 1 like Matlab.
 
