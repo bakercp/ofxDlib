@@ -8,13 +8,10 @@
 #include "ofApp.h"
 
 
-using namespace ofxDlib;
-
-
 void ofApp::setup()
 {
     // Set up the detector settings.
-    FaceDetector::Settings settings;
+    ofxDlib::FaceDetector::Settings settings;
 
     // By default the detector uses the standard dlib HOG detector.
     // It can also use the more accurate (and computationally expensive)
@@ -23,10 +20,26 @@ void ofApp::setup()
     //
     // settings.detectorType = FaceDetector::Type::FACE_DETECTOR_MMOD;
 
-    // We scale the image down to increase detection speed.
-    settings.inputScale = 0.5;
+    // We can scale the image DOWN to increase detection speed.
+    // But this makes smaller faces more difficult to detect.
+    //
+    // settings.inputScale = 0.5;
 
-    // We set a region of interest (ROI) to increase detection speed.
+    // We can scale the image UP to detect smaller faces. But this will result
+    // in slower detection speeds.
+    //
+    // settings.inputScale = 1.5;
+
+    // By default, scaling interpolation is done using a
+    // OF_INTERPOLATE_NEAREST_NEIGHBOR, which is very fast. In some cases
+    // it might be useful to use more complex interpolation, like
+    // OF_INTERPOLATE_BILINEAR. This will be slower.
+    //
+    // settings.inputScaleInterpolation = OF_INTERPOLATE_BILINEAR;
+
+    // If you know what region of the image will contain faces, you can set
+    // region of interest (ROI). This will increase the speed by reducing the
+    // number of pixels that need to be processed.
     settings.inputROI = ofRectangle(200, 200, 800, 400);
 
     // Set up the detector.
