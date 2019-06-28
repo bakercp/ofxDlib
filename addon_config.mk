@@ -66,12 +66,10 @@ linux64:
 
 	# ADDON_INCLUDES += /opt/intel/mkl/include
 	# ADDON_INCLUDES += /opt/intel/include
-	# ADDON_LDFLAGS  += -Wl,--start-group
 	# ADDON_LDFLAGS  += /opt/intel/lib/intel64/libiomp5.a
 	# ADDON_LDFLAGS  += /opt/intel/mkl/lib/intel64/libmkl_intel_lp64.a
 	# ADDON_LDFLAGS  += /opt/intel/mkl/lib/intel64/libmkl_sequential.a
 	# ADDON_LDFLAGS  += /opt/intel/mkl/lib/intel64/libmkl_core.a
-	# ADDON_LDFLAGS  += -Wl,--end-group
 	# ADDON_LDFLAGS  += -lpthread -lm -ldl
 	# ADDON_CPPFLAGS += -m64
 
