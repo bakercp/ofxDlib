@@ -72,6 +72,19 @@ inline ofRectangle toOf(const dlib::rectangle& r)
     return ofRectangle(r.left(), r.top(), r.width(), r.height());
 }
 
+
+/// \brief Copy a ofRectangle to a dlib::rectangle.
+/// \param r the ofRectangle.
+/// \returns a dlib::rectangle.
+inline dlib::rectangle toDlib(const ofRectangle& r)
+{
+    return dlib::rectangle(r.getLeft(),
+                           r.getTop(),
+                           r.getRight(),
+                           r.getBottom());
+}
+
+
 /// \brief Copy a dlib::rgb_pixel to an ofColor.
 /// \param v The dlib::rgb_pixel to convert.
 /// \returns an ofColor.
@@ -389,12 +402,12 @@ ofPixels_<typename dlib::pixel_traits<typename dlib::image_traits<image_type>::p
 
 /// DNN
 
-enum ImageMapType
-{
-    IMAGE_MAP_NONE,
-    IMAGE_MAP_LAYER,
-    IMAGE_MAP_SAMPLE
-};
+//enum ImageMapType
+//{
+//    IMAGE_MAP_NONE,
+//    IMAGE_MAP_LAYER,
+//    IMAGE_MAP_SAMPLE
+//};
 
 template <template<typename> class TAG_TYPE, std::size_t NR, std::size_t NC, typename NET>
 inline std::vector<dlib::matrix<float, NR, NC>> layerOutputsToMatrices(const NET& net)
@@ -446,8 +459,8 @@ inline std::vector<ofTexture> layerOutputsToTextures(const NET& net)
         dlib::matrix<float, NR, NC> m = dlib::mat(a(layer_output, offset));
 
         auto mm = std::minmax_element(m.begin(), m.end());
-        std::cout << "---- " << *mm.first << "," << *mm.second << std::endl;
-        std::cout << std::endl;
+//        std::cout << "---- " << *mm.first << "," << *mm.second << std::endl;
+//        std::cout << std::endl;
         ofFloatPixels p = toOf(m);
 
         map(p, *mm.first, *mm.second);
