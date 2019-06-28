@@ -1,0 +1,3 @@
+dlib/examples/mmod_cars_test_image.png mmod_cars_test_image.png
+dlib/examples/mmod_cars_test_image2.png mmod_cars_test_image2.png
+dlib/models/mmod_front_and_rear_end_vehicle_detector.dat mmod_front_and_rear_end_vehicle_detector.dat

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2018 Dario Longobardi 
+// Copyright (c) 2018 Dario Longobardi
 //
 // License: MIT
 //
@@ -10,11 +10,11 @@
     an image.  We will also visualize some of the detector's processing steps by
     plotting various intermediate images on the screen.  Viewing these can help
     you understand how the detector works.
-    
-    The model used by this example was trained by the dnn_mmod_train_find_cars_ex.cpp 
+
+    The model used by this example was trained by the dnn_mmod_train_find_cars_ex.cpp
     example.  Also, since this is a CNN, you really should use a GPU to get the
-    best execution speed.  For instance, when run on a NVIDIA 1080ti, this detector 
-    runs at 98fps when run on the provided test image.  That's more than an order 
+    best execution speed.  For instance, when run on a NVIDIA 1080ti, this detector
+    runs at 98fps when run on the provided test image.  That's more than an order
     of magnitude faster than when run on the CPU.
 
     Users who are just learning about dlib's deep learning API should read
@@ -31,14 +31,14 @@
 
 void ofApp::setup()
 {
-	image.load("test.jpg");
+	image.load("mmod_cars_test_image.png");
 
 	net_type net;
 	dlib::shape_predictor sp;
         dlib::matrix<dlib::rgb_pixel> img = dlib::mat(image.getPixels());
 
         dlib::deserialize(ofToDataPath("mmod_rear_end_vehicle_detector.dat")) >> net >> sp;
-	
+
 	// Run the detector on the image and show us the output.
     	for (auto&& d : net(img))
     	{
