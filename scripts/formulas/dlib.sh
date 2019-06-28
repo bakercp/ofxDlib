@@ -104,11 +104,14 @@ function copy() {
 # executed inside the lib src dir
 function clean() {
     if [ "$TYPE" == "osx" ] || [ "$TYPE" == "linux64" ] || [ "$TYPE" == "linuxarmv6l" ] ; then
-        cd "${BUILD_DIR}/dlib/build" || exit 1
-        cmake clean .
-        cd ..
-        rm -rf build
-        cd ..
+        # If we can't go to that dir, then there's nothing to clean.
+        if [ -d "${BUILD_DIR}/dlib/build" ] ; then
+            cd "${BUILD_DIR}/dlib/build"
+            cmake clean .
+            cd ..
+            rm -rf build
+            cd ..
+        fi
     elif [ "$TYPE" == "android" ] ; then
         rm -rf obj
     fi
