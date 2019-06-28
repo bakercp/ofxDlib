@@ -319,7 +319,7 @@ public:
 
         mutable std::vector<float> _meanFaceCode;
 
-        float _faceChipAlpha = 0.99;
+        float _faceChipAlpha = 0.99f;
         ofFloatPixels _faceChip;
         mutable ofTexture _faceChipTexture;
 
