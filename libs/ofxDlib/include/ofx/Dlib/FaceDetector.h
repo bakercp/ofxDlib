@@ -23,35 +23,11 @@ namespace Dlib {
 class ObjectDetection
 {
 public:
-    ObjectDetection()
-    {
-    }
-
-    ObjectDetection(const dlib::mmod_rect& rect):
-        confidence(rect.detection_confidence),
-        rectangle(toOf(rect.rect))
-    {
-    }
-
-    ObjectDetection(const std::pair<double, dlib::rectangle>& det):
-        ObjectDetection(det.second, det.first)
-    {
-    }
-
-    ObjectDetection(const dlib::rectangle& _rectangle, float _confidence):
-        rectangle(toOf(_rectangle)),
-        confidence(_confidence)
-    {
-    }
-
-    ObjectDetection(const ofRectangle& _rectangle, float _confidence):
-        rectangle(_rectangle),
-        confidence(_confidence)
-    {
-    }
-
-    /// \brief The detection rectangle in pixel coordinates.
-    ofRectangle rectangle;
+    ObjectDetection();
+    ObjectDetection(const dlib::mmod_rect& detection);
+    ObjectDetection(const std::pair<double, dlib::rectangle>& detection);
+    ObjectDetection(double confidence, const dlib::rectangle& rectangle);
+    ObjectDetection(double confidence, const ofRectangle& rectangle);
 
     /// \brief The detection confidence.
     ///
@@ -59,7 +35,10 @@ public:
     ///     > 1.0 => very confident
     ///
     /// If confidence is unsupported, a confidence of 1 will returned.
-    float confidence = 0.0;
+    double confidence = 0.0;
+
+    /// \brief The detection rectangle in pixel coordinates.
+    ofRectangle rectangle;
 
 };
 
@@ -71,6 +50,7 @@ class FaceDetector
 public:
     struct Settings;
 
+    /// \brief The face detector types.
     enum class Type
     {
         /// \brief The standard HOG based face detector.
@@ -134,10 +114,10 @@ public:
 
         if (!_settings.inputROI.isEmpty())
         {
-            roi.left() = _settings.inputROI.getLeft();
-            roi.top() = _settings.inputROI.getTop();
-            roi.right() = _settings.inputROI.getRight();
-            roi.bottom() = _settings.inputROI.getBottom();
+            roi.left() = static_cast<long>(_settings.inputROI.getLeft());
+            roi.top() = static_cast<long>(_settings.inputROI.getTop());
+            roi.right() = static_cast<long>(_settings.inputROI.getRight());
+            roi.bottom() = static_cast<long>(_settings.inputROI.getBottom());
         }
 
         // Toll-free roi image.
