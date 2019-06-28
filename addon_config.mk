@@ -44,6 +44,20 @@ osx:
 	# ADDON_DEFINES  += MKL_ILP64
 	# ADDON_CPPFLAGS += -m64
 
+linuxarmv6l:
+	ADDON_LIBS = libs/dlib/lib/linux64/libdlib.a
+	ADDON_PKG_CONFIG_LIBRARIES = libpng libjpeg
+	ADDON_LDFLAGS += -lgif
+
+	# If your processor supports SIMD AVX instructions.
+	ADDON_CPPFLAGS += -O3 -mfpu=neon
+
+	# dlib on the Rapberry Pi can benefit from profiling. See the discussion here:
+	# https://github.com/davisking/dlib/issues/557
+
+	# If dlib is compiled with libblas/liblapack support, you may need to include these.
+	ADDON_PKG_CONFIG_LIBRARIES += blas lapack
+
 linux64:
 	ADDON_LIBS = libs/dlib/lib/linux64/libdlib.a
 	ADDON_PKG_CONFIG_LIBRARIES = libpng libjpeg
