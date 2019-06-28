@@ -1,3 +1,0 @@
-mnist/
-dlib/models/mnist_network.dat mnist_network.dat
-dlib/models/mnist_network_tagged.dat mnist_network_tagged.dat
