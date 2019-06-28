@@ -32,7 +32,7 @@ function prepare() {
 
 # executed inside the lib src dir
 function build() {
-    if [ "$TYPE" == "osx" ] || [ "$TYPE" == "linux64" ] || [ "$TYPE" == "linuxarmv6l" ] ; then
+    if [ "$TYPE" == "osx" ] || [[ "$TYPE" == linux* ]] ; then
         mkdir -p "build"
         pushd "build" || return
         if [ "$TYPE" == "linuxarmv6l" ] ; then
@@ -48,7 +48,7 @@ function build() {
             # Strangely, it works in Xcode but not w/ makefiles or QTCreator.
             # -D DLIB_ENABLE_ASSERTS=ON \
             cmake \
-             -D DLIB_JPEG_SUPPORT=OFF \
+              -D DLIB_JPEG_SUPPORT=OFF \
               -DUSE_SSE2_INSTRUCTIONS=ON \
               -DUSE_SSE4_INSTRUCTIONS=ON \
               -DUSE_AVX_INSTRUCTIONS=ON \
@@ -84,7 +84,7 @@ function copy() {
     mkdir -p $1/include
     mkdir -p $1/lib/$TYPE
 
-    if [ "$TYPE" == "osx" ] || [ "$TYPE" == "linux64" ] || [ "$TYPE" == "linuxarmv6l" ] ; then
+    if [ "$TYPE" == "osx" ] || [[ "$TYPE" == linux* ]] ; then
         cd "${BUILD_DIR}/dlib/build" || exit 1
         make install
         cd - || exit 1
@@ -103,7 +103,7 @@ function copy() {
 
 # executed inside the lib src dir
 function clean() {
-    if [ "$TYPE" == "osx" ] || [ "$TYPE" == "linux64" ] || [ "$TYPE" == "linuxarmv6l" ] ; then
+    if [ "$TYPE" == "osx" ] || [[ "$TYPE" == linux* ]] ; then
         # If we can't go to that dir, then there's nothing to clean.
         if [ -d "${BUILD_DIR}/dlib/build" ] ; then
             cd "${BUILD_DIR}/dlib/build"
