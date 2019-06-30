@@ -110,6 +110,13 @@ FaceDetector::Settings FaceDetector::settings() const
 }
 
 
+//std::vector<ObjectDetection> FaceDetector::detect(const ofBaseHasPixels& image)
+//{
+////    dlib::of_image _image = toDlib(image.getPixels());
+//    return detect(toDlib(image.getPixels()));
+//}
+
+
 const ofPixels& FaceDetector::pixels() const
 {
     return _pixels;

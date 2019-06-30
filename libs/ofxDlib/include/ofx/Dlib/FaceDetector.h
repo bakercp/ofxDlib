@@ -9,9 +9,12 @@
 
 
 #include <vector>
-#include <dlib/image_processing/frontal_face_detector.h>
+#include "dlib/of_default_adapter.h"
+#include "dlib/of_image.h"
+#include "dlib/image_processing/frontal_face_detector.h"
 #include "ofx/Dlib/Utils.h"
 #include "ofx/Dlib/Network/MMODFaceDetector.h"
+#include "ofThreadChannel.h"
 #include "ofWindowSettings.h"
 
 
@@ -93,7 +96,7 @@ public:
     ///
     /// \param image The pixels to search.
     /// \returns a vector of rectangles in pixel coordinates and confidences.
-    /// \tparam The image type.
+    /// \tparam An image implementing the dlib generic image template interface.
     template<typename image_type>
     std::vector<ObjectDetection> detect(const image_type& image)
     {
@@ -120,8 +123,8 @@ public:
             roi.bottom() = static_cast<long>(_settings.inputROI.getBottom());
         }
 
-        // Toll-free roi image.
-        auto roiImage = dlib::sub_image(image, roi);
+        // Toll-free roi image. Using `auto` in these places seems to cause problems.
+        dlib::const_sub_image_proxy<image_type> roiImage = dlib::sub_image(image, roi);
 
         dlib::set_image_size(_pixels,
                              std::round(_settings.inputScale * dlib::num_rows(roiImage)),
@@ -145,7 +148,7 @@ public:
         for (auto& detection: detections)
         {
             // Scale and translate detections back to input pixel coordinates.
-            detection.second = dlib::scale_rect(detection.second, 1.0 / _settings.inputScale);
+            detection.second = dlib::scale_rect(detection.second, 1.0 / double(_settings.inputScale));
             detection.second = dlib::translate_rect(detection.second, roi.left(), roi.top());
 
             // Filter out any detections that don't meet requirements.
