@@ -56,7 +56,7 @@ void ofApp::update()
 
     if (video.isFrameNew())
     {
-        detections = detector.detect(video.getPixels());
+        detections = detector.detect(video);
     }
 }
 
