@@ -8,8 +8,43 @@
 #pragma once
 
 
+#include <algorithm>
+#include <cstdint>
+#include <limits>
+#include <map>
+#include <vector>
+#include "glm.hpp"
+#include "ofMath.h"
+#include "ofRectangle.h"
+
+
 namespace ofx {
 namespace Dlib {
+
+
+inline glm::vec2 position(const ofRectangle& item)
+{
+    return item.getCenter();
+}
+
+inline ofRectangle lerp(const ofRectangle& a,
+                 const ofRectangle& b,
+                 float smoothingRate)
+{
+    ofRectangle result;
+    result.x = ofLerp(a.x, b.x, smoothingRate);
+    result.y = ofLerp(a.y, b.y, smoothingRate);
+    result.width = ofLerp(a.width, b.width, smoothingRate);
+    result.height = ofLerp(a.height, b.height, smoothingRate);
+    return result;
+}
+
+inline float distance(const ofRectangle& a, const ofRectangle& b)
+{
+    glm::vec2 dp = a.getCenter() - b.getCenter();
+    glm::vec2 ds = { a.width - b.width, a.height - b.height };
+    return glm::length(dp) + glm::length(ds);
+}
 
 
 /// \tparam T The type of object being tracked.
@@ -40,6 +75,8 @@ public:
         _lastSeen(old._lastSeen)
     {
     }
+
+    // TODO write implicit copy assignment operator since we do it here.
 
     /// \returns a reference to the tracked object.
     T& object()
@@ -88,8 +125,8 @@ public:
 protected:
     T _object;
 
-    std::size_t _label = std::numeric_limits<std::size_t>::max();
-    std::size_t _index = std::numeric_limits<std::size_t>::max();
+    std::size_t _label = static_cast<std::size_t>(-1);
+    std::size_t _index = static_cast<std::size_t>(-1);
 
     uint64_t _age = 0;
     uint64_t _lastSeen = 0;
@@ -180,10 +217,8 @@ public:
 
     uint64_t getLastSeen(std::size_t label) const
     {
-        return _currentLabelMap.find(label)->second->getLastSeen();
+        return _currentLabelMap.find(label)->second->lastSeen();
     }
-
-    virtual float distance(const T& a, const T& b) = 0;
 
     virtual Labels track(const std::vector<T>& objects)
     {
@@ -328,7 +363,7 @@ public:
     {
     }
 
-    virtual ~SmoothTracker()
+    virtual ~SmoothTracker() override
     {
     }
 
@@ -411,41 +446,19 @@ protected:
 };
 
 
-class RectSmoothTracker: public SmoothTracker<ofRectangle>
-{
-public:
-    RectSmoothTracker()
-    {
-    }
+//class RectSmoothTracker: public SmoothTracker<ofRectangle>
+//{
+//public:
+//    RectSmoothTracker()
+//    {
+//    }
 
-    virtual ~RectSmoothTracker()
-    {
-    }
+//    virtual ~RectSmoothTracker() override
+//    {
+//    }
 
-    glm::vec2 position(const ofRectangle& item) override
-    {
-        return item.getCenter();
-    }
 
-    ofRectangle lerp(const ofRectangle& a,
-                     const ofRectangle& b,
-                     float smoothingRate) override
-    {
-        ofRectangle result;
-        result.x = ofLerp(a.x, b.x, smoothingRate);
-        result.y = ofLerp(a.y, b.y, smoothingRate);
-        result.width = ofLerp(a.width, b.width, smoothingRate);
-        result.height = ofLerp(a.height, b.height, smoothingRate);
-        return result;
-    }
-
-    float distance(const ofRectangle& a, const ofRectangle& b) override
-    {
-        glm::vec2 dp = a.getCenter() - b.getCenter();
-        glm::vec2 ds = { a.width - b.width, a.height - b.height };
-        return glm::length(dp) + glm::length(ds);
-    }
-};
+//};
 
 
 template <class T>
@@ -460,11 +473,11 @@ public:
     {
     }
 
-    virtual void setup(const T& track)
+    virtual void setup(const T&)
     {
     }
 
-    virtual void update(const T& track)
+    virtual void update(const T&)
     {
     }
 
