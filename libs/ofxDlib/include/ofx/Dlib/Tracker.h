@@ -367,10 +367,6 @@ public:
     {
     }
 
-    virtual glm::vec2 position(const T& item) = 0;
-
-    virtual T lerp(const T& from, const T& to, float smoothingRate) = 0;
-
     typename Tracker<T>::Labels track(const std::vector<ofRectangle>& objects) override
     {
         auto labels = Tracker<T>::track(objects);
@@ -444,21 +440,6 @@ protected:
     std::map<std::size_t, T> _smoothed;
 
 };
-
-
-//class RectSmoothTracker: public SmoothTracker<ofRectangle>
-//{
-//public:
-//    RectSmoothTracker()
-//    {
-//    }
-
-//    virtual ~RectSmoothTracker() override
-//    {
-//    }
-
-
-//};
 
 
 template <class T>
