@@ -8,6 +8,7 @@
 #pragma once
 
 
+#include "ofGraphics.h"
 #include "ofx/Dlib/FaceDetector.h"
 
 
@@ -45,6 +46,14 @@ inline void draw(const ofRectangle& rectangle, const std::string& label, float l
 inline void draw(const ObjectDetection& detection)
 {
     draw(detection.rectangle, "Confidence: " + ofToString(detection.confidence, 2));
+}
+
+inline void draw(const std::map<std::size_t, ObjectDetection>& tracks)
+{
+    for (auto&& track: tracks)
+    {
+        draw(track.second.rectangle, "#:" + ofToString(track.first) + " @ " + ofToString(track.second.confidence, 2));
+    }
 }
 
 
