@@ -49,9 +49,9 @@ function build() {
             # -D DLIB_ENABLE_ASSERTS=ON \
             cmake \
               -D DLIB_JPEG_SUPPORT=OFF \
-              -DUSE_SSE2_INSTRUCTIONS=ON \
-              -DUSE_SSE4_INSTRUCTIONS=ON \
-              -DUSE_AVX_INSTRUCTIONS=ON \
+              -D USE_SSE2_INSTRUCTIONS=ON \
+              -D USE_SSE4_INSTRUCTIONS=ON \
+              -D USE_AVX_INSTRUCTIONS=ON \
               -D CMAKE_OSX_DEPLOYMENT_TARGET=10.9 \
               -D DLIB_NO_GUI_SUPPORT=YES \
               -D DLIB_GIF_SUPPORT=OFF \
@@ -59,9 +59,10 @@ function build() {
               ..
         else
             cmake \
-              -DUSE_SSE2_INSTRUCTIONS=ON \
-              -DUSE_SSE4_INSTRUCTIONS=ON \
-              -DUSE_AVX_INSTRUCTIONS=ON \
+              -D USE_SSE2_INSTRUCTIONS=ON \
+              -D USE_SSE4_INSTRUCTIONS=ON \
+              -D USE_AVX_INSTRUCTIONS=ON \
+              -D USE_NEON_INSTRUCTIONS=ON \
               -D DLIB_NO_GUI_SUPPORT=YES \
               -D CMAKE_INSTALL_PREFIX="${LIBS_DIR}/dlib/install" \
               ..
