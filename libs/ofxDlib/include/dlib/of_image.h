@@ -59,7 +59,7 @@ inline ofPixelFormat get_of_pixel_format()
 }
 
 
-// we have to have a pointer because this must be default constructable.
+/// \note We must have a pointer because this must be default constructable.
 template <typename dlib_pixel_type, typename of_pixel_type>
 class of_image
 {
@@ -246,9 +246,9 @@ struct image_traits<of_image<dlib_pixel_type, of_pixel_type>>
 };
 
 template <typename dlib_pixel_type, typename of_pixel_type>
-inline long num_rows( const of_image<dlib_pixel_type, of_pixel_type>& img) { return img.nr(); }
+inline long num_rows(const of_image<dlib_pixel_type, of_pixel_type>& img) { return img.nr(); }
 template <typename dlib_pixel_type, typename of_pixel_type>
-inline long num_columns( const of_image<dlib_pixel_type, of_pixel_type>& img) { return img.nc(); }
+inline long num_columns(const of_image<dlib_pixel_type, of_pixel_type>& img) { return img.nc(); }
 
 template <typename dlib_pixel_type, typename of_pixel_type>
 inline void set_image_size(of_image<dlib_pixel_type, of_pixel_type>& img, long rows, long cols)
@@ -261,14 +261,14 @@ template <typename dlib_pixel_type, typename of_pixel_type>
 inline void* image_data(of_image<dlib_pixel_type, of_pixel_type>& img)
 {
     if (img.size() != 0) return &img[0][0];
-    return 0;
+    return nullptr;
 }
 
 template <typename dlib_pixel_type, typename of_pixel_type>
 inline const void* image_data(const of_image<dlib_pixel_type, of_pixel_type>& img)
 {
     if (img.size() != 0) return &img[0][0];
-    return 0;
+    return nullptr;
 }
 
 template <typename dlib_pixel_type, typename of_pixel_type>
