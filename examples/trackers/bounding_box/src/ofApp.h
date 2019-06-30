@@ -50,7 +50,7 @@ public:
     void update() override;
     void draw() override;
 
-    ofxDlib::RectSmoothTracker rectangleTracker;
+    ofxDlib::SmoothTracker<ofRectangle> rectangleTracker;
 
     std::vector<Rectangle> rectangles;
 
