@@ -251,7 +251,7 @@ void resize_image(const input_image_type& input,
 /// to work as expected in openFrameworks, we need to rescale the values loaded
 /// by dlib into the range expected by openFrameworks.
 ///
-/// This function is not optimized and certainly could be with simd.
+/// This function is not optimized and certainly could be with SIMD.
 ///
 /// \param pixels The pixels to map.
 /// \param inMin The input minimum. Usually 0.

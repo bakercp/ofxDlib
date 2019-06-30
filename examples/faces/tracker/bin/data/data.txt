@@ -1,0 +1,2 @@
+dlib/examples/faces/ faces/
+dlib/models/mmod_human_face_detector.dat mmod_human_face_detector.dat
