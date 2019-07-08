@@ -13,7 +13,6 @@
 #include "dlib/of_image.h"
 #include "dlib/image_processing/frontal_face_detector.h"
 #include "ofx/Dlib/FaceDetection.h"
-#include "ofx/Dlib/ObjectDetection.h"
 #include "ofx/Dlib/Utils.h"
 #include "ofx/Dlib/Network/MMODFaceDetector.h"
 #include "ofx/Dlib/Network/FaceRecognitionResnetModelV1.h"

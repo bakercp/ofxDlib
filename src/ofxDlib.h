@@ -8,7 +8,6 @@
 #pragma once
 
 
-#include "dlib/glm_adapter.h"
 #include "dlib/of_default_adapter.h"
 #include "dlib/of_image.h"
 #include "dlib/to_of.h"

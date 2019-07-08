@@ -11,7 +11,6 @@
 #include "ofGraphics.h"
 #include "ofx/Dlib/FaceFinder.h"
 #include "ofx/Dlib/FaceDetection.h"
-#include "ofx/Dlib/ObjectDetection.h"
 
 
 namespace ofx {
@@ -54,24 +53,10 @@ inline void draw(const ofRectangle& rectangle, const std::string& label, float l
     ofPopStyle();
 }
 
-inline void draw(const ObjectDetection& detection)
-{
-    draw(detection.rectangle, "Confidence: " + ofToString(detection.confidence, 2));
-}
-
 
 inline void draw(const FaceDetection& detection)
 {
     draw(detection.rectangle(), "Confidence: " + ofToString(detection.confidence(), 2));
-}
-
-
-inline void draw(const std::map<std::size_t, ObjectDetection>& tracks)
-{
-    for (auto&& track: tracks)
-    {
-        draw(track.second.rectangle, "#:" + ofToString(track.first) + " @ " + ofToString(track.second.confidence, 2));
-    }
 }
 
 
