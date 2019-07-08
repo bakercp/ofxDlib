@@ -51,6 +51,9 @@ void ofApp::setup()
 
     // Set up the video input.
     video.setup(1280, 720);
+    trackBeginListener = tracker.trackBegin.newListener(this, &ofApp::onTrackBegin);
+    trackUpdateListener = tracker.trackUpdate.newListener(this, &ofApp::onTrackUpdate);
+    trackEndListener = tracker.trackEnd.newListener(this, &ofApp::onTrackEnd);
 }
 
 
@@ -78,4 +81,46 @@ void ofApp::draw()
     // Draw the tracks.
     ofSetColor(ofColor::yellow);
     ofxDlib::draw(tracker.tracks());
+
+    ofSetColor(ofColor::white);
+
+    float y = 0;
+    for (auto&& t: tracked)
+    {
+        t.second.draw(0, y);
+        y += t.second.getHeight();
+    }
+}
+
+
+void ofApp::onTrackBegin(ofxDlib::FaceTrackerEventArgs& evt)
+{
+    std::cout << "Track begin: " << evt.label << std::endl;
+    auto iter = tracked.find(evt.label);
+    bool success = false;
+    if (iter == tracked.end())
+        std::tie(iter, success) = tracked.insert(std::make_pair(evt.label, ofTexture()));
+    iter->second.loadData(evt.detection.faceChip());
+}
+
+
+void ofApp::onTrackUpdate(ofxDlib::FaceTrackerEventArgs& evt)
+{
+    std::cout << "Track update: " << evt.label << std::endl;
+    auto iter = tracked.find(evt.label);
+    bool success = false;
+    if (iter == tracked.end())
+        std::tie(iter, success) = tracked.insert(std::make_pair(evt.label, ofTexture()));
+    iter->second.loadData(evt.detection.faceChip());
+}
+
+
+void ofApp::onTrackEnd(ofxDlib::FaceTrackerEventArgs& evt)
+{
+    std::cout << "Track end: " << evt.label << std::endl;
+    auto iter = tracked.find(evt.label);
+    if (iter != tracked.end())
+        tracked.erase(iter);
+    else
+        std::cout << "NO IMAGE TRACKED FOR: " << evt.label << std::endl;
 }
