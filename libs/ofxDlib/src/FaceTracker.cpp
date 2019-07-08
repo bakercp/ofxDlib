@@ -114,7 +114,7 @@ bool FaceTracker::_process(const dlib::matrix<dlib::rgb_pixel>& input,
 {
     _tracker.track(_finder.find(input));
 
-    auto saveEvents = [&](const Tracker<ObjectDetection>::Labels& labels,
+    auto saveEvents = [&](const Tracker<FaceDetection>::Labels& labels,
                           FaceTrackerEventArgs::State state)
     {
         for (std::size_t label: labels)
