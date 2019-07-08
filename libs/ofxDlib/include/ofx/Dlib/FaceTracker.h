@@ -8,11 +8,11 @@
 #pragma once
 
 
-#include <dlib/pipe.h>
-#include <dlib/threads.h>
+#include "dlib/pipe.h"
+#include "dlib/threads.h"
 #include "ofEvents.h"
 #include "ofx/Dlib/Tracker.h"
-#include "ofx/Dlib/FaceDetector.h"
+#include "ofx/Dlib/FaceFinder.h"
 
 
 namespace ofx {
@@ -37,6 +37,7 @@ public:
     AsyncProcess(std::function<bool(const InputType& input, OutputType& output)> processFunction,
                  std::size_t inputPipeMaxSize,
                  std::size_t outputPipeMaxSize):
+        _exitListener(ofEvents().exit.newListener(this, &AsyncProcess::_exit)),
         inputPipe(inputPipeMaxSize),
         outputPipe(outputPipeMaxSize),
         _processFunction(processFunction)
@@ -93,6 +94,16 @@ public:
     }
 
 private:
+    /// \brief The exit callback.
+    void _exit(ofEventArgs&)
+    {
+        inputPipe.disable();
+        wait();
+    }
+
+    /// \brief The exit listener.
+    ofEventListener _exitListener;
+
     /// \brief Mutext to protect counts.
     mutable std::mutex _mutex;
 
@@ -130,6 +141,7 @@ private:
                     std::unique_lock<std::mutex> lock(_mutex);
                     _droppedOutputsCount++;
                 }
+                
                 outputPipe.enqueue(lastOutput);
             }
         }
@@ -161,29 +173,30 @@ public:
     /// \brief The time since last seen.
     uint64_t lastSeen = 0;
 
-    /// \brief The object detection associated with this event, if any.
+    /// \brief The FaceDetection associated with this event, if any.
     ///
     /// This will only be valid for state == TRACK_BEGIN and
     /// state == TRACK_UPDATE.
-    ObjectDetection detection;
+    FaceDetection detection;
 
     /// \brief The previous detection associated with this event, if any.
     ///
     /// This will only be valid for state == TRACK_UPDATE and
     /// state == TRACK_END.
-    ObjectDetection previousDetection;
+    FaceDetection previousDetection;
 
 };
 
 
-inline float distance(const ObjectDetection& _a, const ObjectDetection& _b)
+inline float distance(const FaceDetection& _a, const FaceDetection& _b)
 {
-    ofRectangle a = _a.rectangle;
-    ofRectangle b = _b.rectangle;
+    ofRectangle a = _a.rectangle();
+    ofRectangle b = _b.rectangle();
     glm::vec2 dp = glm::vec2(a.getCenter()) - glm::vec2(b.getCenter());
     glm::vec2 ds = { a.width - b.width, a.height - b.height };
     return glm::length(dp) + glm::length(ds);
 }
+
 
 /// \brief The FaceTracker.
 class FaceTracker
@@ -226,12 +239,12 @@ public:
     Settings settings() const;
 
     /// \returns the current set of tracks.
-    std::map<std::size_t, ObjectDetection> tracks() const;
+    std::map<std::size_t, FaceDetection> tracks() const;
 
-    struct Settings: public FaceDetector::Settings
+    struct Settings: public FaceFinder::Settings
     {
         std::size_t trackerPersistence = 15;
-        float trackerMaximumDistance = 64;
+        float trackerMaximumDistance = 200;
         // bool useThreaded = true;
         std::size_t threadInputMaxQueueSize = 1;
         std::size_t threadOutputMaxQueueSize = 2048;
@@ -250,6 +263,7 @@ public:
     ofEvent<FaceTrackerEventArgs> trackEnd;
 
 private:
+    /// \brief The update callback.
     void _update(ofEventArgs&);
 
     /// \brief The update listener.
@@ -259,7 +273,7 @@ private:
     Settings _settings;
 
     /// \brief The last set of detections.
-    std::map<std::size_t, ObjectDetection> _tracks;
+    std::map<std::size_t, FaceDetection> _tracks;
 
     // Threaded components below.
 
@@ -268,11 +282,11 @@ private:
     bool _process(const dlib::matrix<dlib::rgb_pixel>& input,
                   std::vector<FaceTrackerEventArgs>& output);
 
-    /// \brief The face detector.
-    FaceDetector _detector;
+    /// \brief The face finder.
+    FaceFinder _finder;
 
     /// \brief The bounding box tracker.
-    Tracker<ObjectDetection> _tracker;
+    Tracker<FaceDetection> _tracker;
 
 };
 

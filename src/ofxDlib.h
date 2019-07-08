@@ -8,14 +8,16 @@
 #pragma once
 
 
+#include "dlib/glm_adapter.h"
 #include "dlib/of_default_adapter.h"
 #include "dlib/of_image.h"
 #include "dlib/to_of.h"
-#include "ofx/Dlib/FaceDetector.h"
-#include "ofx/Dlib/FaceTracker.h"
+#include "ofx/Dlib/FaceDetection.h"
 #include "ofx/Dlib/FaceFinder.h"
+#include "ofx/Dlib/FaceTracker.h"
 #include "ofx/Dlib/Graphics.h"
 #include "ofx/Dlib/ImageCollection.h"
+#include "ofx/Dlib/LSHash.h"
 #include "ofx/Dlib/MatrixMath.h"
 #include "ofx/Dlib/Utils.h"
 #include "ofx/Dlib/Network/LeNet.h"
@@ -27,19 +29,21 @@
 
 
 #include <iostream>
-#include <dlib/clustering.h>
-#include <dlib/data_io.h>
-#include <dlib/dnn.h>
-#include <dlib/image_io.h>
-#include <dlib/image_processing.h>
-#include <dlib/image_processing/frontal_face_detector.h>
-#include <dlib/image_processing/full_object_detection.h>
+#include "dlib/clustering.h"
+#include "dlib/data_io.h"
+#include "dlib/dnn.h"
+#include "dlib/graph_utils.h"
+#include "dlib/image_io.h"
+#include "dlib/image_processing.h"
+#include "dlib/image_processing/frontal_face_detector.h"
+#include "dlib/image_processing/full_object_detection.h"
+#include "dlib/filtering/kalman_filter.h"
 #if !defined(DLIB_NO_GUI_SUPPORT)
-#include <dlib/gui_widgets.h>
+#include "dlib/gui_widgets.h"
 #endif
-#include <dlib/matrix.h>
+#include "dlib/matrix.h"
 #if defined(OPENCV)
-#include <dlib/opencv.h>
+#include "dlib/opencv.h"
 #endif
 
 

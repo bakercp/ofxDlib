@@ -13,9 +13,9 @@
 #include <limits>
 #include <map>
 #include <vector>
-#include "glm.hpp"
 #include "ofMath.h"
 #include "ofRectangle.h"
+#include "ofVectorMath.h"
 
 
 namespace ofx {
@@ -44,6 +44,13 @@ inline float distance(const ofRectangle& a, const ofRectangle& b)
     glm::vec2 dp = a.getCenter() - b.getCenter();
     glm::vec2 ds = { a.width - b.width, a.height - b.height };
     return glm::length(dp) + glm::length(ds);
+
+//    float dx = (a.x + a.width / 2.) - (b.x + b.width / 2.);
+//    float dy = (a.y + a.height / 2.) - (b.y + b.height / 2.);
+//    float dw = a.width - b.width;
+//    float dh = a.height - b.height;
+//    float pd = sqrtf(dx * dx + dy * dy);
+//    float sd = sqrtf(dw * dw + dh * dh);
 }
 
 

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2018 Christopher Baker <https://christopherbaker.net>
+// Copyright (c) 2019 Christopher Baker <https://christopherbaker.net>
 //
 // SPDX-License-Identifier: MIT
 //
@@ -9,13 +9,14 @@
 
 
 #include <vector>
-#include <dlib/image_processing/frontal_face_detector.h>
-#include "ofx/Dlib/Utils.h"
-#include "ofx/Dlib/Network/MMODFaceDetector.h"
-#include "ofx/Dlib/Network/FaceRecognitionResnetModelV1.h"
+#include "dlib/image_processing/frontal_face_detector.h"
+//#include "ofx/Dlib/ObjectDetection.h"
+//#include "ofx/Dlib/Network/MMODFaceDetector.h"
+//#include "ofx/Dlib/Network/FaceRecognitionResnetModelV1.h"
 #include "ofPath.h"
 #include "ofPixels.h"
 #include "ofRectangle.h"
+#include "ofTexture.h"
 
 
 namespace ofx {
@@ -23,15 +24,15 @@ namespace Dlib {
 
 
 /// \brief A structure representing a Detected Face detection.
-class Face
+class FaceDetection//: public ObjectDetection
 {
 public:
-    Face();
+    FaceDetection();
 
-    Face(const std::pair<double, dlib::rectangle>& face,
-         const dlib::full_object_detection& shape,
-         const ofPixels& faceChip,
-         const std::vector<float>& faceCode);
+    FaceDetection(const std::pair<double, dlib::rectangle>& face,
+                  const dlib::full_object_detection& shape,
+                  const ofPixels& faceChip,
+                  const std::vector<float>& faceCode);
 
     /// \returns true if a face has been loaded.
     bool isLoaded() const;

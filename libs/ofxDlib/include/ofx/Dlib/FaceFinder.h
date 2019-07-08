@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2018 Christopher Baker <https://christopherbaker.net>
+// Copyright (c) 2019 Christopher Baker <https://christopherbaker.net>
 //
 // SPDX-License-Identifier: MIT
 //
@@ -9,34 +9,29 @@
 
 
 #include <vector>
-#include <dlib/image_processing/frontal_face_detector.h>
-#include "ofx/Dlib/Face.h"
+#include "dlib/of_default_adapter.h"
+#include "dlib/of_image.h"
+#include "dlib/image_processing/frontal_face_detector.h"
+#include "ofx/Dlib/FaceDetection.h"
+#include "ofx/Dlib/ObjectDetection.h"
 #include "ofx/Dlib/Utils.h"
 #include "ofx/Dlib/Network/MMODFaceDetector.h"
 #include "ofx/Dlib/Network/FaceRecognitionResnetModelV1.h"
-#include "ofPath.h"
-#include "ofPixels.h"
-#include "ofRectangle.h"
+#include "ofThreadChannel.h"
+#include "ofWindowSettings.h"
 
 
 namespace ofx {
 namespace Dlib {
 
 
-/// \brief A class that finds faces.
-///
-/// There are lots of ways to find faces in an image.  This class provides a
-/// simple interface for finding faces.
-///
-/// All coordinates of rectangles and shapes are in the original image
-/// coordiantes.
+/// \brief The FaceFinder class wraps several dlib face detection types.
 class FaceFinder
 {
 public:
     struct Settings;
 
-    typedef std::vector<Face> Faces;
-
+    /// \brief An enum for the FaceDetector algorithm.
     enum class FaceDetector
     {
         /// \brief The standard HOG based face detector.
@@ -61,6 +56,7 @@ public:
         FACE_SHAPE_PREDICTOR_68_LANDMARKS
     };
 
+
     /// \brief Create a default FaceFinder.
     FaceFinder();
 
@@ -68,7 +64,7 @@ public:
     /// \param settings The Settings to use.
     FaceFinder(const Settings& settings);
 
-    /// \brief Set up the FaceDetector.
+    /// \brief Set up the FaceFinder.
     ///
     /// Calling setup will reset the FaceFinder completely.
     ///
@@ -78,36 +74,59 @@ public:
     /// \returns true if the FaceFinder has been set up successfully.
     bool isLoaded() const;
 
-    /// \brief Find all faces.
+    /// \brief Detect all faces.
     ///
-    /// Find all faces and return their location in pixel coordinates and
-    /// the normalized detection confidence on (0 = no confidence, 1 = total
-    /// confidence). If confidence is unsupported, a confidence of 1 will be
-    /// returned.
+    /// Detect all faces and return their location in pixel coordinates and
+    /// the normalized detection confidence.
     ///
-    /// \param pixels The pixels to search.
+    ///       0.0 => no confidence,
+    ///     > 1.0 => very confident
+    ///
+    /// \param image The pixels to search.
     /// \returns a vector of rectangles in pixel coordinates and confidences.
-    /// \tparam The image type.
+    /// \tparam An image implementing the dlib generic image template interface.
     template<typename image_type>
-    Faces findAll(const image_type& image)
+    std::vector<FaceDetection> find(const image_type& image)
     {
-        Faces faces;
+        std::vector<FaceDetection> faces;
+        std::vector<std::pair<double, dlib::rectangle>> detections;
 
         if (!_isLoaded)
         {
-            ofLogWarning("FaceFinder::findAll") << "The face finder is not set up correctly. Please check your error log and confirm your settings.";
+            ofLogWarning("FaceFinder::detect") << "The face detector is not set up correctly. Please check your error log and confirm your settings.";
             return faces;
         }
 
-        std::vector<std::pair<double, dlib::rectangle>> detections;
-        dlib::matrix<dlib::rgb_pixel> img = dlib::mat(image);
+        // Establish ROI.
+        dlib::rectangle roi(0,
+                            0,
+                            dlib::num_columns(image),
+                            dlib::num_rows(image));
+
+        if (!_settings.inputROI.isEmpty())
+        {
+            roi.left() = static_cast<long>(_settings.inputROI.getLeft());
+            roi.top() = static_cast<long>(_settings.inputROI.getTop());
+            roi.right() = static_cast<long>(_settings.inputROI.getRight());
+            roi.bottom() = static_cast<long>(_settings.inputROI.getBottom());
+        }
+
+        // Toll-free roi image. Using `auto` in these places seems to cause problems.
+        dlib::const_sub_image_proxy<image_type> roiImage = dlib::sub_image(image, roi);
+
+        dlib::set_image_size(_pixels,
+                             std::round(_settings.inputScale * dlib::num_rows(roiImage)),
+                             std::round(_settings.inputScale * dlib::num_columns(roiImage)));
+
+        dlib::resize_image(roiImage, _pixels);
 
         if (_settings.detectorType == FaceDetector::FACE_DETECTOR_HOG)
         {
-            _faceDetectorHOG[0](img, detections);
+            (*_faceDetectorHOG)(_pixels, detections);
         }
         else if (_settings.detectorType == FaceDetector::FACE_DETECTOR_MMOD)
         {
+            dlib::matrix<dlib::rgb_pixel> img = dlib::mat(dlib::of_image<dlib::rgb_pixel, unsigned char>(_pixels));
             std::vector<dlib::mmod_rect> _detections = (*_faceDetectorMMOD)(img);
             detections.reserve(_detections.size());
             for (auto& detection: _detections)
@@ -115,96 +134,94 @@ public:
         }
 
         faces.reserve(detections.size());
-        for (auto& detection: detections)
+
+        dlib::parallel_for(_effectiveNumThreads, 0, detections.size(), [&](long i)
         {
-            auto faceShape = _faceShapePredictor[0](img, detection.second);
-            auto faceDetails = dlib::get_face_chip_details(faceShape,
-                                                           _settings.faceChipSize,
-                                                           _settings.faceChipPadding);
-            image_type faceChip;
-            dlib::extract_image_chip(image, faceDetails, faceChip);
-            dlib::matrix<dlib::rgb_pixel> fc = dlib::mat(faceChip);
-            std::size_t nJitters = std::max(std::size_t(0), _settings.jitterIterations);
-            dlib::matrix<float, 0, 1> faceCodes;
 
-            if (nJitters > 0)
-                faceCodes = dlib::mean(dlib::mat((*_faceCoder)(jitter_image(fc, nJitters))));
-            else
-                faceCodes = (*_faceCoder)(fc);
+            // Scale and translate detections back to input pixel coordinates.
+            detections[i].second = dlib::scale_rect(detections[i].second, 1.0 / double(_settings.inputScale));
+            detections[i].second = dlib::translate_rect(detections[i].second, roi.left(), roi.top());
 
-            std::vector<float> faceCode(faceCodes.begin(), faceCodes.end());
-            faces.push_back(Face(detection, faceShape, faceChip, faceCode));
-        }
+
+            // Filter out any detections that don't meet requirements.
+            if (detections[i].first >= _settings.minimumDetectionConfidence
+            &&  detections[i].second.width()  >= _settings.minimumDetectionSize
+            &&  detections[i].second.height() >= _settings.minimumDetectionSize)
+            {
+                auto faceShape = _faceShapePredictor[i](image, detections[i].second);
+                auto faceDetails = dlib::get_face_chip_details(faceShape,
+                                                               _settings.faceChipSize,
+                                                               _settings.faceChipPadding);
+                ofPixels faceChip;
+                dlib::extract_image_chip(image, faceDetails, faceChip);
+                dlib::matrix<dlib::rgb_pixel> fc = dlib::mat(faceChip);
+
+                std::size_t nJitters = std::max(std::size_t(0), _settings.jitterIterations);
+                dlib::matrix<float, 0, 1> faceCodes;
+
+                if (_settings.jitterIterations > 0)
+                    faceCodes = dlib::mean(dlib::mat(_faceCoder[i](jitter_image(fc, nJitters))));
+                else
+                    faceCodes = _faceCoder[i](fc);
+
+                std::vector<float> faceCode(faceCodes.begin(), faceCodes.end());
+
+                faces.push_back(FaceDetection(detections[i], faceShape, faceChip, faceCode));
+            }
+        });
 
         return faces;
     }
 
-
-//    dlib::matrix<float, 0, 1> getEmbeddings(
-
-//
-//    /// \brief Find all faces in batch mode.
-//    ///
-//    /// Finding faces in batch mode can speed execution in some cases.
-//    ///
-//    /// Find all faces and return their location in pixel coordinates and
-//    /// the normalized detection confidence on (0 = no confidence, 1 = total
-//    /// confidence). If confidence is unsupported, a confidence of 1 will be
-//    /// returned.
-//    ///
-//    /// \param pixels The pixels to search.
-//    /// \returns a vector of vectors of rectangles in pixel coordinates and confidences.
-//    /// \tparam The image type.
-//    template<typename image_type>
-//    std::vector<Faces> findAll(const std::vector<image_type>& images)
-//    {
-//        std::vector<Faces> results;
-//
-//        if (!_isLoaded)
-//        {
-//            ofLogWarning("FaceFinder::findAll") << "The face finder is not set up correctly. Please check your error log and confirm your settings.";
-//            return results;
-//        }
-//
-//        results.resize(images.size());
-//
-//        if (_settings.detectorType == FaceDetector::FACE_DETECTOR_HOG)
-//        {
-//            dlib::parallel_for(0, images.size(), [&](long i)
-//            {
-//                std::vector<std::pair<double, dlib::rectangle>> detections;
-//                _faceDetectorHOG[i](images[i], detections);
-//                for (auto& detection: detections)
-//                {
-//                    auto faceShape = _faceShapePredictor[i](images[i], detection);
-//                    results[i].push_back(Face(detection, faceShape));
-//                }
-//            });
-//        }
-//        else if (_settings.detectorType == FaceDetector::FACE_DETECTOR_MMOD)
-//        {
-//
-//        }
-//
-//        return results;
-//    }
-//
-//
     /// \returns the current settings.
     Settings settings() const;
 
+    /// \returns the scaled, cropped input pixels used for detections.
+    const ofPixels& pixels() const;
+
     struct Settings
     {
+        /// \brief The number of threads to use.
+        ///
+        /// A value of 0 queries the hardware for maximum concurrent threads.
+        std::size_t numThreads = 0;
+
         /// \brief Set the back-end detection algorithm.
         FaceDetector detectorType = FaceDetector::FACE_DETECTOR_HOG;
 
         /// \brief Set the shape predictor algorithm.
         FaceShapePredictor shapePredictorType = FaceShapePredictor::FACE_SHAPE_PREDICTOR_5_LANDMARKS;
 
-        /// \brief Set the number of threads for parallel execution.
+        /// \brief The video scale used for detection.
         ///
-        /// A value of 0 will use the maximum threads available to the system.
-        std::size_t numThreads = 1;
+        /// Typically this is set smaller to speed detection. In some cases it
+        /// might be set larger and used with an ROI if the faces are too small.
+        double inputScale = 1.0;
+
+        /// \brief The interpolation method used when scaling.
+        ofInterpolationMethod inputScaleInterpolation = OF_INTERPOLATE_NEAREST_NEIGHBOR;
+
+        /// \brief Detection ROI.
+        ///
+        /// The coordinates are in input image pixels.
+        ///
+        /// Detection searches will be limited to this region.
+        ofRectangle inputROI;
+
+        /// \brief Ignore detections less than the minimum confidence.
+        double minimumDetectionConfidence = 0.0;
+
+        /// \brief Ignore detections with a size (width or height) less than the minimum size.
+        double minimumDetectionSize = 0.0;
+
+        /// \brief The size of the extracted face chips.
+        std::size_t faceChipSize = 150;
+
+        /// \brief The padding of the extracted face chips.
+        double faceChipPadding = 0.25;
+
+        /// \brief The number image jitters used to calculate a face code.
+        std::size_t jitterIterations = 1;
 
         /// \brief The path where any models will be found.
         ///
@@ -215,46 +232,9 @@ public:
         /// location by modifying this variable.
         std::string modelsPath;
 
-        /// \brief The size of the extracted face chips.
-        ///
-        /// The default used by
-        std::size_t faceChipSize = 150;
-
-        /// \brief The padding of the extracted face chips.
-        float faceChipPadding = 0.25;
-
-        std::size_t jitterIterations = 1;
-
-        enum
-        {
-            MAX_THREADS = 0
-        };
     };
 
 private:
-    /// \brief The current Settings.
-    Settings _settings;
-
-    /// \brief True if the FaceFinder is loaded.
-    bool _isLoaded = false;
-
-    /// \brief The HOG face detector.
-    ///
-    /// The number of instances will match the number of threads specified in
-    /// the settings.
-    std::vector<dlib::frontal_face_detector> _faceDetectorHOG;
-
-    /// \brief A pointer to the MMOD face detector.
-    std::unique_ptr<MMODFaceDetector::Net> _faceDetectorMMOD = nullptr;
-
-    /// \brief Our shape predictor.
-    std::vector<dlib::shape_predictor> _faceShapePredictor;
-
-    // The neural network that we will use to convert
-    // each face to a "face code" (i.e. 128 numbers).
-    std::unique_ptr<FaceRecognitionResnetModelV1::Net> _faceCoder;
-
-
     /// \brief Create a collection of slight image variations.
     ///
     /// This calls `dlib::jitter_image` a total of `n` times and returns the
@@ -281,172 +261,32 @@ private:
 
         return crops;
     }
-};
 
+    /// \brief The current Settings.
+    Settings _settings;
 
+    /// \brief The number of threads to use.
+    std::size_t _effectiveNumThreads = 0;
 
-class FaceDatabase
-{
-public:
-    class Entry
-    {
-    public:
-        Entry();
+    /// \brief True if the FaceFinder is loaded.
+    bool _isLoaded = false;
 
-//        float distance(const Entry& entry);
-        float distance(const Face& face);
+    /// \brief A pointer to the HOG face detector.
+    std::unique_ptr<dlib::frontal_face_detector> _faceDetectorHOG = nullptr;
 
-        /// \brief Determine if two faces
-//        bool matches(const Entry& entry, float maxDistance);
-        bool matches(const Face& face, float maxDistance);
+    /// \brief A pointer to the MMOD face detector.
+    std::unique_ptr<MMODFaceDetector::Net> _faceDetectorMMOD = nullptr;
 
-        void add(const Face& face);
+    /// \brief Our shape predictor.
+    std::vector<dlib::shape_predictor> _faceShapePredictor;
 
-        void add(const std::vector<Face>& faces);
+    /// \brief The neural network used to calculate a 128 digit face code.
+    std::vector<FaceRecognitionResnetModelV1::Net> _faceCoder;
 
-        std::vector<float> meanFaceCode() const;
-
-        void draw(float x, float y, float width, float height) const;
-
-        void setLabel(const std::string& label);
-
-        std::string getLabel() const;
-
-    private:
-        std::string _label;
-        std::size_t _numSamples = 0;
-        std::vector<dlib::running_stats<double>> _faceCode;
-
-        mutable std::vector<float> _meanFaceCode;
-
-        float _faceChipAlpha = 0.99f;
-        ofFloatPixels _faceChip;
-        mutable ofTexture _faceChipTexture;
-
-    };
-
-    FaceDatabase();
-
-    void add(const FaceFinder::Faces& faces);
-
-    std::vector<Entry> entries();
-
-    void draw(float x,
-              float y,
-              float width,
-              float height) const;
-
-private:
-    std::vector<Entry> _entries;
+    /// \brief The scaled / ROI copy of the pixels passed to the detector.
+    ofPixels _pixels;
 
 };
-
-
-
-class FaceLandmarks
-{
-public:
-    enum class Model
-    {
-        /// \brief The fast 5 landmark face shape predictor.
-        MODEL_5_LANDMARKS,
-        /// \brief The precise 68 landmark face shape predictor.
-        MODEL_68_LANDMARKS
-    };
-
-   // enum class Model_5_Features
-
-
-};
-
-//
-//
-//class LandmarkMapper
-//{
-//public:
-//    enum Feature
-//    {
-//        LEFT_EYE_TOP,
-//        RIGHT_EYE_TOP,
-//        LEFT_EYEBROW,
-//        RIGHT_EYEBROW,
-//        LEFT_EYE,
-//        RIGHT_EYE,
-//        LEFT_JAW,
-//        RIGHT_JAW,
-//        JAW,
-//        OUTER_MOUTH,
-//        INNER_MOUTH,
-//        NOSE_BRIDGE,
-//        NOSE_BASE,
-//        FACE_OUTLINE,
-//        ALL_FEATURES
-//    };
-//
-//    std::vector<std::size_t> getFeatureIndices(Feature feature) {
-//        switch(feature) {
-//            case LEFT_EYE_TOP: return consecutive(36, 40);
-//            case RIGHT_EYE_TOP: return consecutive(42, 46);
-//            case LEFT_JAW: return consecutive(0, 9);
-//            case RIGHT_JAW: return consecutive(8, 17);
-//            case JAW: return consecutive(0, 17);
-//            case LEFT_EYEBROW: return consecutive(17, 22);
-//            case RIGHT_EYEBROW: return consecutive(22, 27);
-//            case LEFT_EYE: return consecutive(36, 42);
-//            case RIGHT_EYE: return consecutive(42, 48);
-//            case OUTER_MOUTH: return consecutive(48, 60);
-//            case INNER_MOUTH: return consecutive(60, 68);
-//            case NOSE_BRIDGE: return consecutive(27, 31);
-//            case NOSE_BASE: return consecutive(31, 36);
-//            case FACE_OUTLINE: {
-//                static int faceOutline[] = {17,18,19,20,21,22,23,24,25,26, 16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0};
-//                return vector<int>(faceOutline, faceOutline + 27);
-//            }
-//            case ALL_FEATURES: return consecutive(0, 68);
-//        }
-//    }
-//
-//
-//    template <class T>
-//    ofPolyline ofxFaceTracker2Landmarks::getFeature(Feature feature, vector<T> points) const {
-//        ofPolyline polyline;
-//        vector<int> indices = getFeatureIndices(feature);
-//        for(int i = 0; i < indices.size(); i++) {
-//            int cur = indices[i];
-//            glm::vec2 pt = toGlm(points[cur]);
-//            polyline.addVertex(pt.x, pt.y, 0);
-//        }
-//        switch(feature) {
-//            case LEFT_EYE:
-//            case RIGHT_EYE:
-//            case OUTER_MOUTH:
-//            case INNER_MOUTH:
-//            case FACE_OUTLINE:
-//                polyline.close();
-//                break;
-//            default:
-//                break;
-//        }
-//
-//        return polyline;
-//    }
-//
-//    std::vector<std::size_t> consecutive(std::size_t start, std::size_t end)
-//    {
-//        if (end < start)
-//        {
-//            ofLogWarning("ofxFaceTracker2Landmarks::consecutive") << "Start index is greater than end index.";
-//            return std::vector<std::size_t>();
-//        }
-//
-//        std::vector<std::size_t> l(end - start);
-//        std::iota(l.begin(), l.end(), start);
-//        return l;
-//    }
-//
-//};
-//
-
 
 
 } } // namespace ofx::Dlib

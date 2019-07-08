@@ -9,11 +9,22 @@
 
 
 #include "ofGraphics.h"
-#include "ofx/Dlib/FaceDetector.h"
+#include "ofx/Dlib/FaceFinder.h"
+#include "ofx/Dlib/FaceDetection.h"
+#include "ofx/Dlib/ObjectDetection.h"
 
 
 namespace ofx {
 namespace Dlib {
+
+
+inline void draw(const dlib::rectangle& rectangle)
+{
+    ofDrawRectangle(rectangle.left(),
+                    rectangle.top(),
+                    rectangle.width(),
+                    rectangle.height());
+}
 
 
 inline void draw(const ofRectangle& rectangle, const std::string& label, float labelFillWidth = 1.0)
@@ -48,11 +59,27 @@ inline void draw(const ObjectDetection& detection)
     draw(detection.rectangle, "Confidence: " + ofToString(detection.confidence, 2));
 }
 
+
+inline void draw(const FaceDetection& detection)
+{
+    draw(detection.rectangle(), "Confidence: " + ofToString(detection.confidence(), 2));
+}
+
+
 inline void draw(const std::map<std::size_t, ObjectDetection>& tracks)
 {
     for (auto&& track: tracks)
     {
         draw(track.second.rectangle, "#:" + ofToString(track.first) + " @ " + ofToString(track.second.confidence, 2));
+    }
+}
+
+
+inline void draw(const std::map<std::size_t, FaceDetection>& tracks)
+{
+    for (auto&& track: tracks)
+    {
+        draw(track.second.rectangle(), "#:" + ofToString(track.first) + " @ " + ofToString(track.second.confidence(), 2));
     }
 }
 

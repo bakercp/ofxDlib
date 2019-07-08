@@ -35,17 +35,19 @@ bool FaceTracker::setup(const Settings& settings)
 
     _asyncTracker.reset();
 
-    if (_detector.setup(settings))
+    if (_finder.setup(settings))
     {
-        // TODO: the internet is out and I can't find documentation on std::bind, so it's in here for a minute.
-        auto process = [this](const dlib::matrix<dlib::rgb_pixel>& input,
-                              std::vector<FaceTrackerEventArgs>& output) -> bool {
-            return this->_process(input, output);
-        };
+        _tracker.setMaximumDistance(settings.trackerMaximumDistance);
+        _tracker.setPersistence(settings.trackerPersistence);
 
-        _asyncTracker = std::make_unique<AsyncTracker>(process,
+        _asyncTracker = std::make_unique<AsyncTracker>([this](const dlib::matrix<dlib::rgb_pixel>& input,
+                                                              std::vector<FaceTrackerEventArgs>& output)
+                                                       {
+                                                           return _process(input, output);
+                                                       },
                                                        settings.threadInputMaxQueueSize,
                                                        settings.threadOutputMaxQueueSize);
+
         _settings = settings;
     }
 
@@ -66,7 +68,7 @@ FaceTracker::Settings FaceTracker::settings() const
 }
 
 
-std::map<std::size_t, ObjectDetection> FaceTracker::tracks() const
+std::map<std::size_t, FaceDetection> FaceTracker::tracks() const
 {
     return _tracks;
 }
@@ -88,12 +90,12 @@ void FaceTracker::_update(ofEventArgs&)
                 switch(event.state)
                 {
                     case FaceTrackerEventArgs::State::TRACK_BEGIN:
-                        ofNotifyEvent(trackBegin, event, this);
                         _tracks[event.label] = event.detection;
+                        ofNotifyEvent(trackBegin, event, this);
                         break;
                     case FaceTrackerEventArgs::State::TRACK_UPDATE:
-                        ofNotifyEvent(trackUpdate, event, this);
                         _tracks[event.label] = event.detection;
+                        ofNotifyEvent(trackUpdate, event, this);
                         break;
                     case FaceTrackerEventArgs::State::TRACK_END:
                         ofNotifyEvent(trackEnd, event, this);
@@ -110,7 +112,7 @@ void FaceTracker::_update(ofEventArgs&)
 bool FaceTracker::_process(const dlib::matrix<dlib::rgb_pixel>& input,
                            std::vector<FaceTrackerEventArgs>& output)
 {
-    _tracker.track(_detector.detect(input));
+    _tracker.track(_finder.find(input));
 
     auto saveEvents = [&](const Tracker<ObjectDetection>::Labels& labels,
                           FaceTrackerEventArgs::State state)
