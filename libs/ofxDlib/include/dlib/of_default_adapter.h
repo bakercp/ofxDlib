@@ -13,14 +13,12 @@
 #include "ofPixels.h"
 #include "ofVideoGrabber.h"
 #include "ofVideoPlayer.h"
-#include <dlib/pixel.h>
-//#include <dlib/matrix.h>
+#include "dlib/pixel.h"
 
 
 /// \sa http://dlib.net/dlib/image_processing/generic_image.h.html
 namespace dlib
 {
-
 
 template <typename PixelType>
 struct image_traits;

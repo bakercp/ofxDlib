@@ -9,11 +9,11 @@
 
 
 #include "ofPixels.h"
-#include "of_image_abstract.h"
-#include <dlib/algs.h>
-#include <dlib/pixel.h>
-#include <dlib/matrix.h>
-#include <dlib/image_processing.h>
+//#include "of_image_abstract.h"
+#include "dlib/algs.h"
+#include "dlib/pixel.h"
+#include "dlib/matrix.h"
+#include "dlib/image_processing.h"
 
 
 namespace dlib
@@ -231,7 +231,7 @@ template <typename dlib_pixel_type, typename of_pixel_type>
 const matrix_op<op_array2d_to_mat<of_image<dlib_pixel_type, of_pixel_type>>> mat(const ofPixels_<of_pixel_type>& m)
 {
     typedef op_array2d_to_mat<of_image<dlib_pixel_type, of_pixel_type>> op;
-    auto dlib_img = of_image<dlib_pixel_type, of_pixel_type>(m);
+    of_image<dlib_pixel_type, of_pixel_type> dlib_img = of_image<dlib_pixel_type, of_pixel_type>(m);
     return matrix_op<op>(op(dlib_img));
 }
 

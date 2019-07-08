@@ -9,7 +9,8 @@
 
 
 #include "ofPixels.h"
-#include <dlib/pixel.h>
+#include "dlib/pixel.h"
+#include "dlib/of_image.h"
 
 
 /// \sa http://dlib.net/dlib/opencv/to_open_cv.h.html
