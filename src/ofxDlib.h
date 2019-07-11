@@ -11,7 +11,10 @@
 #include "dlib/of_default_adapter.h"
 #include "dlib/of_image.h"
 #include "dlib/to_of.h"
+<<<<<<< HEAD
 #include "ofx/Dlib/Face.h"
+=======
+>>>>>>> 46902b66ca4b6480713e432d7f31dbc29e089c70
 #include "ofx/Dlib/FaceDetector.h"
 #include "ofx/Dlib/FaceFinder.h"
 #include "ofx/Dlib/FaceTracker.h"
