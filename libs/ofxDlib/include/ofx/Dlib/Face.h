@@ -23,22 +23,22 @@ namespace ofx {
 namespace Dlib {
 
 
-/// \brief A structure representing a Detected Face detection.
-class FaceDetection//: public ObjectDetection
+/// \brief A structure representing a Face.
+class Face
 {
 public:
-    FaceDetection();
+    Face();
 
-    FaceDetection(const std::pair<double, dlib::rectangle>& face,
-                  const dlib::full_object_detection& shape,
-                  const ofPixels& faceChip,
-                  const std::vector<float>& faceCode);
+    Face(const std::pair<double, dlib::rectangle>& face,
+         const dlib::full_object_detection& shape,
+         const ofPixels& faceChip,
+         const std::vector<float>& faceCode);
 
-    /// \returns true if a face has been loaded.
+    /// \returns true if a Face has been loaded.
     bool isLoaded() const;
 
     /// \returns The confidence of the face detection.
-    float confidence() const;
+    double confidence() const;
 
     /// \returns The location of the face detection.
     ofRectangle rectangle() const;
@@ -56,7 +56,7 @@ public:
     const std::vector<float>& faceCode() const;
 
     /// \brief Draw the detection.
-    void draw() const;
+    //void draw() const;
 
 private:
     std::string _key;
@@ -65,22 +65,24 @@ private:
     bool _isLoaded = false;
 
     /// \brief The confidence of the detection.
-    float _confidence = 0;
+    double _confidence = 0;
 
     /// \brief The location of the face.
     ofRectangle _rectangle;
 
+    /// \brief The face shape.
     dlib::full_object_detection _shape;
 
     /// \brief The face chip.
     ofPixels _faceChip;
 
+    /// \brief The face code.
     std::vector<float> _faceCode;
 
     /// \brief The shape mesh for debug drawing.
-    mutable ofPath _shapePath;
-    mutable bool _hasShapePath = false;
-    mutable ofTexture _faceChipTexture;
+    //mutable ofPath _shapePath;
+    //mutable bool _hasShapePath = false;
+    //mutable ofTexture _faceChipTexture;
 };
 
 

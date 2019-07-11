@@ -11,7 +11,7 @@
 #include <algorithm>
 #include <cstdint>
 #include <limits>
-#include <map>
+#include <unordered_map>
 #include <vector>
 #include "ofMath.h"
 #include "ofRectangle.h"
@@ -296,7 +296,7 @@ public:
         {
             if (!matchedObjects[i])
             {
-                std::size_t curLabel = _curLabel++;
+                std::size_t curLabel = nextLabel();
                 std::size_t index = _current.size();
                 _current.push_back(TrackedObject<T>(objects[i],
                                                     curLabel,
@@ -343,6 +343,12 @@ public:
         return _currentLabels;
     }
 
+    virtual std::size_t nextLabel()
+    {
+        return _curLabel++;
+    }
+
+
 protected:
     std::vector<TrackedObject<T>> _previous;
     std::vector<TrackedObject<T>> _current;
@@ -352,8 +358,8 @@ protected:
     Labels _newLabels;
     Labels _deadLabels;
 
-    std::map<std::size_t, TrackedObject<T>*> _previousLabelMap;
-    std::map<std::size_t, TrackedObject<T>*> _currentLabelMap;
+    std::unordered_map<std::size_t, TrackedObject<T>*> _previousLabelMap;
+    std::unordered_map<std::size_t, TrackedObject<T>*> _currentLabelMap;
 
     std::size_t _persistence = 15;
     float _maximumDistance = 64;

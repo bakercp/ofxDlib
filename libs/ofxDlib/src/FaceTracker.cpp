@@ -17,11 +17,11 @@ namespace Dlib {
 FaceTracker::FaceTracker():
     _updateListener(ofEvents().update.newListener(this, &FaceTracker::_update))
 {
-    setup(Settings());
 }
 
 
-FaceTracker::FaceTracker(const Settings& settings)
+FaceTracker::FaceTracker(const Settings& settings):
+    _updateListener(ofEvents().update.newListener(this, &FaceTracker::_update))
 {
     setup(settings);
 }
@@ -35,7 +35,7 @@ bool FaceTracker::setup(const Settings& settings)
 
     _asyncTracker.reset();
 
-    if (_finder.setup(settings))
+    if (_detector.setup(settings))
     {
         _tracker.setMaximumDistance(settings.trackerMaximumDistance);
         _tracker.setPersistence(settings.trackerPersistence);
@@ -68,9 +68,9 @@ FaceTracker::Settings FaceTracker::settings() const
 }
 
 
-std::map<std::size_t, FaceDetection> FaceTracker::tracks() const
+const Tracker<ObjectDetection>& FaceTracker::tracker() const
 {
-    return _tracks;
+    return _tracker;
 }
 
 
@@ -81,8 +81,6 @@ void FaceTracker::_update(ofEventArgs&)
         std::vector<FaceTrackerEventArgs> events;
         if (_asyncTracker->outputPipe.dequeue_or_timeout(events, 0))
         {
-            _tracks.clear();
-
             for (auto&& event: events)
             {
                 ofNotifyEvent(trackEvent, event, this);
@@ -90,11 +88,9 @@ void FaceTracker::_update(ofEventArgs&)
                 switch(event.state)
                 {
                     case FaceTrackerEventArgs::State::TRACK_BEGIN:
-                        _tracks[event.label] = event.detection;
                         ofNotifyEvent(trackBegin, event, this);
                         break;
                     case FaceTrackerEventArgs::State::TRACK_UPDATE:
-                        _tracks[event.label] = event.detection;
                         ofNotifyEvent(trackUpdate, event, this);
                         break;
                     case FaceTrackerEventArgs::State::TRACK_END:
@@ -112,9 +108,9 @@ void FaceTracker::_update(ofEventArgs&)
 bool FaceTracker::_process(const dlib::matrix<dlib::rgb_pixel>& input,
                            std::vector<FaceTrackerEventArgs>& output)
 {
-    _tracker.track(_finder.find(input));
+    _tracker.track(_detector.detect(input));
 
-    auto saveEvents = [&](const Tracker<FaceDetection>::Labels& labels,
+    auto saveEvents = [&](const Tracker<ObjectDetection>::Labels& labels,
                           FaceTrackerEventArgs::State state)
     {
         for (std::size_t label: labels)
@@ -125,12 +121,15 @@ bool FaceTracker::_process(const dlib::matrix<dlib::rgb_pixel>& input,
 
             if (_tracker.existsCurrent(label))
             {
-                evt.detection = _tracker.getCurrent(label);
+                evt.face = _tracker.getCurrent(label);
                 evt.age = _tracker.getAge(label);
                 evt.lastSeen = _tracker.getLastSeen(label);
             }
             if (_tracker.existsPrevious(label))
-               evt.previousDetection = _tracker.getPrevious(label);
+            {
+               evt.previousFace = _tracker.getPrevious(label);
+
+            }
 
             output.push_back(evt);
         }

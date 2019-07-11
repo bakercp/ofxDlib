@@ -26,7 +26,7 @@ template<typename PixelType>
 class ImageCollection
 {
 public:
-    /// \basic Image parameters.
+    /// \brief Image parameters.
     struct ImageHeader
     {
         std::size_t width = 0;
@@ -136,18 +136,18 @@ public:
             }
         };
 
-        int hardwareThreads = static_cast<int>(std::thread::hardware_concurrency());
-        int numThreads = _settings.numThreads;
+        if (settings.numThreads == 0)
+            _effectiveNumThreads = std::thread::hardware_concurrency();
 
-        if (numThreads > 0)
-            numThreads = std::min(numThreads, hardwareThreads);
-        else if (numThreads == 0)
-            numThreads = hardwareThreads;
-        else numThreads = 0;
-
-        if (numThreads > 0)
+        if (_effectiveNumThreads == 0)
         {
-            std::vector<std::thread> threads(numThreads);
+            ofLogWarning("ImageCollection::load") << "Unable to detect number of threads, setting manually. Defaulting to 0 additional thread.";
+            _effectiveNumThreads = 0;
+        }
+
+        if (_effectiveNumThreads > 0)
+        {
+            std::vector<std::thread> threads(_effectiveNumThreads);
             for (auto& t: threads) t = std::thread(imageLoader);
             for (auto& t: threads) t.join();
         }
@@ -269,9 +269,7 @@ public:
         ///
         /// If numThreads is equal to 0, the number of threads will be chosen
         /// automatically, usually based on the number of processor cores.
-        ///
-        /// If equal to -1, no additional threads are created.
-        int numThreads = -1;
+        std::size_t numThreads = 0;
     };
 
     /// \brief Load image header information without loading pixels data.
@@ -322,6 +320,8 @@ public:
 private:
     /// \brief The search settings used.
     Settings _settings;
+
+    std::size_t _effectiveNumThreads = 0;
 
     /// \brief The width of the images in the collection.
     std::size_t _width = 0;

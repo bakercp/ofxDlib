@@ -5,7 +5,7 @@
 //
 
 
-#include "ofx/Dlib/FaceDetection.h"
+#include "ofx/Dlib/Face.h"
 #include "ofx/Dlib/Utils.h"
 #include "ofGraphics.h"
 #include "ofMesh.h"
@@ -17,15 +17,15 @@ namespace Dlib {
 
 
 
-FaceDetection::FaceDetection()
+Face::Face()
 {
 }
 
 
-FaceDetection::FaceDetection(const std::pair<double, dlib::rectangle>& face,
-                             const dlib::full_object_detection& shape,
-                             const ofPixels& faceChip,
-                             const std::vector<float>& faceCode):
+Face::Face(const std::pair<double, dlib::rectangle>& face,
+           const dlib::full_object_detection& shape,
+           const ofPixels& faceChip,
+           const std::vector<float>& faceCode):
     _isLoaded(true),
     _confidence(face.first),
     _rectangle(toOf(face.second)),
@@ -36,25 +36,25 @@ FaceDetection::FaceDetection(const std::pair<double, dlib::rectangle>& face,
 }
 
 
-bool FaceDetection::isLoaded() const
+bool Face::isLoaded() const
 {
     return _isLoaded;
 }
 
 
-float FaceDetection::confidence() const
+double Face::confidence() const
 {
     return _confidence;
 }
 
 
-ofRectangle FaceDetection::rectangle() const
+ofRectangle Face::rectangle() const
 {
     return _rectangle;
 }
 
 
-std::vector<glm::vec2> FaceDetection::landmarks() const
+std::vector<glm::vec2> Face::landmarks() const
 {
     std::vector<glm::vec2> landmarks;
     for (std::size_t i = 0; i < _shape.num_parts(); ++i)
@@ -65,20 +65,19 @@ std::vector<glm::vec2> FaceDetection::landmarks() const
 }
 
 
-
-dlib::full_object_detection FaceDetection::shape() const
+dlib::full_object_detection Face::shape() const
 {
     return _shape;
 }
 
 
-const ofPixels& FaceDetection::faceChip() const
+const ofPixels& Face::faceChip() const
 {
     return _faceChip;
 }
 
 
-const std::vector<float>& FaceDetection::faceCode() const
+const std::vector<float>& Face::faceCode() const
 {
     return _faceCode;
 }

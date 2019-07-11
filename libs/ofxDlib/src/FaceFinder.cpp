@@ -14,7 +14,6 @@ namespace Dlib {
 
 FaceFinder::FaceFinder()
 {
-    setup(Settings());
 }
 
 
@@ -32,7 +31,7 @@ bool FaceFinder::setup(const Settings& settings)
 
     _isLoaded = false;
 
-    if (_settings.numThreads == 0)
+    if (settings.numThreads == 0)
         _effectiveNumThreads = std::thread::hardware_concurrency();
 
     if (_effectiveNumThreads == 0)
@@ -50,7 +49,7 @@ bool FaceFinder::setup(const Settings& settings)
     }
     else if (settings.detectorType == FaceDetector::FACE_DETECTOR_MMOD)
     {
-        std::filesystem::path path = ofToDataPath(_settings.modelsPath, true);
+        std::filesystem::path path = ofToDataPath(settings.modelsPath, true);
         path /= "mmod_human_face_detector.dat";
 
         if (std::filesystem::exists(path))
@@ -67,7 +66,7 @@ bool FaceFinder::setup(const Settings& settings)
 
     _faceShapePredictor.clear();
 
-    std::filesystem::path path = ofToDataPath(_settings.modelsPath, true);
+    std::filesystem::path path = ofToDataPath(settings.modelsPath, true);
 
     if (settings.shapePredictorType == FaceShapePredictor::FACE_SHAPE_PREDICTOR_5_LANDMARKS)
         path /= "shape_predictor_5_face_landmarks.dat";
@@ -88,10 +87,9 @@ bool FaceFinder::setup(const Settings& settings)
         return false;
     }
 
-
     _faceCoder.clear();
 
-    path = ofToDataPath(_settings.modelsPath, true);
+    path = ofToDataPath(settings.modelsPath, true);
     path /= "dlib_face_recognition_resnet_model_v1.dat";
 
     if (std::filesystem::exists(path))

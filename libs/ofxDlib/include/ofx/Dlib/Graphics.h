@@ -9,8 +9,10 @@
 
 
 #include "ofGraphics.h"
+#include "ofx/Dlib/Face.h"
 #include "ofx/Dlib/FaceFinder.h"
-#include "ofx/Dlib/FaceDetection.h"
+#include "ofx/Dlib/ObjectDetection.h"
+#include "ofx/Dlib/Tracker.h"
 
 
 namespace ofx {
@@ -54,17 +56,52 @@ inline void draw(const ofRectangle& rectangle, const std::string& label, float l
 }
 
 
-inline void draw(const FaceDetection& detection)
+inline void draw(const ObjectDetection& detection)
+{
+    draw(detection.rectangle, "Confidence: " + ofToString(detection.confidence, 2));
+}
+
+
+inline void draw(const Face& detection)
 {
     draw(detection.rectangle(), "Confidence: " + ofToString(detection.confidence(), 2));
 }
 
 
-inline void draw(const std::map<std::size_t, FaceDetection>& tracks)
+inline void draw(const std::map<std::size_t, Face>& tracks)
 {
     for (auto&& track: tracks)
     {
         draw(track.second.rectangle(), "#:" + ofToString(track.first) + " @ " + ofToString(track.second.confidence(), 2));
+        for (auto& v: track.second.landmarks())
+            ofDrawCircle(v, 3);
+    }
+}
+
+
+inline void draw(const Tracker<ObjectDetection>& tracker)
+{
+    for (std::size_t label: tracker.deadLabels())
+    {
+    }
+
+    for (std::size_t label: tracker.newLabels())
+    {
+        ofSetColor(ofColor::green);
+        draw(tracker.getCurrent(label));
+    }
+
+    for (std::size_t label: tracker.previousLabels())
+    {
+        ofSetColor(ofColor::white);
+        draw(tracker.getCurrent(label));
+    }
+
+    for (std::size_t label: tracker.currentLabels())
+    {
+        ofSetColor(ofColor::yellow);
+        ObjectDetection detection = tracker.getCurrent(label);
+        draw(detection.rectangle, "#:" + ofToString(label) + " @ " + ofToString(detection.confidence, 2));
     }
 }
 

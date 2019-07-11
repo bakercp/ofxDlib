@@ -11,8 +11,9 @@
 #include "dlib/pipe.h"
 #include "dlib/threads.h"
 #include "ofEvents.h"
+#include "ofx/Dlib/FaceDetector.h"
+#include "ofx/Dlib/ObjectDetection.h"
 #include "ofx/Dlib/Tracker.h"
-#include "ofx/Dlib/FaceFinder.h"
 
 
 namespace ofx {
@@ -141,7 +142,7 @@ private:
                     std::unique_lock<std::mutex> lock(_mutex);
                     _droppedOutputsCount++;
                 }
-                
+
                 outputPipe.enqueue(lastOutput);
             }
         }
@@ -150,14 +151,20 @@ private:
 };
 
 
+/// \brief Event arguments that are sent with tracking events.
 class FaceTrackerEventArgs
 {
 public:
+    /// \brief The tracking states.
     enum class State
     {
+        /// \brief The state when a new track begins.
         TRACK_BEGIN,
+        /// \brief The state when a track is updated. This may be a stale track.
         TRACK_UPDATE,
+        /// \brief The state when a track expires and is lost.
         TRACK_END,
+        /// \brief The state when an event is not tracking.
         TRACK_NONE
     };
 
@@ -173,28 +180,37 @@ public:
     /// \brief The time since last seen.
     uint64_t lastSeen = 0;
 
-    /// \brief The FaceDetection associated with this event, if any.
+    /// \brief The Face associated with this event, if any.
     ///
     /// This will only be valid for state == TRACK_BEGIN and
     /// state == TRACK_UPDATE.
-    FaceDetection detection;
+    ObjectDetection face;
 
     /// \brief The previous detection associated with this event, if any.
     ///
     /// This will only be valid for state == TRACK_UPDATE and
     /// state == TRACK_END.
-    FaceDetection previousDetection;
+    ObjectDetection previousFace;
 
 };
 
 
-inline float distance(const FaceDetection& _a, const FaceDetection& _b)
+inline float distance(const ObjectDetection& _a, const ObjectDetection& _b)
 {
-    ofRectangle a = _a.rectangle();
-    ofRectangle b = _b.rectangle();
+    // Calculate the spatial "distance" between the objects.
+    ofRectangle a = _a.rectangle;
+    ofRectangle b = _b.rectangle;
     glm::vec2 dp = glm::vec2(a.getCenter()) - glm::vec2(b.getCenter());
     glm::vec2 ds = { a.width - b.width, a.height - b.height };
-    return glm::length(dp) + glm::length(ds);
+
+    // Distance between the centers.
+    float centerDistance = glm::length(dp);
+
+    // Difference between the sizes.
+    float sizeDistance = glm::length(ds);
+
+    // The combined distance.
+    return centerDistance + sizeDistance;
 }
 
 
@@ -238,15 +254,21 @@ public:
     /// \returns the current settings.
     Settings settings() const;
 
-    /// \returns the current set of tracks.
-    std::map<std::size_t, FaceDetection> tracks() const;
+    /// \returns the tracker.
+    const Tracker<ObjectDetection>& tracker() const;
 
-    struct Settings: public FaceFinder::Settings
+    struct Settings: public FaceDetector::Settings
     {
+        /// \brief How many frames to persist the tracked object.
         std::size_t trackerPersistence = 15;
+
+        /// \brief The maximum distance that a tracked object can move.
         float trackerMaximumDistance = 200;
-        // bool useThreaded = true;
+
+        /// \brief Thread input max queue size.
         std::size_t threadInputMaxQueueSize = 1;
+
+        /// \brief Thread output max queue size.
         std::size_t threadOutputMaxQueueSize = 2048;
     };
 
@@ -262,6 +284,11 @@ public:
     /// \brief Called for all TRACK_END events.
     ofEvent<FaceTrackerEventArgs> trackEnd;
 
+    const AsyncTracker* t()
+    {
+        return _asyncTracker.get();
+    }
+
 private:
     /// \brief The update callback.
     void _update(ofEventArgs&);
@@ -272,9 +299,6 @@ private:
     /// \brief The current Settings.
     Settings _settings;
 
-    /// \brief The last set of detections.
-    std::map<std::size_t, FaceDetection> _tracks;
-
     // Threaded components below.
 
     std::unique_ptr<AsyncTracker> _asyncTracker = nullptr;
@@ -282,11 +306,11 @@ private:
     bool _process(const dlib::matrix<dlib::rgb_pixel>& input,
                   std::vector<FaceTrackerEventArgs>& output);
 
-    /// \brief The face finder.
-    FaceFinder _finder;
+    /// \brief The face detector.
+    FaceDetector _detector;
 
     /// \brief The bounding box tracker.
-    Tracker<FaceDetection> _tracker;
+    Tracker<ObjectDetection> _tracker;
 
 };
 

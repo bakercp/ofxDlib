@@ -30,8 +30,8 @@ class LSHash
 public:
     struct Settings;
 
-    /// \brief Create an LSHash with default Settings.
-    LSHash(): LSHash(Settings())
+    /// \brief Create an unloaded LSHash.
+    LSHash()
     {
     }
 
@@ -39,7 +39,7 @@ public:
     /// \param settings The settings to load.
     LSHash(const Settings& settings)
     {
-        setup(Settings());
+        setup(settings);
     }
 
     /// \brief Load new settings.
@@ -53,9 +53,8 @@ public:
         _isLoaded = false;
         _samples.clear();
         _hashes.clear();
-        _settings = settings;
 
-        if (_settings.numThreads == 0)
+        if (settings.numThreads == 0)
             _effectiveNumThreads = std::thread::hardware_concurrency();
 
         if (_effectiveNumThreads == 0)
@@ -64,6 +63,7 @@ public:
             _effectiveNumThreads = 1;
         }
 
+        _settings = settings;
         _isLoaded = true;
         return isLoaded();
     }
@@ -87,16 +87,6 @@ public:
                                                               LSHashType,
                                                               std::allocator<dlib::sample_pair>
         > scan_type;
-
-//        scan_find_k_nearest_neighbors_lsh (
-//                                           const vector_type& samples_,
-//                                           const distance_function_type& dist_funct_,
-//                                           const hash_function_type& hash_funct_,
-//                                           const unsigned long k_,
-//                                           std::vector<sample_pair, alloc>& edges_,
-//                                           const unsigned long k_oversample_,
-//                                           const std::vector<typename hash_function_type::result_type>& hashes_
-//
 
         scan_type temp(_samples,
                        DistanceFunctionType(),
@@ -181,7 +171,7 @@ public:
               std::vector<typename LSHashType::result_type>& hashes)
     {
         // Call the multi-threaded hasher.
-        dlib::hash_samples(*reinterpret_cast<const std::vector<dlib::vector<float, 2>>*>(&samples),
+        dlib::hash_samples(samples,
                            LSHashType(_settings.hashSeed),
                            _effectiveNumThreads,
                            hashes);

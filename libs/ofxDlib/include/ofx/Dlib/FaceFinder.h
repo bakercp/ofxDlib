@@ -12,7 +12,7 @@
 #include "dlib/of_default_adapter.h"
 #include "dlib/of_image.h"
 #include "dlib/image_processing/frontal_face_detector.h"
-#include "ofx/Dlib/FaceDetection.h"
+#include "ofx/Dlib/Face.h"
 #include "ofx/Dlib/Utils.h"
 #include "ofx/Dlib/Network/MMODFaceDetector.h"
 #include "ofx/Dlib/Network/FaceRecognitionResnetModelV1.h"
@@ -85,9 +85,11 @@ public:
     /// \returns a vector of rectangles in pixel coordinates and confidences.
     /// \tparam An image implementing the dlib generic image template interface.
     template<typename image_type>
-    std::vector<FaceDetection> find(const image_type& image)
+    std::vector<Face> detect(const image_type& image)
     {
-        std::vector<FaceDetection> faces;
+        //dlib::cuda::raii_set_device gpuDevice(_settings.gpuDevice);
+
+        std::vector<Face> faces;
         std::vector<std::pair<double, dlib::rectangle>> detections;
 
         if (!_isLoaded)
@@ -134,9 +136,8 @@ public:
 
         faces.reserve(detections.size());
 
-        dlib::parallel_for(_effectiveNumThreads, 0, detections.size(), [&](long i)
+        for (std::size_t i = 0; i < detections.size(); ++i)
         {
-
             // Scale and translate detections back to input pixel coordinates.
             detections[i].second = dlib::scale_rect(detections[i].second, 1.0 / double(_settings.inputScale));
             detections[i].second = dlib::translate_rect(detections[i].second, roi.left(), roi.top());
@@ -165,9 +166,111 @@ public:
 
                 std::vector<float> faceCode(faceCodes.begin(), faceCodes.end());
 
-                faces.push_back(FaceDetection(detections[i], faceShape, faceChip, faceCode));
+                faces.push_back(Face(detections[i], faceShape, faceChip, faceCode));
             }
-        });
+        }
+
+        return faces;
+    }
+
+
+
+    /// \brief Detect all faces.
+    ///
+    /// Detect all faces and return their location in pixel coordinates and
+    /// the normalized detection confidence.
+    ///
+    ///       0.0 => no confidence,
+    ///     > 1.0 => very confident
+    ///
+    /// \param image The pixels to search.
+    /// \returns a vector of rectangles in pixel coordinates and confidences.
+    /// \tparam An image implementing the dlib generic image template interface.
+    template<typename image_type>
+    std::vector<Face> find(const image_type& image)
+    {
+        //dlib::cuda::raii_set_device gpuDevice(_settings.gpuDevice);
+
+        std::vector<Face> faces;
+        std::vector<std::pair<double, dlib::rectangle>> detections;
+
+        if (!_isLoaded)
+        {
+            ofLogWarning("FaceFinder::detect") << "The face detector is not set up correctly. Please check your error log and confirm your settings.";
+            return faces;
+        }
+
+        // Establish ROI.
+        dlib::rectangle roi(0,
+                            0,
+                            dlib::num_columns(image),
+                            dlib::num_rows(image));
+
+        if (!_settings.inputROI.isEmpty())
+        {
+            roi.left() = static_cast<long>(_settings.inputROI.getLeft());
+            roi.top() = static_cast<long>(_settings.inputROI.getTop());
+            roi.right() = static_cast<long>(_settings.inputROI.getRight());
+            roi.bottom() = static_cast<long>(_settings.inputROI.getBottom());
+        }
+
+        // Toll-free roi image. Using `auto` in these places seems to cause problems.
+        dlib::const_sub_image_proxy<image_type> roiImage = dlib::sub_image(image, roi);
+
+        dlib::set_image_size(_pixels,
+                             std::round(_settings.inputScale * dlib::num_rows(roiImage)),
+                             std::round(_settings.inputScale * dlib::num_columns(roiImage)));
+
+        dlib::resize_image(roiImage, _pixels);
+
+        if (_settings.detectorType == FaceDetector::FACE_DETECTOR_HOG)
+        {
+            (*_faceDetectorHOG)(_pixels, detections);
+        }
+        else if (_settings.detectorType == FaceDetector::FACE_DETECTOR_MMOD)
+        {
+            dlib::matrix<dlib::rgb_pixel> img = dlib::mat(dlib::of_image<dlib::rgb_pixel, unsigned char>(_pixels));
+            std::vector<dlib::mmod_rect> _detections = (*_faceDetectorMMOD)(img);
+            detections.reserve(_detections.size());
+            for (auto& detection: _detections)
+                detections.push_back(std::make_pair(detection.detection_confidence, detection.rect));
+        }
+
+        faces.reserve(detections.size());
+
+        for (std::size_t i = 0; i < detections.size(); ++i)
+        {
+            // Scale and translate detections back to input pixel coordinates.
+            detections[i].second = dlib::scale_rect(detections[i].second, 1.0 / double(_settings.inputScale));
+            detections[i].second = dlib::translate_rect(detections[i].second, roi.left(), roi.top());
+
+
+            // Filter out any detections that don't meet requirements.
+            if (detections[i].first >= _settings.minimumDetectionConfidence
+            &&  detections[i].second.width()  >= _settings.minimumDetectionSize
+            &&  detections[i].second.height() >= _settings.minimumDetectionSize)
+            {
+                auto faceShape = _faceShapePredictor[i](image, detections[i].second);
+                auto faceDetails = dlib::get_face_chip_details(faceShape,
+                                                               _settings.faceChipSize,
+                                                               _settings.faceChipPadding);
+                ofPixels faceChip;
+                dlib::extract_image_chip(image, faceDetails, faceChip);
+                dlib::matrix<dlib::rgb_pixel> fc = dlib::mat(faceChip);
+
+                std::size_t nJitters = std::max(std::size_t(0), _settings.jitterIterations);
+                dlib::matrix<float, 0, 1> faceCodes;
+
+                if (_settings.jitterIterations > 0)
+                    faceCodes = dlib::mean(dlib::mat(_faceCoder[i](jitter_image(fc, nJitters))));
+                else
+                    faceCodes = _faceCoder[i](fc);
+
+                std::vector<float> faceCode(faceCodes.begin(), faceCodes.end());
+
+                faces.push_back(Face(detections[i], faceShape, faceChip, faceCode));
+            }
+        }
 
         return faces;
     }
@@ -189,7 +292,7 @@ public:
         FaceDetector detectorType = FaceDetector::FACE_DETECTOR_HOG;
 
         /// \brief Set the shape predictor algorithm.
-        FaceShapePredictor shapePredictorType = FaceShapePredictor::FACE_SHAPE_PREDICTOR_5_LANDMARKS;
+        FaceShapePredictor shapePredictorType = FaceShapePredictor::FACE_SHAPE_PREDICTOR_68_LANDMARKS;
 
         /// \brief The video scale used for detection.
         ///
@@ -217,10 +320,12 @@ public:
         std::size_t faceChipSize = 150;
 
         /// \brief The padding of the extracted face chips.
+        ///
+        /// Adds padding around the face chip to capture additional context.
         double faceChipPadding = 0.25;
 
         /// \brief The number image jitters used to calculate a face code.
-        std::size_t jitterIterations = 1;
+        std::size_t jitterIterations = 0;
 
         /// \brief The path where any models will be found.
         ///
@@ -230,6 +335,9 @@ public:
         /// for these files in the bin/data/. The user can specify an alternate
         /// location by modifying this variable.
         std::string modelsPath;
+
+        /// \brief Choose the GPU device to use if available.
+        // int gpuDevice = 0;
 
     };
 
