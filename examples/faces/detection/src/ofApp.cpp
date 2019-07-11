@@ -15,17 +15,25 @@ void ofApp::setup()
 
     // By default the detector uses the standard dlib HOG detector.
     // It can also use the more accurate (and computationally expensive)
-    // MMOD detector. The MMOD detector benefits greatly from hardware
-    // acceleration (e.g. MKL, CUDA, etc).
+    // MMOD detector. The MMOD detector benefits greatly from CUDA hardware
+    // acceleration.
     //
-    // settings.detectorType = FaceDetector::Type::FACE_DETECTOR_MMOD;
+    // Find a useful a discussion of the various methods here:
+    // https://www.learnopencv.com/face-detection-opencv-dlib-and-deep-learning-c-python/
+    //
+    // settings.detectorType = ofxDlib::FaceDetector::Type::FACE_DETECTOR_MMOD;
+
+    // If you are using the MMOD detector and have multiple GPUS, you can select
+    // the gpu device to use. See also http://dlib.net/dlib/dnn/cuda_dlib.h.html
+    //
+    // settings.gpuDevice = 0;
 
     // We can scale the image DOWN to increase detection speed.
     // But this makes smaller faces more difficult to detect.
     //
     // settings.inputScale = 0.5;
 
-    // We can scale the image UP to detect smaller faces. But this will result
+    // We can scale the image UP to detect smaller faces. But this may result
     // in slower detection speeds.
     //
     // settings.inputScale = 1.5;
@@ -42,10 +50,11 @@ void ofApp::setup()
     // number of pixels that need to be processed.
     settings.inputROI = ofRectangle(200, 200, 800, 400);
 
-    // Set up the detector.
+    // Set up the detector with the settings.
     detector.setup(settings);
 
     // Set up the video input.
+    video.setDeviceID(0);
     video.setup(1280, 720);
 }
 

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2018 Christopher Baker <https://christopherbaker.net>
+// Copyright (c) 2019 Christopher Baker <https://christopherbaker.net>
 //
 // SPDX-License-Identifier: MIT
 //
@@ -24,16 +24,15 @@ public:
     void onTrackEnd(ofxDlib::FaceTrackerEventArgs& evt);
 
     // The video grabber.
-    ofVideoGrabber video;
+    // ofVideoGrabber video;
+    ofVideoPlayer video;
 
     // The face detector.
     ofxDlib::FaceTracker tracker;
 
-    ofEventListener trackEventListener;
+    // The event listener tokens.
     ofEventListener trackBeginListener;
     ofEventListener trackUpdateListener;
     ofEventListener trackEndListener;
-
-    std::map<std::size_t, ofTexture> tracked;
 
 };

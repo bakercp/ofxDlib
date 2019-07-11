@@ -10,6 +10,9 @@
 
 void ofApp::setup()
 {
+    ofSetVerticalSync(true);
+    ofSetFrameRate(60);
+
     // Set up the detector settings.
     ofxDlib::FaceTracker::Settings settings;
 
@@ -18,17 +21,17 @@ void ofApp::setup()
     // MMOD detector. The MMOD detector benefits greatly from hardware
     // acceleration (e.g. MKL, CUDA, etc).
     //
-    // settings.detectorType = ofxDlib::FaceDetector::Type::FACE_DETECTOR_MMOD;
+    settings.detectorType = ofxDlib::FaceDetector::Type::FACE_DETECTOR_MMOD;
 
     // We can scale the image DOWN to increase detection speed.
     // But this makes smaller faces more difficult to detect.
     //
-    // settings.inputScale = 0.5;
+    // settings.inputScale = 0.75;
 
     // We can scale the image UP to detect smaller faces. But this will result
     // in slower detection speeds.
     //
-    // settings.inputScale = 1.5;
+//     settings.inputScale = 1.5;
 
     // By default, scaling interpolation is done using a
     // OF_INTERPOLATE_NEAREST_NEIGHBOR, which is very fast. In some cases
@@ -40,20 +43,23 @@ void ofApp::setup()
     // If you know what region of the image will contain faces, you can set
     // region of interest (ROI). This will increase the speed by reducing the
     // number of pixels that need to be processed.
-    settings.inputROI = ofRectangle(200, 200, 800, 400);
+//    settings.inputROI = ofRectangle(200, 200, 400, 400);
 
-    //
-    settings.trackerPersistence = 60;
-
+//    settings.gpuDevice = 1;
 
     // Set up the detector.
     tracker.setup(settings);
 
-    // Set up the video input.
-    video.setup(1280, 720);
+    // Add trackers event listeners.
     trackBeginListener = tracker.trackBegin.newListener(this, &ofApp::onTrackBegin);
     trackUpdateListener = tracker.trackUpdate.newListener(this, &ofApp::onTrackUpdate);
     trackEndListener = tracker.trackEnd.newListener(this, &ofApp::onTrackEnd);
+
+    // Set up the video input.
+    // video.setup(1280, 720);
+    video.load("LateLate.mp4");
+    video.play();
+    video.setPosition(0.25);
 }
 
 
@@ -70,6 +76,26 @@ void ofApp::update()
 
 void ofApp::draw()
 {
+//    const auto* t = tracker.t();
+//    if (t)
+//    {
+//        std::size_t droppedInputs =  t->droppedInputsCount();
+//        std::size_t droppedOutputs =  t->droppedOutputsCount();
+
+//        std::cout << "IN: " << droppedInputs << " OUT: " << droppedOutputs << std::endl;
+//    }
+
+//    std::size_t droppedInputsCount() const
+//    {
+//        std::unique_lock<std::mutex> lock(_mutex);
+//        return _droppedInputsCount;
+//    }
+
+//    /// \returns the number of outputs that were not recevied.
+//    std::size_t droppedOutputsCount() const
+
+
+
     // Draw the input video.
     ofSetColor(ofColor::white);
     video.draw(0, 0);
@@ -79,48 +105,26 @@ void ofApp::draw()
     ofxDlib::draw(tracker.settings().inputROI, "ROI");
 
     // Draw the tracks.
-    ofSetColor(ofColor::yellow);
-    ofxDlib::draw(tracker.tracks());
+    // ofSetColor(ofColor::yellow);
+    ofxDlib::draw(tracker.tracker());
 
-    ofSetColor(ofColor::white);
-
-    float y = 0;
-    for (auto&& t: tracked)
-    {
-        t.second.draw(0, y);
-        y += t.second.getHeight();
-    }
+    ofDrawBitmapStringHighlight(ofToString(ofGetFrameRate()) + " FPS", 20, 20);
 }
 
 
 void ofApp::onTrackBegin(ofxDlib::FaceTrackerEventArgs& evt)
 {
     std::cout << "Track begin: " << evt.label << std::endl;
-    auto iter = tracked.find(evt.label);
-    bool success = false;
-    if (iter == tracked.end())
-        std::tie(iter, success) = tracked.insert(std::make_pair(evt.label, ofTexture()));
-    iter->second.loadData(evt.detection.faceChip());
 }
 
 
 void ofApp::onTrackUpdate(ofxDlib::FaceTrackerEventArgs& evt)
 {
     std::cout << "Track update: " << evt.label << std::endl;
-    auto iter = tracked.find(evt.label);
-    bool success = false;
-    if (iter == tracked.end())
-        std::tie(iter, success) = tracked.insert(std::make_pair(evt.label, ofTexture()));
-    iter->second.loadData(evt.detection.faceChip());
 }
 
 
 void ofApp::onTrackEnd(ofxDlib::FaceTrackerEventArgs& evt)
 {
     std::cout << "Track end: " << evt.label << std::endl;
-    auto iter = tracked.find(evt.label);
-    if (iter != tracked.end())
-        tracked.erase(iter);
-    else
-        std::cout << "NO IMAGE TRACKED FOR: " << evt.label << std::endl;
 }
