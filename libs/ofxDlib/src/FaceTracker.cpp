@@ -30,7 +30,7 @@ FaceTracker::FaceTracker(const Settings& settings):
 bool FaceTracker::setup(const Settings& settings)
 {
 #if !defined(__OPTIMIZE__)
-    ofLogWarning("FaceTracker::setup") << "FaceTracker runs much faster in RELEASE Mode. http://dlib.net/faq.html#Whyisdlibslow";
+    ofLogWarning("FaceTracker::setup") << "FaceDetector runs much faster when compiled with optimizations (i.e. RELEASE Mode). http://dlib.net/faq.html#Whyisdlibslow";
 #endif
 
     _asyncTracker.reset();

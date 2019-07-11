@@ -26,7 +26,7 @@ FaceFinder::FaceFinder(const Settings& settings)
 bool FaceFinder::setup(const Settings& settings)
 {
 #if !defined(__OPTIMIZE__)
-    ofLogWarning("FaceFinder::setup") << "FaceFinder runs much faster in RELEASE Mode. http://dlib.net/faq.html#Whyisdlibslow";
+    ofLogWarning("FaceFinder::setup") << "FaceDetector runs much faster when compiled with optimizations (i.e. RELEASE Mode). http://dlib.net/faq.html#Whyisdlibslow";
 #endif
 
     _isLoaded = false;
