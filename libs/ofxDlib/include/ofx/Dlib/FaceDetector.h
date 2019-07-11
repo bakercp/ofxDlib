@@ -110,7 +110,7 @@ public:
 
         if (_settings.detectorType == Type::FACE_DETECTOR_HOG)
         {
-            (*_faceDetectorHOG)(_pixels, detections);
+            (*_faceDetectorHOG)(_pixels, detections, _settings.minimumDetectionConfidence);
         }
         else if (_settings.detectorType == Type::FACE_DETECTOR_MMOD)
         {
