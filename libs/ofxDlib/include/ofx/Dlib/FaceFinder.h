@@ -375,7 +375,7 @@ private:
     /// \brief The number of threads to use.
     std::size_t _effectiveNumThreads = 0;
 
-    /// \brief True if the FaceFinder is loaded.
+    /// \brief True if the settings were loaded correctly.
     bool _isLoaded = false;
 
     /// \brief A pointer to the HOG face detector.
