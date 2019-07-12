@@ -68,6 +68,13 @@ inline void draw(const Face& detection)
 }
 
 
+inline void draw(const std::map<std::size_t, ObjectDetection>& tracks)
+{
+    for (auto&& track: tracks)
+        draw(track.second.rectangle, "#:" + ofToString(track.first) + " @ " + ofToString(track.second.confidence, 2));
+}
+
+
 inline void draw(const std::map<std::size_t, Face>& tracks)
 {
     for (auto&& track: tracks)
