@@ -6,6 +6,7 @@
 
 
 #include "ofx/Dlib/FaceTracker.h"
+#include "ofAppRunner.h"
 #include "ofEvents.h"
 #include "ofEventUtils.h"
 
@@ -14,14 +15,12 @@ namespace ofx {
 namespace Dlib {
 
 
-FaceTracker::FaceTracker():
-    _updateListener(ofEvents().update.newListener(this, &FaceTracker::_update))
+FaceTracker::FaceTracker()
 {
 }
 
 
-FaceTracker::FaceTracker(const Settings& settings):
-    _updateListener(ofEvents().update.newListener(this, &FaceTracker::_update))
+FaceTracker::FaceTracker(const Settings& settings)
 {
     setup(settings);
 }
@@ -33,32 +32,48 @@ bool FaceTracker::setup(const Settings& settings)
     ofLogWarning("FaceTracker::setup") << "FaceDetector runs much faster when compiled with optimizations (i.e. RELEASE Mode). http://dlib.net/faq.html#Whyisdlibslow";
 #endif
 
-    _asyncTracker.reset();
-
+    _isLoaded = false;
+    _asyncProcess.reset();
+    _tracks.clear();
+    _tracker = Tracker<ObjectDetection>();
     if (_detector.setup(settings))
     {
         _tracker.setMaximumDistance(settings.trackerMaximumDistance);
         _tracker.setPersistence(settings.trackerPersistence);
 
-        _asyncTracker = std::make_unique<AsyncTracker>([this](const dlib::matrix<dlib::rgb_pixel>& input,
-                                                              std::vector<FaceTrackerEventArgs>& output)
-                                                       {
-                                                           return _process(input, output);
-                                                       },
-                                                       settings.threadInputMaxQueueSize,
-                                                       settings.threadOutputMaxQueueSize);
+        if (settings.async)
+        {
+            _asyncProcess = std::make_unique<AsyncProcess>([this](const InputType& input, OutputType& output) { return _processInput(input, output); },
+                                                           [this](const OutputType& output) { _processOutput(output); }
+                                                           );
+        }
 
         _settings = settings;
+        _isLoaded = true;
     }
 
-    return isLoaded();
-
+    return _isLoaded;
 }
 
 
 bool FaceTracker::isLoaded() const
 {
-    return _asyncTracker != nullptr;
+    return _isLoaded;
+}
+
+
+double FaceTracker::fps() const
+{
+    if (_settings.async)
+        return _asyncProcess->fps();
+
+    return _fpsCounter.getFps();
+}
+
+
+std::map<std::size_t, ObjectDetection> FaceTracker::tracks() const
+{
+    return _tracks;
 }
 
 
@@ -68,45 +83,8 @@ FaceTracker::Settings FaceTracker::settings() const
 }
 
 
-const Tracker<ObjectDetection>& FaceTracker::tracker() const
-{
-    return _tracker;
-}
-
-
-void FaceTracker::_update(ofEventArgs&)
-{
-    if (isLoaded())
-    {
-        std::vector<FaceTrackerEventArgs> events;
-        if (_asyncTracker->outputPipe.dequeue_or_timeout(events, 0))
-        {
-            for (auto&& event: events)
-            {
-                ofNotifyEvent(trackEvent, event, this);
-
-                switch(event.state)
-                {
-                    case FaceTrackerEventArgs::State::TRACK_BEGIN:
-                        ofNotifyEvent(trackBegin, event, this);
-                        break;
-                    case FaceTrackerEventArgs::State::TRACK_UPDATE:
-                        ofNotifyEvent(trackUpdate, event, this);
-                        break;
-                    case FaceTrackerEventArgs::State::TRACK_END:
-                        ofNotifyEvent(trackEnd, event, this);
-                        break;
-                    case FaceTrackerEventArgs::State::TRACK_NONE:
-                        break;
-                }
-            }
-        }
-    }
-}
-
-
-bool FaceTracker::_process(const dlib::matrix<dlib::rgb_pixel>& input,
-                           std::vector<FaceTrackerEventArgs>& output)
+bool FaceTracker::_processInput(const InputType& input,
+                                OutputType& output)
 {
     _tracker.track(_detector.detect(input));
 
@@ -128,7 +106,6 @@ bool FaceTracker::_process(const dlib::matrix<dlib::rgb_pixel>& input,
             if (_tracker.existsPrevious(label))
             {
                evt.previousFace = _tracker.getPrevious(label);
-
             }
 
             output.push_back(evt);
@@ -139,7 +116,48 @@ bool FaceTracker::_process(const dlib::matrix<dlib::rgb_pixel>& input,
     saveEvents(_tracker.newLabels(), FaceTrackerEventArgs::State::TRACK_BEGIN);
     saveEvents(_tracker.currentLabels(), FaceTrackerEventArgs::State::TRACK_UPDATE);
 
+    // Relabel dead tracker events.
+    for (auto& event: output)
+    {
+        if (event.state == FaceTrackerEventArgs::State::TRACK_END)
+        {
+            if (event.age != 0 || event.lastSeen != 0)
+            {
+                event.state = FaceTrackerEventArgs::State::TRACK_UPDATE;
+            }
+        }
+    }
+
     return true;
+}
+
+void FaceTracker::_processOutput(const OutputType& output)
+{
+    _tracks.clear();
+
+    OutputType events = output;
+
+    for (auto&& event: events)
+    {
+        ofNotifyEvent(trackEvent, event, this);
+
+        switch(event.state)
+        {
+            case FaceTrackerEventArgs::State::TRACK_BEGIN:
+                _tracks[event.label] = event.face;
+                ofNotifyEvent(trackBegin, event, this);
+                break;
+            case FaceTrackerEventArgs::State::TRACK_UPDATE:
+                _tracks[event.label] = event.face;
+                ofNotifyEvent(trackUpdate, event, this);
+                break;
+            case FaceTrackerEventArgs::State::TRACK_END:
+                ofNotifyEvent(trackEnd, event, this);
+                break;
+            case FaceTrackerEventArgs::State::TRACK_NONE:
+                break;
+        }
+    }
 }
 
 
