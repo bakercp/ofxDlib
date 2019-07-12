@@ -24,15 +24,9 @@ public:
     void onTrackEnd(ofxDlib::FaceTrackerEventArgs& evt);
 
     // The video grabber.
-    // ofVideoGrabber video;
-    ofVideoPlayer video;
+    ofVideoGrabber video;
 
     // The face detector.
     ofxDlib::FaceTracker tracker;
-
-    // The event listener tokens.
-    ofEventListener trackBeginListener;
-    ofEventListener trackUpdateListener;
-    ofEventListener trackEndListener;
 
 };
