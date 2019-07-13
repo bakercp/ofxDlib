@@ -69,6 +69,18 @@ public:
     }
 
 private:
+    /// \brief The input process function.
+    std::function<bool(const InputType& input, OutputType& output)> _processInput;
+
+    /// \brief The output process function.
+    std::function<void(const OutputType& output)> _processOutput;
+
+    /// \brief The update listener.
+    ofEventListener _updateListener;
+
+    /// \brief The exit listener.
+    ofEventListener _exitListener;
+
     /// \brief The input pipe.
     dlib::pipe<InputType> _inputPipe;
 
@@ -96,20 +108,8 @@ private:
         wait();
     }
 
-    /// \brief The update listener.
-    ofEventListener _updateListener;
-
-    /// \brief The exit listener.
-    ofEventListener _exitListener;
-
     /// \brief an FPS counter.
     ofFpsCounter _fpsCounter;
-
-    /// \brief The input process function.
-    std::function<bool(const InputType& input, OutputType& output)> _processInput;
-
-    /// \brief The output process function.
-    std::function<void(const OutputType& output)> _processOutput;
 
     void thread() override
     {
