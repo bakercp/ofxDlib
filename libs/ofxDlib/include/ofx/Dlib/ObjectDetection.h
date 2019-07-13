@@ -9,6 +9,7 @@
 
 
 #include "dlib/image_processing/frontal_face_detector.h"
+#include "ofx/Dlib/Tracker.h"
 #include "ofRectangle.h"
 
 
@@ -16,7 +17,7 @@ namespace ofx {
 namespace Dlib {
 
 
-///// \brief An object detection result with confidence in pixel cooridinates.
+/// \brief An object detection result with confidence in pixel cooridinates.
 class ObjectDetection
 {
 public:
@@ -38,6 +39,13 @@ public:
     ofRectangle rectangle;
 
 };
+
+
+/// \brief A distance function used by trackers, etc.
+inline float distance(const ObjectDetection& _a, const ObjectDetection& _b)
+{
+    return distance(_a.rectangle, _b.rectangle);
+}
 
 
 } } // namespace ofx::Dlib

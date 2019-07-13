@@ -19,8 +19,7 @@ ObjectDetection::ObjectDetection()
 
 
 ObjectDetection::ObjectDetection(const dlib::mmod_rect& detection):
-    confidence(detection.detection_confidence),
-    rectangle(toOf(detection.rect))
+    ObjectDetection(detection.detection_confidence, detection.rect)
 {
 }
 
@@ -34,8 +33,7 @@ ObjectDetection::ObjectDetection(const std::pair<double,
 
 ObjectDetection::ObjectDetection(double _confidence,
                                  const dlib::rectangle& _rectangle):
-    confidence(_confidence),
-    rectangle(toOf(_rectangle))
+    ObjectDetection(_confidence, toOf(_rectangle))
 {
 }
 

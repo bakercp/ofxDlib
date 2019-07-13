@@ -8,78 +8,32 @@
 #pragma once
 
 
+#include "dlib/of_default_adapter.h"
+#include "dlib/of_image.h"
 #include "ofEvents.h"
 #include "ofx/Dlib/AsyncProcess.h"
-#include "ofx/Dlib/FaceDetector.h"
-#include "ofx/Dlib/ObjectDetection.h"
 #include "ofx/Dlib/Tracker.h"
+#include "ofx/Dlib/FaceDetector.h"
+#include "ofx/Dlib/FaceShapePredictor.h"
+#include "ofx/Dlib/FilterGroup.h"
+#include "ofx/Dlib/ObjectDetection.h"
+#include "ofx/Dlib/ObjectTracker.h"
+#include "ofx/Dlib/TrackerEventFilter.h"
 
 
 namespace ofx {
 namespace Dlib {
 
 
-/// \brief Event arguments that are sent with tracking events.
-class FaceTrackerEventArgs
+class FaceTrackerEventArgs: public TrackerEventArgs
 {
 public:
-    /// \brief The tracking states.
-    enum class State
-    {
-        /// \brief The state when a new track begins.
-        TRACK_BEGIN,
-        /// \brief The state when a track is updated. This may be a stale track.
-        TRACK_UPDATE,
-        /// \brief The state when a track expires and is lost.
-        TRACK_END,
-        /// \brief The state when an event is not tracking.
-        TRACK_NONE
-    };
+    FaceTrackerEventArgs(const TrackerEventArgs& trackerEventArgs,
+                         const FaceShape& faceShape);
 
-    /// \brief The tracker state.
-    State state = State::TRACK_NONE;
-
-    /// \brief The tracker label associated with this event.
-    std::size_t label = static_cast<std::size_t>(-1);
-
-    /// \brief The age of the track.
-    uint64_t age = 0;
-
-    /// \brief The time since last seen.
-    uint64_t lastSeen = 0;
-
-    /// \brief The Face associated with this event, if any.
-    ///
-    /// This will only be valid for state == TRACK_BEGIN and
-    /// state == TRACK_UPDATE.
-    ObjectDetection face;
-
-    /// \brief The previous detection associated with this event, if any.
-    ///
-    /// This will only be valid for state == TRACK_UPDATE and
-    /// state == TRACK_END.
-    ObjectDetection previousFace;
-
+    FaceShape faceShape;
+    
 };
-
-
-inline float distance(const ObjectDetection& _a, const ObjectDetection& _b)
-{
-    // Calculate the spatial "distance" between the objects.
-    ofRectangle a = _a.rectangle;
-    ofRectangle b = _b.rectangle;
-    glm::vec2 dp = glm::vec2(a.getCenter()) - glm::vec2(b.getCenter());
-    glm::vec2 ds = { a.width - b.width, a.height - b.height };
-
-    // Distance between the centers.
-    float centerDistance = glm::length(dp);
-
-    // Difference between the sizes.
-    float sizeDistance = glm::length(ds);
-
-    // The combined distance.
-    return centerDistance + sizeDistance;
-}
 
 
 /// \brief The FaceTracker.
@@ -138,21 +92,47 @@ public:
     double fps() const;
 
     /// \returns the current tracks.
-    std::map<std::size_t, ObjectDetection> tracks() const;
+    const std::unordered_map<std::size_t, ObjectDetection>& tracks() const;
+
+    /// \returns the current tracks.
+    const std::unordered_map<std::size_t, FaceShape>& shapes() const;
 
     /// \returns the current settings.
     Settings settings() const;
 
-    struct Settings: public FaceDetector::Settings
+    struct Settings
     {
         /// \brief True if a seperate thread should be used for tracking.
         bool async = true;
 
-        /// \brief How many frames to persist the tracked object.
-        std::size_t trackerPersistence = 15;
+        /// \brief Enable or disable the tracker event filter.
+        bool enableTrackerEventFilter = true;
 
-        /// \brief The maximum distance that a tracked object can move.
-        float trackerMaximumDistance = 200;
+        /// \brief The tracker settings.
+        Tracker_<ObjectDetection>::Settings trackerSettings;
+
+        /// \brief Face detector settings.
+        FaceDetector::Settings faceDetectorSettings;
+
+        /// \brief Face shape
+        FaceShapePredictor::Settings faceShapePredictorSettings;
+
+        /// \brief Face detector filter alpha.
+        ///
+        /// A simple low-pass filter can be applied to the corners of the face
+        /// detection bounding box. The filter value should be in the range
+        /// [0, 1). A value of 0 means no smoothing. A value close to 1 means
+        /// greater smoothing but more latency.
+        double faceDetectorFilterSmoothness = 0.0;
+
+        /// \brief Face landmark filter alpha.
+        ///
+        /// A simple low-pass filter can be applied to all detected face
+        /// landmarks. The filter value should be in the range [0, 1).
+        /// A value of 0 means no smoothing. A value close to 1 means greater
+        /// smoothing but more latency.
+        double faceShapeFilterSmoothness = 0.0;
+
     };
 
     /// \brief Register tracker event listeners.
@@ -227,7 +207,16 @@ private:
     ofFpsCounter _fpsCounter;
 
     /// \brief The current tracks.
-    std::map<std::size_t, ObjectDetection> _tracks;
+    std::unordered_map<std::size_t, ObjectDetection> _tracks;
+
+    /// \brief The current face shapes.
+    std::unordered_map<std::size_t, FaceShape> _shapes;
+
+    /// \brief Bounding box filter.
+    FilterGroup_<std::vector<glm::vec2>> _boundingBoxFilter;
+
+    /// \brief A shape filter.
+    FilterGroup_<std::vector<glm::vec2>> _faceLandmarkFilter;
 
     /// \brief The async processor.
     std::unique_ptr<AsyncProcess> _asyncProcess = nullptr;
@@ -238,8 +227,11 @@ private:
     /// \brief The face detector.
     FaceDetector _detector;
 
+    /// \breif The face shape predictor.
+    FaceShapePredictor _faceShapePredictor;
+
     /// \brief The bounding box tracker.
-    Tracker<ObjectDetection> _tracker;
+    Tracker_<ObjectDetection> _tracker;
 
 
 };

@@ -16,42 +16,10 @@
 #include "ofMath.h"
 #include "ofRectangle.h"
 #include "ofVectorMath.h"
-
+#include "ofx/Dlib/Utils.h"
 
 namespace ofx {
 namespace Dlib {
-
-
-inline glm::vec2 position(const ofRectangle& item)
-{
-    return item.getCenter();
-}
-
-inline ofRectangle lerp(const ofRectangle& a,
-                 const ofRectangle& b,
-                 float smoothingRate)
-{
-    ofRectangle result;
-    result.x = ofLerp(a.x, b.x, smoothingRate);
-    result.y = ofLerp(a.y, b.y, smoothingRate);
-    result.width = ofLerp(a.width, b.width, smoothingRate);
-    result.height = ofLerp(a.height, b.height, smoothingRate);
-    return result;
-}
-
-inline float distance(const ofRectangle& a, const ofRectangle& b)
-{
-    glm::vec2 dp = a.getCenter() - b.getCenter();
-    glm::vec2 ds = { a.width - b.width, a.height - b.height };
-    return glm::length(dp) + glm::length(ds);
-
-//    float dx = (a.x + a.width / 2.) - (b.x + b.width / 2.);
-//    float dy = (a.y + a.height / 2.) - (b.y + b.height / 2.);
-//    float dw = a.width - b.width;
-//    float dh = a.height - b.height;
-//    float pd = sqrtf(dx * dx + dy * dy);
-//    float sd = sqrtf(dw * dw + dh * dh);
-}
 
 
 /// \tparam T The type of object being tracked.
@@ -142,27 +110,39 @@ protected:
 
 
 template <class T>
-class Tracker
+class Tracker_
 {
 public:
+    struct Settings;
+
     typedef std::vector<std::size_t> Labels;
 
-    Tracker()
+    Tracker_()
     {
     }
 
-    virtual ~Tracker()
+    virtual ~Tracker_()
     {
     }
 
-    void setPersistence(std::size_t persistence)
+    bool setup(const Settings& settings)
     {
-        _persistence = persistence;
-    }
+        _settings = settings;
 
-    void setMaximumDistance(float maximumDistance)
-    {
-        _maximumDistance = maximumDistance;
+        _previous.clear();
+        _current.clear();
+
+        _currentLabels.clear();
+        _previousLabels.clear();
+        _newLabels.clear();
+        _deadLabels.clear();
+
+        _previousLabelMap.clear();
+        _currentLabelMap.clear();
+
+        _curLabel = 0;
+
+        return true;
     }
 
     // organized in the order received by track()
@@ -246,7 +226,7 @@ public:
             {
                 float curDistance = distance(objects[i], _previous[j].object());
 
-                if (curDistance < _maximumDistance)
+                if (curDistance < _settings.maximumDistance)
                 {
                     all.push_back(MatchDistancePair(MatchPair(i, j),
                                                     curDistance));
@@ -315,7 +295,7 @@ public:
         {
             if (!matchedPrevious[j])
             {
-                if (_previous[j].lastSeen() < _persistence)
+                if (_previous[j].lastSeen() < _settings.persistence)
                 {
                     _current.push_back(_previous[j]);
                     _current.back().timeStep(false);
@@ -348,8 +328,18 @@ public:
         return _curLabel++;
     }
 
+    struct Settings
+    {
+        /// \brief How many updates to persist the tracked object.
+        std::size_t persistence = 15;
+
+        /// \brief The maximum distance that a tracked object can move between updates.
+        float maximumDistance = 200;
+    };
 
 protected:
+    Settings _settings;
+
     std::vector<TrackedObject<T>> _previous;
     std::vector<TrackedObject<T>> _current;
 
@@ -361,219 +351,217 @@ protected:
     std::unordered_map<std::size_t, TrackedObject<T>*> _previousLabelMap;
     std::unordered_map<std::size_t, TrackedObject<T>*> _currentLabelMap;
 
-    std::size_t _persistence = 15;
-    float _maximumDistance = 64;
     std::size_t _curLabel = 0;
 
 };
 
 
-template <class T>
-class SmoothTracker: public Tracker<T>
-{
-public:
-    SmoothTracker()
-    {
-    }
-
-    virtual ~SmoothTracker() override
-    {
-    }
-
-    typename Tracker<T>::Labels track(const std::vector<ofRectangle>& objects) override
-    {
-        auto labels = Tracker<T>::track(objects);
-
-        // add new objects, update old objects
-        for (std::size_t i = 0; i < labels.size(); ++i)
-        {
-            std::size_t label = labels[i];
-
-            T cur = Tracker<T>::getCurrent(label);
-
-            if  (_smoothed.count(label) > 0)
-            {
-                _smoothed[label] = lerp(_smoothed[label], cur, _smoothingRate);
-            }
-            else
-            {
-                _smoothed[label] = cur;
-            }
-        }
-
-        auto smoothedItr = _smoothed.begin();
-
-        while (smoothedItr != _smoothed.end())
-        {
-            auto label = smoothedItr->first;
-
-            if (!Tracker<T>::existsCurrent(label))
-            {
-                smoothedItr = _smoothed.erase(smoothedItr);
-            }
-            else
-            {
-                ++smoothedItr;
-            }
-        }
-
-        return labels;
-    }
-
-    T getSmoothed(std::size_t label) const
-    {
-        return _smoothed.find(label)->second;
-    }
-
-    glm::vec2 getVelocity(std::size_t index) const
-    {
-        std::size_t label = Tracker<T>::getLabelFromIndex(index);
-
-        if (Tracker<T>::existsPrevious(label))
-        {
-            return position(Tracker<T>::getCurrent(label)) - position(Tracker<T>::getPrevious(label));
-        }
-
-        return glm::vec2(0, 0);
-    }
-
-    void setSmoothingRate(float smoothingRate)
-    {
-        _smoothingRate = smoothingRate;
-    }
-
-    float getSmoothingRate() const
-    {
-        return _smoothingRate;
-    }
-
-protected:
-    float _smoothingRate = 0.5;
-
-    std::map<std::size_t, T> _smoothed;
-
-};
-
-
-template <class T>
-class Follower
-{
-public:
-    Follower()
-    {
-    }
-
-    virtual ~Follower()
-    {
-    }
-
-    virtual void setup(const T&)
-    {
-    }
-
-    virtual void update(const T&)
-    {
-    }
-
-    virtual void kill()
-    {
-        _dead = true;
-    }
-
-    void setLabel(std::size_t label)
-    {
-        _label = label;
-    }
-
-    std::size_t getLabel() const
-    {
-        return _label;
-    }
-
-    bool isDead() const
-    {
-        return _dead;
-    }
-
-protected:
-    bool _dead = false;
-
-    std::size_t _label = std::numeric_limits<std::size_t>::max();
-
-};
-
-
-/// The Follower class type should be default constructable and implement an
-/// Follower::isDead() const method that returns true when the follower is
-/// "dead".
-///
-/// \tparam T The Tracker class type.
-/// \tparam F The Follower class type. The follower must be default constructable.
-template <class T, class F>
-class TrackerFollower: public Tracker<T>
-{
-public:
-    typename Tracker<T>::Labels track(const std::vector<T>& objects) override
-    {
-        // Do the standard tracking.
-        Tracker<T>::track(objects);
-
-        // kill missing, update old
-        for (std::size_t i = 0; i < _labels.size(); ++i)
-        {
-            std::size_t curLabel = _labels[i];
-            F& curFollower = _followers[i];
-
-            if (!Tracker<T>::existsCurrent(curLabel))
-            {
-                curFollower.kill();
-            }
-            else
-            {
-                curFollower.update(Tracker<T>::getCurrent(curLabel));
-            }
-        }
-
-        // add new
-        for (std::size_t i = 0; i < Tracker<T>::_newLabels.size(); ++i)
-        {
-            std::size_t curLabel = Tracker<T>::_newLabels[i];
-            _labels.push_back(curLabel);
-
-            _followers.push_back(F());
-            _followers.back().setup(Tracker<T>::getCurrent(curLabel));
-            _followers.back().setLabel(curLabel);
-        }
-
-        // remove dead
-        for (std::size_t i = _labels.size() - 1; i != static_cast<std::size_t>(-1); --i)
-        {
-            if (_followers[i].isDead())
-            {
-                _followers.erase(_followers.begin() + i);
-                _labels.erase(_labels.begin() + i);
-            }
-        }
-
-        return _labels;
-    }
-
-    std::vector<F>& followers()
-    {
-        return _followers;
-    }
-
-    std::vector<F> followers() const
-    {
-        return _followers;
-    }
-
-protected:
-    typename Tracker<T>::Labels _labels;
-
-    std::vector<F> _followers;
-
-};
+//template <class T>
+//class SmoothTracker: public Tracker<T>
+//{
+//public:
+//    SmoothTracker()
+//    {
+//    }
+//
+//    virtual ~SmoothTracker() override
+//    {
+//    }
+//
+//    typename Tracker<T>::Labels track(const std::vector<ofRectangle>& objects) override
+//    {
+//        auto labels = Tracker<T>::track(objects);
+//
+//        // add new objects, update old objects
+//        for (std::size_t i = 0; i < labels.size(); ++i)
+//        {
+//            std::size_t label = labels[i];
+//
+//            T cur = Tracker<T>::getCurrent(label);
+//
+//            if  (_smoothed.count(label) > 0)
+//            {
+//                _smoothed[label] = lerp(_smoothed[label], cur, _smoothingRate);
+//            }
+//            else
+//            {
+//                _smoothed[label] = cur;
+//            }
+//        }
+//
+//        auto smoothedItr = _smoothed.begin();
+//
+//        while (smoothedItr != _smoothed.end())
+//        {
+//            auto label = smoothedItr->first;
+//
+//            if (!Tracker<T>::existsCurrent(label))
+//            {
+//                smoothedItr = _smoothed.erase(smoothedItr);
+//            }
+//            else
+//            {
+//                ++smoothedItr;
+//            }
+//        }
+//
+//        return labels;
+//    }
+//
+//    T getSmoothed(std::size_t label) const
+//    {
+//        return _smoothed.find(label)->second;
+//    }
+//
+//    glm::vec2 getVelocity(std::size_t index) const
+//    {
+//        std::size_t label = Tracker<T>::getLabelFromIndex(index);
+//
+//        if (Tracker<T>::existsPrevious(label))
+//        {
+//            return position(Tracker<T>::getCurrent(label)) - position(Tracker<T>::getPrevious(label));
+//        }
+//
+//        return glm::vec2(0, 0);
+//    }
+//
+//    void setSmoothingRate(float smoothingRate)
+//    {
+//        _smoothingRate = smoothingRate;
+//    }
+//
+//    float getSmoothingRate() const
+//    {
+//        return _smoothingRate;
+//    }
+//
+//protected:
+//    float _smoothingRate = 0.5;
+//
+//    std::map<std::size_t, T> _smoothed;
+//
+//};
+//
+//
+//template <class T>
+//class Follower
+//{
+//public:
+//    Follower()
+//    {
+//    }
+//
+//    virtual ~Follower()
+//    {
+//    }
+//
+//    virtual void setup(const T&)
+//    {
+//    }
+//
+//    virtual void update(const T&)
+//    {
+//    }
+//
+//    virtual void kill()
+//    {
+//        _dead = true;
+//    }
+//
+//    void setLabel(std::size_t label)
+//    {
+//        _label = label;
+//    }
+//
+//    std::size_t getLabel() const
+//    {
+//        return _label;
+//    }
+//
+//    bool isDead() const
+//    {
+//        return _dead;
+//    }
+//
+//protected:
+//    bool _dead = false;
+//
+//    std::size_t _label = std::numeric_limits<std::size_t>::max();
+//
+//};
+//
+//
+///// The Follower class type should be default constructable and implement an
+///// Follower::isDead() const method that returns true when the follower is
+///// "dead".
+/////
+///// \tparam T The Tracker class type.
+///// \tparam F The Follower class type. The follower must be default constructable.
+//template <class T, class F>
+//class TrackerFollower: public Tracker<T>
+//{
+//public:
+//    typename Tracker<T>::Labels track(const std::vector<T>& objects) override
+//    {
+//        // Do the standard tracking.
+//        Tracker<T>::track(objects);
+//
+//        // kill missing, update old
+//        for (std::size_t i = 0; i < _labels.size(); ++i)
+//        {
+//            std::size_t curLabel = _labels[i];
+//            F& curFollower = _followers[i];
+//
+//            if (!Tracker<T>::existsCurrent(curLabel))
+//            {
+//                curFollower.kill();
+//            }
+//            else
+//            {
+//                curFollower.update(Tracker<T>::getCurrent(curLabel));
+//            }
+//        }
+//
+//        // add new
+//        for (std::size_t i = 0; i < Tracker<T>::_newLabels.size(); ++i)
+//        {
+//            std::size_t curLabel = Tracker<T>::_newLabels[i];
+//            _labels.push_back(curLabel);
+//
+//            _followers.push_back(F());
+//            _followers.back().setup(Tracker<T>::getCurrent(curLabel));
+//            _followers.back().setLabel(curLabel);
+//        }
+//
+//        // remove dead
+//        for (std::size_t i = _labels.size() - 1; i != static_cast<std::size_t>(-1); --i)
+//        {
+//            if (_followers[i].isDead())
+//            {
+//                _followers.erase(_followers.begin() + i);
+//                _labels.erase(_labels.begin() + i);
+//            }
+//        }
+//
+//        return _labels;
+//    }
+//
+//    std::vector<F>& followers()
+//    {
+//        return _followers;
+//    }
+//
+//    std::vector<F> followers() const
+//    {
+//        return _followers;
+//    }
+//
+//protected:
+//    typename Tracker<T>::Labels _labels;
+//
+//    std::vector<F> _followers;
+//
+//};
 
 
 } } // namespace ofx::Dlib

@@ -9,10 +9,19 @@
 #include "ofAppRunner.h"
 #include "ofEvents.h"
 #include "ofEventUtils.h"
+#include "ofx/Dlib/Utils.h"
 
 
 namespace ofx {
 namespace Dlib {
+
+
+FaceTrackerEventArgs::FaceTrackerEventArgs(const TrackerEventArgs& trackerEventArgs,
+                                           const FaceShape& faceShape_):
+    TrackerEventArgs(trackerEventArgs),
+    faceShape(faceShape_)
+{
+}
 
 
 FaceTracker::FaceTracker()
@@ -35,11 +44,19 @@ bool FaceTracker::setup(const Settings& settings)
     _isLoaded = false;
     _asyncProcess.reset();
     _tracks.clear();
-    _tracker = Tracker<ObjectDetection>();
-    if (_detector.setup(settings))
+    _shapes.clear();
+    _tracker = Tracker_<ObjectDetection>();
+    _faceShapePredictor = FaceShapePredictor();
+
+    _boundingBoxFilter.clear();
+    _faceLandmarkFilter.clear();
+
+    if (_detector.setup(settings.faceDetectorSettings)
+    && _tracker.setup(settings.trackerSettings)
+    && _faceShapePredictor.setup(settings.faceShapePredictorSettings))
     {
-        _tracker.setMaximumDistance(settings.trackerMaximumDistance);
-        _tracker.setPersistence(settings.trackerPersistence);
+        _boundingBoxFilter.setAlpha(settings.faceDetectorFilterSmoothness);
+        _faceLandmarkFilter.setAlpha(settings.faceShapeFilterSmoothness);
 
         if (settings.async)
         {
@@ -71,9 +88,15 @@ double FaceTracker::fps() const
 }
 
 
-std::map<std::size_t, ObjectDetection> FaceTracker::tracks() const
+const std::unordered_map<std::size_t, ObjectDetection>& FaceTracker::tracks() const
 {
     return _tracks;
+}
+
+
+const std::unordered_map<std::size_t, FaceShape>& FaceTracker::shapes() const
+{
+    return _shapes;
 }
 
 
@@ -88,43 +111,111 @@ bool FaceTracker::_processInput(const InputType& input,
 {
     _tracker.track(_detector.detect(input));
 
-    auto saveEvents = [&](const Tracker<ObjectDetection>::Labels& labels,
-                          FaceTrackerEventArgs::State state)
+    std::vector<TrackerEventArgs> trackerEvents;
+
+    auto saveEvents = [&](const Tracker_<ObjectDetection>::Labels& labels,
+                          TrackerEventArgs::State state)
     {
         for (std::size_t label: labels)
         {
-            FaceTrackerEventArgs evt;
+            TrackerEventArgs evt;
             evt.state = state;
             evt.label = label;
 
             if (_tracker.existsCurrent(label))
             {
-                evt.face = _tracker.getCurrent(label);
+                evt.detection = _tracker.getCurrent(label);
                 evt.age = _tracker.getAge(label);
                 evt.lastSeen = _tracker.getLastSeen(label);
             }
-            if (_tracker.existsPrevious(label))
-            {
-               evt.previousFace = _tracker.getPrevious(label);
-            }
 
-            output.push_back(evt);
+            trackerEvents.push_back(evt);
         }
     };
 
-    saveEvents(_tracker.deadLabels(), FaceTrackerEventArgs::State::TRACK_END);
-    saveEvents(_tracker.newLabels(), FaceTrackerEventArgs::State::TRACK_BEGIN);
-    saveEvents(_tracker.currentLabels(), FaceTrackerEventArgs::State::TRACK_UPDATE);
+    saveEvents(_tracker.deadLabels(), TrackerEventArgs::State::TRACK_END);
+    saveEvents(_tracker.newLabels(), TrackerEventArgs::State::TRACK_BEGIN);
+    saveEvents(_tracker.currentLabels(), TrackerEventArgs::State::TRACK_UPDATE);
 
-    // Relabel dead tracker events.
-    for (auto& event: output)
+    // Relabel dead tracker events and filter if needed.
+    for (auto& event: trackerEvents)
     {
-        if (event.state == FaceTrackerEventArgs::State::TRACK_END)
+        // Adjust our events to turn dead labels in to updates if they are lost
+        // but not forgotten.
+        if (event.state == TrackerEventArgs::State::TRACK_END)
         {
             if (event.age != 0 || event.lastSeen != 0)
             {
-                event.state = FaceTrackerEventArgs::State::TRACK_UPDATE;
+                event.state = TrackerEventArgs::State::TRACK_UPDATE;
             }
+        }
+
+        // Filter any bounding boxes if needed.
+        if (_settings.faceDetectorFilterSmoothness > 0)
+        {
+            std::vector<glm::vec2> filteredBoundingBox =
+            {
+                event.detection.rectangle.getMin(),
+                event.detection.rectangle.getMax()
+            };
+
+            switch(event.state)
+            {
+                case TrackerEventArgs::State::TRACK_BEGIN:
+                case TrackerEventArgs::State::TRACK_UPDATE:
+                {
+                    filteredBoundingBox = _boundingBoxFilter.filter(event.label, filteredBoundingBox);
+                    break;
+                }
+                case TrackerEventArgs::State::TRACK_END:
+                {
+                    _boundingBoxFilter.end(event.label);
+                    break;
+                }
+                case TrackerEventArgs::State::TRACK_NONE:
+                    break;
+            }
+
+            event.detection.rectangle = ofRectangle(filteredBoundingBox[0], filteredBoundingBox[1]);
+        }
+    }
+
+    // Face shape analysis.
+    // calculate optical flow.
+
+    output.reserve(trackerEvents.size());
+
+    for (auto& event: trackerEvents)
+    {
+        FaceShape shape = _faceShapePredictor.predict(input,
+                                                      event.detection.rectangle);
+        // Do filtering if possible.
+        if (_settings.faceShapeFilterSmoothness > 0)
+        {
+            std::vector<glm::vec2> filteredFaceLandmarks = shape.faceLandmarks();
+
+            switch(event.state)
+            {
+                case TrackerEventArgs::State::TRACK_BEGIN:
+                case TrackerEventArgs::State::TRACK_UPDATE:
+                {
+                    filteredFaceLandmarks = _faceLandmarkFilter.filter(event.label, filteredFaceLandmarks);
+                    break;
+                }
+                case TrackerEventArgs::State::TRACK_END:
+                {
+                    _faceLandmarkFilter.end(event.label);
+                    break;
+                }
+                case TrackerEventArgs::State::TRACK_NONE:
+                    break;
+            }
+
+            output.push_back(FaceTrackerEventArgs(event, FaceShape(shape, filteredFaceLandmarks)));
+        }
+        else
+        {
+            output.push_back(FaceTrackerEventArgs(event, shape));
         }
     }
 
@@ -134,6 +225,7 @@ bool FaceTracker::_processInput(const InputType& input,
 void FaceTracker::_processOutput(const OutputType& output)
 {
     _tracks.clear();
+    _shapes.clear();
 
     OutputType events = output;
 
@@ -143,18 +235,26 @@ void FaceTracker::_processOutput(const OutputType& output)
 
         switch(event.state)
         {
-            case FaceTrackerEventArgs::State::TRACK_BEGIN:
-                _tracks[event.label] = event.face;
+            case TrackerEventArgs::State::TRACK_BEGIN:
+            {
+                _tracks[event.label] = event.detection;
+                _shapes[event.label] = event.faceShape;
                 ofNotifyEvent(trackBegin, event, this);
                 break;
-            case FaceTrackerEventArgs::State::TRACK_UPDATE:
-                _tracks[event.label] = event.face;
+            }
+            case TrackerEventArgs::State::TRACK_UPDATE:
+            {
+                _tracks[event.label] = event.detection;
+                _shapes[event.label] = event.faceShape;
                 ofNotifyEvent(trackUpdate, event, this);
                 break;
-            case FaceTrackerEventArgs::State::TRACK_END:
+            }
+            case TrackerEventArgs::State::TRACK_END:
+            {
                 ofNotifyEvent(trackEnd, event, this);
                 break;
-            case FaceTrackerEventArgs::State::TRACK_NONE:
+            }
+            case TrackerEventArgs::State::TRACK_NONE:
                 break;
         }
     }
