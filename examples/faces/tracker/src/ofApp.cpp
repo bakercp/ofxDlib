@@ -79,7 +79,6 @@ void ofApp::setup()
     tracker.registerEvents(this);
 
     // Set up the video input.
-    video.setDeviceID(1);
     video.setup(1280, 720);
 }
 
