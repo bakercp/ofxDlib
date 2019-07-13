@@ -18,7 +18,6 @@
 #include "ofx/Dlib/FilterGroup.h"
 #include "ofx/Dlib/ObjectDetection.h"
 #include "ofx/Dlib/ObjectTracker.h"
-#include "ofx/Dlib/TrackerEventFilter.h"
 
 
 namespace ofx {
