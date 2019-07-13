@@ -29,8 +29,11 @@ public:
     /// \brief Image parameters.
     struct ImageHeader
     {
+        /// \brief Image width in pixels.
         std::size_t width = 0;
+        /// \brief Image height in pixels.
         std::size_t height = 0;
+        /// \brief Bits per pixel.
         std::size_t bpp = 0;
     };
 

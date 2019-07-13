@@ -622,4 +622,39 @@ ofTexture toTexture(const dlib::matrix<PixelType>& _mat,
 
 
 
+//inline glm::vec2 position(const ofRectangle& item)
+//{
+//    return item.getCenter();
+//}
+//
+//inline ofRectangle lerp(const ofRectangle& a,
+//                 const ofRectangle& b,
+//                 float smoothingRate)
+//{
+//    ofRectangle result;
+//    result.x = ofLerp(a.x, b.x, smoothingRate);
+//    result.y = ofLerp(a.y, b.y, smoothingRate);
+//    result.width = ofLerp(a.width, b.width, smoothingRate);
+//    result.height = ofLerp(a.height, b.height, smoothingRate);
+//    return result;
+//}
+
+inline float distance(const ofRectangle& a, const ofRectangle& b)
+{
+    // Calculate the spatial "distance" between the objects.
+    glm::vec2 dp = glm::vec2(a.getCenter()) - glm::vec2(b.getCenter());
+    glm::vec2 ds = { a.width - b.width, a.height - b.height };
+
+    // Distance between the centers.
+    float centerDistance = glm::length(dp);
+
+    // Difference between the sizes.
+    float sizeDistance = glm::length(ds);
+
+    // The combined distance.
+    return centerDistance + sizeDistance;
+}
+
+
+
 } } // namespace ofx::Dlib

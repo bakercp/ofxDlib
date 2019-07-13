@@ -26,7 +26,7 @@ FaceDetector::FaceDetector(const Settings& settings)
 bool FaceDetector::setup(const Settings& settings)
 {
 #if !defined(__OPTIMIZE__)
-    ofLogWarning("FaceDetector::setup") << "FaceDetector runs much faster in RELEASE Mode. http://dlib.net/faq.html#Whyisdlibslow";
+    ofLogWarning("FaceDetector::setup") << "FaceDetector runs much faster when compiled with optimizations (i.e. RELEASE Mode). http://dlib.net/faq.html#Whyisdlibslow";
 #endif
 
     _isLoaded = false;

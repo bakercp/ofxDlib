@@ -8,217 +8,41 @@
 #pragma once
 
 
-#include "dlib/pipe.h"
-#include "dlib/threads.h"
+#include "dlib/of_default_adapter.h"
+#include "dlib/of_image.h"
 #include "ofEvents.h"
-#include "ofx/Dlib/FaceDetector.h"
-#include "ofx/Dlib/ObjectDetection.h"
+#include "ofx/Dlib/AsyncProcess.h"
 #include "ofx/Dlib/Tracker.h"
+#include "ofx/Dlib/FaceDetector.h"
+#include "ofx/Dlib/FaceShapePredictor.h"
+#include "ofx/Dlib/FilterGroup.h"
+#include "ofx/Dlib/ObjectDetection.h"
+#include "ofx/Dlib/ObjectTracker.h"
+#include "ofx/Dlib/TrackerEventFilter.h"
 
 
 namespace ofx {
 namespace Dlib {
 
 
-
-/// \brief An AsyncProcess.
-/// \note I'm sure this was directly influenced by the StoryBots song.
-template <typename InputType, typename OutputType>
-class AsyncProcess: public dlib::threaded_object
+class FaceTrackerEventArgs: public TrackerEventArgs
 {
 public:
-    /// \brief Create an async process.
-    ///
-    /// To bind the finction, call
-    ///     std::bind(&TheClass::function, pointerToInstanceOfTheClass)
-    ///
-    /// \param processFunction The threaded function.
-    /// \param inputPipeMaxSize The maximum size of the input pipe.
-    /// \param outputPipeMaxSize The maximum size of the output pipe.
-    AsyncProcess(std::function<bool(const InputType& input, OutputType& output)> processFunction,
-                 std::size_t inputPipeMaxSize,
-                 std::size_t outputPipeMaxSize):
-        _exitListener(ofEvents().exit.newListener(this, &AsyncProcess::_exit)),
-        inputPipe(inputPipeMaxSize),
-        outputPipe(outputPipeMaxSize),
-        _processFunction(processFunction)
-    {
-        start();
-    }
+    FaceTrackerEventArgs(const TrackerEventArgs& trackerEventArgs,
+                         const FaceShape& faceShape);
 
-    /// \brief Destroy the async process, stopping and waiting for the thread.
-    ~AsyncProcess() override
-    {
-        // We do control this.
-        // inputPipe.wait_until_empty();
-
-        // We don't control this.
-        // outputPipe.wait_until_empty();
-
-        // This causes inputPipe.dequeue() to unblock and return false.
-        inputPipe.disable();
-        // outputPipe.disable();
-
-        // It is not required to call stop() as calling
-        // inputPipe.disable() will have the same effect.
-
-        // stop();
-        wait();
-    }
-
-    /// \brief The input pipe.
-    dlib::pipe<InputType> inputPipe;
-
-    /// \brief The output pipe.
-    dlib::pipe<OutputType> outputPipe;
-
-    /// \brief Sets dopped input and output counts to zero.
-    void resetCounts()
-    {
-        std::unique_lock<std::mutex> lock(_mutex);
-        _droppedInputsCount = 0;
-        _droppedOutputsCount = 0;
-    }
-
-    /// \returns the number of inputs that were not processed.
-    std::size_t droppedInputsCount() const
-    {
-        std::unique_lock<std::mutex> lock(_mutex);
-        return _droppedInputsCount;
-    }
-
-    /// \returns the number of outputs that were not recevied.
-    std::size_t droppedOutputsCount() const
-    {
-        std::unique_lock<std::mutex> lock(_mutex);
-        return _droppedOutputsCount;
-    }
-
-private:
-    /// \brief The exit callback.
-    void _exit(ofEventArgs&)
-    {
-        inputPipe.disable();
-        wait();
-    }
-
-    /// \brief The exit listener.
-    ofEventListener _exitListener;
-
-    /// \brief Mutext to protect counts.
-    mutable std::mutex _mutex;
-
-    /// \brief The number of inputs that were dropped.
-    std::size_t _droppedInputsCount = 0;
-
-    /// \brief The number of outputs that were dropped.
-    std::size_t _droppedOutputsCount = 0;
-
-    /// \brief The process function.
-    std::function<bool(const InputType& input, OutputType& output)> _processFunction;
-
-    void thread() override
-    {
-        InputType lastInput;
-        OutputType lastOutput;
-        OutputType missedOutput;
-
-        while (inputPipe.dequeue(lastInput))
-        {
-            // We need to get to the latest frame, so consume it and continue.
-            if (inputPipe.size() != 0)
-            {
-                std::unique_lock<std::mutex> lock(_mutex);
-                _droppedInputsCount++;
-                continue;
-            }
-
-            if (_processFunction(lastInput, lastOutput))
-            {
-                // Make space in the output pipe if needed.
-                if (outputPipe.size() == outputPipe.max_size())
-                {
-                    outputPipe.dequeue(missedOutput);
-                    std::unique_lock<std::mutex> lock(_mutex);
-                    _droppedOutputsCount++;
-                }
-
-                outputPipe.enqueue(lastOutput);
-            }
-        }
-    }
-
+    FaceShape faceShape;
+    
 };
-
-
-/// \brief Event arguments that are sent with tracking events.
-class FaceTrackerEventArgs
-{
-public:
-    /// \brief The tracking states.
-    enum class State
-    {
-        /// \brief The state when a new track begins.
-        TRACK_BEGIN,
-        /// \brief The state when a track is updated. This may be a stale track.
-        TRACK_UPDATE,
-        /// \brief The state when a track expires and is lost.
-        TRACK_END,
-        /// \brief The state when an event is not tracking.
-        TRACK_NONE
-    };
-
-    /// \brief The tracker state.
-    State state = State::TRACK_NONE;
-
-    /// \brief The tracker label associated with this event.
-    std::size_t label = static_cast<std::size_t>(-1);
-
-    /// \brief The age of the track.
-    uint64_t age = 0;
-
-    /// \brief The time since last seen.
-    uint64_t lastSeen = 0;
-
-    /// \brief The Face associated with this event, if any.
-    ///
-    /// This will only be valid for state == TRACK_BEGIN and
-    /// state == TRACK_UPDATE.
-    ObjectDetection face;
-
-    /// \brief The previous detection associated with this event, if any.
-    ///
-    /// This will only be valid for state == TRACK_UPDATE and
-    /// state == TRACK_END.
-    ObjectDetection previousFace;
-
-};
-
-
-inline float distance(const ObjectDetection& _a, const ObjectDetection& _b)
-{
-    // Calculate the spatial "distance" between the objects.
-    ofRectangle a = _a.rectangle;
-    ofRectangle b = _b.rectangle;
-    glm::vec2 dp = glm::vec2(a.getCenter()) - glm::vec2(b.getCenter());
-    glm::vec2 ds = { a.width - b.width, a.height - b.height };
-
-    // Distance between the centers.
-    float centerDistance = glm::length(dp);
-
-    // Difference between the sizes.
-    float sizeDistance = glm::length(ds);
-
-    // The combined distance.
-    return centerDistance + sizeDistance;
-}
 
 
 /// \brief The FaceTracker.
 class FaceTracker
 {
 public:
-    typedef AsyncProcess<dlib::matrix<dlib::rgb_pixel>, std::vector<FaceTrackerEventArgs>> AsyncTracker;
+    typedef dlib::matrix<dlib::rgb_pixel> InputType;
+    typedef std::vector<FaceTrackerEventArgs> OutputType;
+    typedef AsyncProcess_<InputType, OutputType> AsyncProcess;
 
     struct Settings;
 
@@ -247,30 +71,115 @@ public:
     {
         if (isLoaded())
         {
-            _asyncTracker->inputPipe.enqueue_or_timeout(dlib::mat(image), 0);
+            if (!_settings.async)
+            {
+                OutputType output;
+                if (_processInput(dlib::mat(image), output))
+                {
+                    _processOutput(output);
+                    _fpsCounter.newFrame();
+                }
+            }
+            else
+            {
+                dlib::matrix<dlib::rgb_pixel> _image = dlib::mat(image);
+                _asyncProcess->tryProcess(_image);
+            }
         }
     }
+
+    /// \brief Get the process
+    double fps() const;
+
+    /// \returns the current tracks.
+    const std::unordered_map<std::size_t, ObjectDetection>& tracks() const;
+
+    /// \returns the current tracks.
+    const std::unordered_map<std::size_t, FaceShape>& shapes() const;
 
     /// \returns the current settings.
     Settings settings() const;
 
-    /// \returns the tracker.
-    const Tracker<ObjectDetection>& tracker() const;
-
-    struct Settings: public FaceDetector::Settings
+    struct Settings
     {
-        /// \brief How many frames to persist the tracked object.
-        std::size_t trackerPersistence = 15;
+        /// \brief True if a seperate thread should be used for tracking.
+        bool async = true;
 
-        /// \brief The maximum distance that a tracked object can move.
-        float trackerMaximumDistance = 200;
+        /// \brief Enable or disable the tracker event filter.
+        bool enableTrackerEventFilter = true;
 
-        /// \brief Thread input max queue size.
-        std::size_t threadInputMaxQueueSize = 1;
+        /// \brief The tracker settings.
+        Tracker_<ObjectDetection>::Settings trackerSettings;
 
-        /// \brief Thread output max queue size.
-        std::size_t threadOutputMaxQueueSize = 2048;
+        /// \brief Face detector settings.
+        FaceDetector::Settings faceDetectorSettings;
+
+        /// \brief Face shape
+        FaceShapePredictor::Settings faceShapePredictorSettings;
+
+        /// \brief Face detector filter alpha.
+        ///
+        /// A simple low-pass filter can be applied to the corners of the face
+        /// detection bounding box. The filter value should be in the range
+        /// [0, 1). A value of 0 means no smoothing. A value close to 1 means
+        /// greater smoothing but more latency.
+        double faceDetectorFilterSmoothness = 0.0;
+
+        /// \brief Face landmark filter alpha.
+        ///
+        /// A simple low-pass filter can be applied to all detected face
+        /// landmarks. The filter value should be in the range [0, 1).
+        /// A value of 0 means no smoothing. A value close to 1 means greater
+        /// smoothing but more latency.
+        double faceShapeFilterSmoothness = 0.0;
+
     };
+
+    /// \brief Register tracker event listeners.
+    ///
+    /// Event listeners registered via this function must have the following
+    /// ofEvent callbacks defined:
+    ///
+    ///     `void onTrackBegin(ofxDlib::FaceTrackerEventArgs& evt)`
+    ///     `void onTrackUpdate(ofxDlib::FaceTrackerEventArgs& evt)`
+    ///     `void onTrackEnd(ofxDlib::FaceTrackerEventArgs& evt)`
+    ///
+    /// Other method signatures event signatures are also supported.
+    ///
+    /// \tparam ListenerClass The class of the listener.
+    /// \param listener A pointer to the listener class.
+    /// \param prio The event priority.
+    template <class ListenerClass>
+    void registerEvents(ListenerClass* listener,
+                        int prio = OF_EVENT_ORDER_AFTER_APP)
+    {
+        ofAddListener(trackBegin, listener, &ListenerClass::onTrackBegin, prio);
+        ofAddListener(trackUpdate, listener, &ListenerClass::onTrackUpdate, prio);
+        ofAddListener(trackEnd, listener, &ListenerClass::onTrackEnd, prio);
+    }
+
+    /// \brief Unregister tracker event listener.
+    ///
+    /// Event listeners unregistered via this function must have the following
+    /// ofEvent callbacks defined:
+    ///
+    ///     `void onTrackBegin(ofxDlib::FaceTrackerEventArgs& evt)`
+    ///     `void onTrackUpdate(ofxDlib::FaceTrackerEventArgs& evt)`
+    ///     `void onTrackEnd(ofxDlib::FaceTrackerEventArgs& evt)`
+    ///
+    /// Other method signatures event signatures are also supported.
+    ///
+    /// \tparam ListenerClass The class of the listener.
+    /// \param listener A pointer to the listener class.
+    /// \param prio The event priority.
+    template <class ListenerClass>
+    void unregisterEvents(ListenerClass* listener,
+                          int prio = OF_EVENT_ORDER_AFTER_APP)
+    {
+        ofRemoveListener(trackBegin, listener, &ListenerClass::onTrackBegin, prio);
+        ofRemoveListener(trackUpdate, listener, &ListenerClass::onTrackUpdate, prio);
+        ofRemoveListener(trackEnd, listener, &ListenerClass::onTrackEnd, prio);
+    }
 
     /// \brief Called for all track events.
     ofEvent<FaceTrackerEventArgs> trackEvent;
@@ -284,33 +193,46 @@ public:
     /// \brief Called for all TRACK_END events.
     ofEvent<FaceTrackerEventArgs> trackEnd;
 
-    const AsyncTracker* t()
-    {
-        return _asyncTracker.get();
-    }
-
 private:
-    /// \brief The update callback.
-    void _update(ofEventArgs&);
-
     /// \brief The update listener.
     ofEventListener _updateListener;
 
     /// \brief The current Settings.
     Settings _settings;
 
-    // Threaded components below.
+    /// \brief True if the settings were loaded correctly.
+    bool _isLoaded = false;
 
-    std::unique_ptr<AsyncTracker> _asyncTracker = nullptr;
+    /// \breif An FPS counter for sync processing.
+    ofFpsCounter _fpsCounter;
 
-    bool _process(const dlib::matrix<dlib::rgb_pixel>& input,
-                  std::vector<FaceTrackerEventArgs>& output);
+    /// \brief The current tracks.
+    std::unordered_map<std::size_t, ObjectDetection> _tracks;
+
+    /// \brief The current face shapes.
+    std::unordered_map<std::size_t, FaceShape> _shapes;
+
+    /// \brief Bounding box filter.
+    FilterGroup_<std::vector<glm::vec2>> _boundingBoxFilter;
+
+    /// \brief A shape filter.
+    FilterGroup_<std::vector<glm::vec2>> _faceLandmarkFilter;
+
+    /// \brief The async processor.
+    std::unique_ptr<AsyncProcess> _asyncProcess = nullptr;
+
+    bool _processInput(const InputType& input, OutputType& output);
+    void _processOutput(const OutputType& output);
 
     /// \brief The face detector.
     FaceDetector _detector;
 
+    /// \breif The face shape predictor.
+    FaceShapePredictor _faceShapePredictor;
+
     /// \brief The bounding box tracker.
-    Tracker<ObjectDetection> _tracker;
+    Tracker_<ObjectDetection> _tracker;
+
 
 };
 

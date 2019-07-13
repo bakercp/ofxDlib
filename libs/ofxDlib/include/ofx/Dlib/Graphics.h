@@ -10,9 +10,9 @@
 
 #include "ofGraphics.h"
 #include "ofx/Dlib/Face.h"
+#include "ofx/Dlib/FaceShape.h"
 #include "ofx/Dlib/FaceFinder.h"
 #include "ofx/Dlib/ObjectDetection.h"
-#include "ofx/Dlib/Tracker.h"
 
 
 namespace ofx {
@@ -58,6 +58,7 @@ inline void draw(const ofRectangle& rectangle, const std::string& label, float l
 
 inline void draw(const ObjectDetection& detection)
 {
+    ofSetColor(ofColor::yellow);
     draw(detection.rectangle, "Confidence: " + ofToString(detection.confidence, 2));
 }
 
@@ -68,6 +69,33 @@ inline void draw(const Face& detection)
 }
 
 
+inline void draw(const FaceShape& faceShape)
+{
+    for (auto&& landmark: faceShape.faceLandmarks())
+    {
+        ofDrawCircle(landmark, 3);
+    }
+}
+
+inline void draw(const std::unordered_map<std::size_t, FaceShape>& tracks)
+{
+    for (auto&& track: tracks)
+    {
+        draw(track.second);
+    }
+}
+
+
+inline void draw(const std::unordered_map<std::size_t, ObjectDetection>& tracks)
+{
+    for (auto&& track: tracks)
+    {
+        ofSetColor(ofColor::yellow);
+        draw(track.second.rectangle, "#:" + ofToString(track.first) + " @ " + ofToString(track.second.confidence, 2));
+    }
+}
+
+
 inline void draw(const std::map<std::size_t, Face>& tracks)
 {
     for (auto&& track: tracks)
@@ -75,33 +103,6 @@ inline void draw(const std::map<std::size_t, Face>& tracks)
         draw(track.second.rectangle(), "#:" + ofToString(track.first) + " @ " + ofToString(track.second.confidence(), 2));
         for (auto& v: track.second.landmarks())
             ofDrawCircle(v, 3);
-    }
-}
-
-
-inline void draw(const Tracker<ObjectDetection>& tracker)
-{
-    for (std::size_t label: tracker.deadLabels())
-    {
-    }
-
-    for (std::size_t label: tracker.newLabels())
-    {
-        ofSetColor(ofColor::green);
-        draw(tracker.getCurrent(label));
-    }
-
-    for (std::size_t label: tracker.previousLabels())
-    {
-        ofSetColor(ofColor::white);
-        draw(tracker.getCurrent(label));
-    }
-
-    for (std::size_t label: tracker.currentLabels())
-    {
-        ofSetColor(ofColor::yellow);
-        ObjectDetection detection = tracker.getCurrent(label);
-        draw(detection.rectangle, "#:" + ofToString(label) + " @ " + ofToString(detection.confidence, 2));
     }
 }
 

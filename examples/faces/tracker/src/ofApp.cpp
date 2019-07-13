@@ -10,28 +10,33 @@
 
 void ofApp::setup()
 {
-    ofSetVerticalSync(true);
-    ofSetFrameRate(60);
-
     // Set up the detector settings.
     ofxDlib::FaceTracker::Settings settings;
 
     // By default the detector uses the standard dlib HOG detector.
     // It can also use the more accurate (and computationally expensive)
-    // MMOD detector. The MMOD detector benefits greatly from hardware
-    // acceleration (e.g. MKL, CUDA, etc).
+    // MMOD detector. The MMOD detector benefits greatly from CUDA hardware
+    // acceleration.
     //
-    settings.detectorType = ofxDlib::FaceDetector::Type::FACE_DETECTOR_MMOD;
+    // Find a useful a discussion of the various methods here:
+    // https://www.learnopencv.com/face-detection-opencv-dlib-and-deep-learning-c-python/
+    //
+    // settings.detectorType = ofxDlib::FaceDetector::Type::FACE_DETECTOR_MMOD;
+
+    // If you are using the MMOD detector and have multiple GPUS, you can select
+    // the gpu device to use. See also http://dlib.net/dlib/dnn/cuda_dlib.h.html
+    //
+    // settings.gpuDevice = 0;
 
     // We can scale the image DOWN to increase detection speed.
     // But this makes smaller faces more difficult to detect.
     //
-    // settings.inputScale = 0.75;
+    settings.inputScale = 0.5;
 
-    // We can scale the image UP to detect smaller faces. But this will result
+    // We can scale the image UP to detect smaller faces. But this may result
     // in slower detection speeds.
     //
-//     settings.inputScale = 1.5;
+    // settings.inputScale = 1.5;
 
     // By default, scaling interpolation is done using a
     // OF_INTERPOLATE_NEAREST_NEIGHBOR, which is very fast. In some cases
@@ -43,23 +48,23 @@ void ofApp::setup()
     // If you know what region of the image will contain faces, you can set
     // region of interest (ROI). This will increase the speed by reducing the
     // number of pixels that need to be processed.
-//    settings.inputROI = ofRectangle(200, 200, 400, 400);
+    //
+    settings.inputROI = ofRectangle(200, 200, 800, 400);
 
-//    settings.gpuDevice = 1;
+    // By default, the tracker runs asynchronously in a background thread. It
+    // emits tracker events from the main thread. If you want the tracking to
+    // also run in the main thread, set this value to false.
+    //
+    // settings.async = true;
 
     // Set up the detector.
     tracker.setup(settings);
 
-    // Add trackers event listeners.
-    trackBeginListener = tracker.trackBegin.newListener(this, &ofApp::onTrackBegin);
-    trackUpdateListener = tracker.trackUpdate.newListener(this, &ofApp::onTrackUpdate);
-    trackEndListener = tracker.trackEnd.newListener(this, &ofApp::onTrackEnd);
+    // Add tracking event listeners.
+    tracker.registerEvents(this);
 
     // Set up the video input.
-    // video.setup(1280, 720);
-    video.load("LateLate.mp4");
-    video.play();
-    video.setPosition(0.25);
+    video.setup(1280, 720);
 }
 
 
@@ -76,26 +81,6 @@ void ofApp::update()
 
 void ofApp::draw()
 {
-//    const auto* t = tracker.t();
-//    if (t)
-//    {
-//        std::size_t droppedInputs =  t->droppedInputsCount();
-//        std::size_t droppedOutputs =  t->droppedOutputsCount();
-
-//        std::cout << "IN: " << droppedInputs << " OUT: " << droppedOutputs << std::endl;
-//    }
-
-//    std::size_t droppedInputsCount() const
-//    {
-//        std::unique_lock<std::mutex> lock(_mutex);
-//        return _droppedInputsCount;
-//    }
-
-//    /// \returns the number of outputs that were not recevied.
-//    std::size_t droppedOutputsCount() const
-
-
-
     // Draw the input video.
     ofSetColor(ofColor::white);
     video.draw(0, 0);
@@ -105,10 +90,11 @@ void ofApp::draw()
     ofxDlib::draw(tracker.settings().inputROI, "ROI");
 
     // Draw the tracks.
-    // ofSetColor(ofColor::yellow);
-    ofxDlib::draw(tracker.tracker());
+    ofSetColor(ofColor::yellow);
+    ofxDlib::draw(tracker.tracks());
 
-    ofDrawBitmapStringHighlight(ofToString(ofGetFrameRate()) + " FPS", 20, 20);
+    ofDrawBitmapStringHighlight("    App: " + ofToString(ofGetFrameRate(), 2) + " FPS", 20, 20);
+    ofDrawBitmapStringHighlight("Tracker: " + ofToString(tracker.fps(), 2) + " FPS", 20, 40);
 }
 
 
@@ -120,7 +106,10 @@ void ofApp::onTrackBegin(ofxDlib::FaceTrackerEventArgs& evt)
 
 void ofApp::onTrackUpdate(ofxDlib::FaceTrackerEventArgs& evt)
 {
-    std::cout << "Track update: " << evt.label << std::endl;
+    if (evt.lastSeen != 0)
+        std::cout << "Track Update (Lost): " << evt.label << " " << evt.age << " " << evt.lastSeen << std::endl;
+    else
+        std::cout << "Track Update: " << evt.label << " " << evt.age << std::endl;
 }
 
 

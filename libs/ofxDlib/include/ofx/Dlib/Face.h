@@ -61,7 +61,7 @@ public:
 private:
     std::string _key;
 
-    /// \brief True if a shape has been loaded.
+    /// \brief True if the settings were loaded correctly.
     bool _isLoaded = false;
 
     /// \brief The confidence of the detection.
