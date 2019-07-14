@@ -192,14 +192,14 @@ bool FaceTracker::_processInput(const InputType& input,
         // Do filtering if possible.
         if (_settings.faceShapeFilterSmoothness > 0)
         {
-            std::vector<glm::vec2> filteredFaceLandmarks = shape.faceLandmarks();
+            std::vector<glm::vec2> filteredLandmarks = shape.landmarks();
 
             switch(event.state)
             {
                 case TrackerEventArgs::State::TRACK_BEGIN:
                 case TrackerEventArgs::State::TRACK_UPDATE:
                 {
-                    filteredFaceLandmarks = _faceLandmarkFilter.filter(event.label, filteredFaceLandmarks);
+                    filteredLandmarks = _faceLandmarkFilter.filter(event.label, filteredLandmarks);
                     break;
                 }
                 case TrackerEventArgs::State::TRACK_END:
@@ -211,7 +211,7 @@ bool FaceTracker::_processInput(const InputType& input,
                     break;
             }
 
-            output.push_back(FaceTrackerEventArgs(event, FaceShape(shape, filteredFaceLandmarks)));
+            output.push_back(FaceTrackerEventArgs(event, FaceShape(shape, filteredLandmarks)));
         }
         else
         {

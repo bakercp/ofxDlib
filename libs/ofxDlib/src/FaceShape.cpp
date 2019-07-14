@@ -19,17 +19,17 @@ FaceShape::FaceShape()
 
 
 FaceShape::FaceShape(const FaceShape& shape,
-                     const std::vector<glm::vec2>& faceLandmarks):
-    FaceShape(shape.type(), faceLandmarks, shape.alignedFace())
+                     const std::vector<glm::vec2>& landmarks):
+    FaceShape(shape.type(), landmarks, shape.alignedFace())
 {
 }
 
 
 FaceShape::FaceShape(Type type,
-                     const std::vector<glm::vec2>& faceLandmarks,
+                     const std::vector<glm::vec2>& landmarks,
                      const ofPixels& alignedFace):
     _type(type),
-    _faceLandmarks(faceLandmarks),
+    _landmarks(landmarks),
     _alignedFace(alignedFace)
 {
 }
@@ -45,9 +45,9 @@ FaceShape::Type FaceShape::type() const
     return _type;
 }
 
-const std::vector<glm::vec2>& FaceShape::faceLandmarks() const
+const std::vector<glm::vec2>& FaceShape::landmarks() const
 {
-    return _faceLandmarks;
+    return _landmarks;
 }
 
 
@@ -57,13 +57,53 @@ const ofPixels& FaceShape::alignedFace() const
 }
 
 
+float FaceShape::getMeasurement(Measurement measurement) const
+{
+    switch (_type)
+    {
+        case Type::FACE_SHAPE_5_LANDMARKS:
+        {
+            // TODO
+            break;
+        }
+        case Type::FACE_SHAPE_68_LANDMARKS:
+        {
+            switch (measurement)
+            {
+                case OUTER_MOUTH_WIDTH:
+                    return glm::length(_landmarks[48] - _landmarks[54]);
+                case INNER_MOUTH_WIDTH:
+                    return glm::length(_landmarks[60] - _landmarks[64]);
+                case OUTER_MOUTH_HEIGHT:
+                    return glm::length(_landmarks[51] - _landmarks[57]);
+                case INNER_MOUTH_HEIGHT:
+                    return glm::length(_landmarks[62] - _landmarks[66]);
+                case LEFT_EYEBROW_HEIGHT:
+                    return glm::length(_landmarks[38] - _landmarks[20]);
+                case RIGHT_EYEBROW_HEIGHT:
+                    return glm::length(_landmarks[43] - _landmarks[24]);
+                case JAW_OPENNESS:
+                    return glm::length(_landmarks[8] - _landmarks[33]);
+                case MOUTH_ASPECT:
+                    return getMeasurement(MOUTH_WIDTH) / getMeasurement(MOUTH_HEIGHT);
+                case YAWN_FACTOR:
+                    return getMeasurement(JAW_OPENNESS) / getMeasurement(MOUTH_ASPECT);
+            }
+        }
+    }
+
+    return -1.0f;
+}
+
+
 std::vector<std::size_t> FaceShape::getFeatureIndices(Feature feature) const
 {
     switch (_type)
     {
         case Type::FACE_SHAPE_5_LANDMARKS:
         {
-
+            // TODO
+            break;
         }
         case Type::FACE_SHAPE_68_LANDMARKS:
         {
@@ -119,7 +159,7 @@ ofPolyline FaceShape::getFeatureAsPolyline(Feature feature) const
 
     for (std::size_t i = 0; i < featureIndices.size(); ++i)
     {
-        auto point = _faceLandmarks[featureIndices[i]];
+        auto point = _landmarks[featureIndices[i]];
         polyline.addVertex(point.x, point.y, 0);
     }
 
@@ -148,7 +188,7 @@ std::vector<glm::vec2> FaceShape::getFeature(Feature feature) const
 
     for (std::size_t i = 0; i < featureIndices.size(); ++i)
     {
-        polyline.push_back(_faceLandmarks[featureIndices[i]]);
+        polyline.push_back(_landmarks[featureIndices[i]]);
     }
 
     return polyline;
@@ -161,7 +201,7 @@ std::vector<std::size_t> FaceShape::consecutive(std::size_t startIndex,
 {
     if (endIndex < startIndex)
         std::swap(startIndex, endIndex);
-    
+
     std::vector<std::size_t> result(endIndex - startIndex, 0);
     std::iota(result.begin(), result.end(), startIndex);
     return result;

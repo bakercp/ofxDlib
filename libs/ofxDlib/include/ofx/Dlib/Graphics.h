@@ -71,7 +71,7 @@ inline void draw(const Face& detection)
 
 inline void draw(const FaceShape& faceShape)
 {
-    for (auto&& landmark: faceShape.faceLandmarks())
+    for (auto&& landmark: faceShape.landmarks())
     {
         ofDrawCircle(landmark, 3);
     }

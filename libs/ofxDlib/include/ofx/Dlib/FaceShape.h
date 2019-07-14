@@ -52,43 +52,100 @@ public:
         NOSE_BASE,
 
         FACE_OUTLINE,
-        
+
         ALL_FEATURES,
     };
+
+    enum Measurement
+    {
+        /// \brief The distance between points 48 and 54.
+        OUTER_MOUTH_WIDTH,
+
+        MOUTH_WIDTH = OUTER_MOUTH_WIDTH,
+
+        /// \brief The distance between points 60 and 64.
+        INNER_MOUTH_WIDTH,
+
+        /// \brief The distance between points 51 and 57.
+        OUTER_MOUTH_HEIGHT,
+
+        /// \brief The distance between points 62 and 66.
+        INNER_MOUTH_HEIGHT,
+
+        MOUTH_HEIGHT = INNER_MOUTH_HEIGHT,
+
+        /// \brief The distance between points 38 and 20.
+        LEFT_EYEBROW_HEIGHT,
+
+        /// \brief The distance between points 43 and 24.
+        RIGHT_EYEBROW_HEIGHT,
+
+        /// \brief The distance between points 8 and 33.
+        JAW_OPENNESS,
+
+        /// \brief MOUTH_WIDTH / MOUTH_HEIGHT
+        MOUTH_ASPECT,
+
+        /// \brief JAW_OPENNESS / MOUTH_ASPECT.
+        YAWN_FACTOR
+    };
+
 
     FaceShape();
 
     FaceShape(Type type,
-              const std::vector<glm::vec2>& faceLandmarks,
+              const std::vector<glm::vec2>& landmarks,
               const ofPixels& alignedFace);
 
     FaceShape(const FaceShape& shape,
-              const std::vector<glm::vec2>& faceLandmarks);
+              const std::vector<glm::vec2>& landmarks);
 
     ~FaceShape();
 
     /// \returns the face shape type.
     FaceShape::Type type() const;
 
-    const std::vector<glm::vec2>& faceLandmarks() const;
+    /// \returns all landmarks.
+    const std::vector<glm::vec2>& landmarks() const;
 
     /// \returns the aligned face image if available, otherwise empty pixels.
     const ofPixels& alignedFace() const;
 
+    /// \brief Take a measurement.
+    /// \param measurement The measurement to take.
+    /// \returns the measured value or -1 if not available.
+    float getMeasurement(Measurement measurement) const;
+
+    /// \brief Get the landmarks for the given feature as a polyline.
+    /// \param feature The feature to query.
+    /// \returns the feature indicies or an empty polyline if not available.
     ofPolyline getFeatureAsPolyline(Feature feature) const;
 
+    /// \brief Get the landmarks for the given feature.
+    /// \param feature The feature to query.
+    /// \returns the feature indicies or an empty vector if not available.
     std::vector<glm::vec2> getFeature(Feature feature) const;
 
+    /// \brief Get the landmark indices for the given feature.
+    /// \param feature The feature to query.
+    /// \returns the feature indicies or an empty vector if not available.
     std::vector<std::size_t> getFeatureIndices(Feature feature) const;
 
+    /// \brief Get consecutive indicies.
+    /// \param startIndex The starting index.
+    /// \param endIndex The ending index.
+    /// \returns a vector of consecutive indicies.
     static std::vector<std::size_t> consecutive(std::size_t startIndex,
                                                 std::size_t endIndex);
 
 private:
+    /// \brief The type of landmarks.
     FaceShape::Type _type = Type::FACE_SHAPE_68_LANDMARKS;
 
-    std::vector<glm::vec2> _faceLandmarks;
+    /// \brief The landmarks.
+    std::vector<glm::vec2> _landmarks;
 
+    /// \brief The aligned face pixels.
     ofPixels _alignedFace;
 };
 
