@@ -51,20 +51,20 @@ void ofApp::setup()
     //
     settings.faceDetectorSettings.inputROI = ofRectangle(200, 200, 800, 400);
 
-    /// For low resolution or noisy cameras, the face detection and shape
-    /// prediction can be pretty jittery. To avoid this jitter, use a higher
-    /// resolution camera with more light or try these smoothing factors.
-    /// They are simple low-pass filters. Values should be set in the range
-    /// [0, 1). Values close to zero yield minimal smoothing and lower latency.
-    /// Values closer to 1 yeild maximal smoothing and larger latency.
-    ///
-    /// The smoothing factor for the detected face bounding boxes.
-    ///
-    /// settings.faceDetectorFilterSmoothness = 0.75;
-    ///
-    /// The smoothing factor for the face shape landmarks.
-    ///
-    /// settings.faceShapeFilterSmoothness = 0.75;
+    // For low resolution or noisy cameras, the face detection and shape
+    // prediction can be pretty jittery. To avoid this jitter, use a higher
+    // resolution camera with more light or try these smoothing factors.
+    // They are simple low-pass filters. Values should be set in the range
+    // [0, 1). Values close to zero yield minimal smoothing and lower latency.
+    // Values closer to 1 yeild maximal smoothing and larger latency.
+    //
+    // The smoothing factor for the detected face bounding boxes.
+    //
+    // settings.faceDetectorFilterSmoothness = 0.75;
+    //
+    // The smoothing factor for the face shape landmarks.
+    //
+    // settings.faceShapeFilterSmoothness = 0.75;
 
     // By default, the tracker runs asynchronously in a background thread. It
     // emits tracker events from the main thread. If you want the tracking to
