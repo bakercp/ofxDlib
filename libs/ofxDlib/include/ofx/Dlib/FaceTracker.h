@@ -31,7 +31,7 @@ public:
                          const FaceShape& faceShape);
 
     FaceShape faceShape;
-    
+
 };
 
 
@@ -103,9 +103,6 @@ public:
     {
         /// \brief True if a seperate thread should be used for tracking.
         bool async = true;
-
-        /// \brief Enable or disable the tracker event filter.
-        bool enableTrackerEventFilter = true;
 
         /// \brief The tracker settings.
         Tracker_<ObjectDetection>::Settings trackerSettings;
