@@ -212,7 +212,6 @@ bool FaceTracker::_processInput(std::size_t frameId,
                     _boundingBoxFilter.end(event.label);
                     break;
                 }
-                case TrackerEventArgs::State::TRACK_ERROR:
                 case TrackerEventArgs::State::TRACK_NONE:
                     break;
             }
@@ -249,7 +248,6 @@ bool FaceTracker::_processInput(std::size_t frameId,
                     _faceLandmarkFilter.end(event.label);
                     break;
                 }
-                case TrackerEventArgs::State::TRACK_ERROR:
                 case TrackerEventArgs::State::TRACK_NONE:
                     break;
             }
@@ -298,9 +296,6 @@ void FaceTracker::_processOutput(std::size_t frameId, const OutputType& output)
                 ofNotifyEvent(trackEnd, event, this);
                 break;
             }
-            case TrackerEventArgs::State::TRACK_ERROR:
-                ofNotifyEvent(trackError, event, this);
-                break;
             case TrackerEventArgs::State::TRACK_NONE:
                 break;
         }

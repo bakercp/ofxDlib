@@ -141,7 +141,6 @@ public:
     ///     `void onTrackBegin(ofxDlib::FaceTrackerEventArgs& evt)`
     ///     `void onTrackUpdate(ofxDlib::FaceTrackerEventArgs& evt)`
     ///     `void onTrackEnd(ofxDlib::FaceTrackerEventArgs& evt)`
-    ///     `void onTrackError(ofxDlib::FaceTrackerEventArgs& evt)`
     ///
     /// Other method signatures event signatures are also supported.
     ///
@@ -155,7 +154,6 @@ public:
         ofAddListener(trackBegin, listener, &ListenerClass::onTrackBegin, prio);
         ofAddListener(trackUpdate, listener, &ListenerClass::onTrackUpdate, prio);
         ofAddListener(trackEnd, listener, &ListenerClass::onTrackEnd, prio);
-        ofAddListener(trackError, listener, &ListenerClass::onTrackError, prio);
     }
 
     /// \brief Unregister tracker event listener.
@@ -166,7 +164,6 @@ public:
     ///     `void onTrackBegin(ofxDlib::FaceTrackerEventArgs& evt)`
     ///     `void onTrackUpdate(ofxDlib::FaceTrackerEventArgs& evt)`
     ///     `void onTrackEnd(ofxDlib::FaceTrackerEventArgs& evt)`
-    ///     `void onTrackError(ofxDlib::FaceTrackerEventArgs& evt)`
     ///
     /// Other method signatures event signatures are also supported.
     ///
@@ -180,7 +177,6 @@ public:
         ofRemoveListener(trackBegin, listener, &ListenerClass::onTrackBegin, prio);
         ofRemoveListener(trackUpdate, listener, &ListenerClass::onTrackUpdate, prio);
         ofRemoveListener(trackEnd, listener, &ListenerClass::onTrackEnd, prio);
-        ofRemoveListener(trackError, listener, &ListenerClass::onTrackError, prio);
     }
 
     /// \brief Called for all track events.
@@ -194,9 +190,6 @@ public:
 
     /// \brief Called for all TRACK_END events.
     ofEvent<FaceTrackerEventArgs> trackEnd;
-
-    /// \brief Called for all TRACK_ERROR events.
-    ofEvent<FaceTrackerEventArgs> trackError;
 
 private:
     /// \brief The update function called when async != true;

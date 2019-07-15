@@ -34,10 +34,8 @@ public:
         TRACK_BEGIN,
         /// \brief The state when a track is updated. This may be a stale track.
         TRACK_UPDATE,
-        /// \brief The state when a track expires and is lost.
+        /// \brief The state when a track expires, has an error or is otherwise lost.
         TRACK_END,
-        /// \brief The state when a tracker has an error.
-        TRACK_ERROR,
         /// \brief The state when an event is not tracking.
         TRACK_NONE
     };
