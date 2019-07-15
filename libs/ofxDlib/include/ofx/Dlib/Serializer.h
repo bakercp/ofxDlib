@@ -99,9 +99,9 @@ inline void to_json(nlohmann::json& j, const FaceTracker::Settings& v)
 inline void from_json(const nlohmann::json& j, FaceTracker::Settings& v)
 {
 //    v.async = j.value("async", v.async);
-//    //v.trackerSettings = j.value("tracker_settings", v.trackerSettings);
+    //v.trackerSettings = j.value("tracker_settings", v.trackerSettings);
 //    v.faceDetectorSettings = j.value("face_detector_settings", v.faceDetectorSettings);
-//    //v.faceShapePredictorSettings = j.value("face_shape_predictor_settings", v.faceShapePredictorSettings);
+    //v.faceShapePredictorSettings = j.value("face_shape_predictor_settings", v.faceShapePredictorSettings);
 //    v.faceDetectorFilterSmoothness = j.value("face_detector_filter_smoothness", v.faceDetectorFilterSmoothness);
 //    v.faceShapeFilterSmoothness = j.value("face_shape_filter_smoothness", v.faceShapeFilterSmoothness);
 }

@@ -90,7 +90,6 @@ inline void draw(const std::unordered_map<std::size_t, ObjectDetection>& tracks)
 {
     for (auto&& track: tracks)
     {
-        ofSetColor(ofColor::yellow);
         draw(track.second.rectangle, "#:" + ofToString(track.first) + " @ " + ofToString(track.second.confidence, 2));
     }
 }
