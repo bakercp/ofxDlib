@@ -299,6 +299,8 @@ void FaceTracker::_processOutput(std::size_t frameId, const OutputType& output)
                 break;
             }
             case TrackerEventArgs::State::TRACK_ERROR:
+                ofNotifyEvent(trackError, event, this);
+                break;
             case TrackerEventArgs::State::TRACK_NONE:
                 break;
         }
