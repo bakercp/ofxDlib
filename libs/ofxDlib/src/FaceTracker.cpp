@@ -44,7 +44,7 @@ bool FaceTracker::setup(const Settings& settings)
     _frameId = 1;
     _isLoaded = false;
     _asyncProcess.reset();
-    _updateListener.unsubscribe();
+    _syncUpdateListener.unsubscribe();
     _tracks.clear();
     _shapes.clear();
     _tracker = Tracker_<ObjectDetection>();
@@ -68,7 +68,7 @@ bool FaceTracker::setup(const Settings& settings)
         }
         else
         {
-            _updateListener = ofEvents().update.newListener(this, &FaceTracker::_update, OF_EVENT_ORDER_AFTER_APP);
+            _syncUpdateListener = ofEvents().update.newListener(this, &FaceTracker::_syncUpdate, OF_EVENT_ORDER_AFTER_APP);
         }
 
         _settings = settings;
@@ -308,7 +308,7 @@ void FaceTracker::_processOutput(std::size_t frameId, const OutputType& output)
 }
 
 
-void FaceTracker::_update(ofEventArgs&)
+void FaceTracker::_syncUpdate(ofEventArgs&)
 {
     if (_hasSyncOutput)
     {

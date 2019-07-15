@@ -141,6 +141,7 @@ public:
     ///     `void onTrackBegin(ofxDlib::FaceTrackerEventArgs& evt)`
     ///     `void onTrackUpdate(ofxDlib::FaceTrackerEventArgs& evt)`
     ///     `void onTrackEnd(ofxDlib::FaceTrackerEventArgs& evt)`
+    ///     `void onTrackError(ofxDlib::FaceTrackerEventArgs& evt)`
     ///
     /// Other method signatures event signatures are also supported.
     ///
@@ -154,6 +155,7 @@ public:
         ofAddListener(trackBegin, listener, &ListenerClass::onTrackBegin, prio);
         ofAddListener(trackUpdate, listener, &ListenerClass::onTrackUpdate, prio);
         ofAddListener(trackEnd, listener, &ListenerClass::onTrackEnd, prio);
+        ofAddListener(trackError, listener, &ListenerClass::onTrackError, prio);
     }
 
     /// \brief Unregister tracker event listener.
@@ -164,6 +166,7 @@ public:
     ///     `void onTrackBegin(ofxDlib::FaceTrackerEventArgs& evt)`
     ///     `void onTrackUpdate(ofxDlib::FaceTrackerEventArgs& evt)`
     ///     `void onTrackEnd(ofxDlib::FaceTrackerEventArgs& evt)`
+    ///     `void onTrackError(ofxDlib::FaceTrackerEventArgs& evt)`
     ///
     /// Other method signatures event signatures are also supported.
     ///
@@ -177,6 +180,7 @@ public:
         ofRemoveListener(trackBegin, listener, &ListenerClass::onTrackBegin, prio);
         ofRemoveListener(trackUpdate, listener, &ListenerClass::onTrackUpdate, prio);
         ofRemoveListener(trackEnd, listener, &ListenerClass::onTrackEnd, prio);
+        ofRemoveListener(trackError, listener, &ListenerClass::onTrackError, prio);
     }
 
     /// \brief Called for all track events.
@@ -196,10 +200,13 @@ public:
 
 private:
     /// \brief The update function called when async != true;
-    void _update(ofEventArgs&);
+    /// We use this function to make sure that the frame ids are received
+    /// by the caller before the track event callbacks are called.
+    /// \todo Collapse this all into the AsyncProcess function.
+    void _syncUpdate(ofEventArgs&);
 
     /// \brief The update listener.
-    ofEventListener _updateListener;
+    ofEventListener _syncUpdateListener;
 
     /// \brief The current Settings.
     Settings _settings;
