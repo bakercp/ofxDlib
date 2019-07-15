@@ -11,6 +11,7 @@
 #include "dlib/of_default_adapter.h"
 #include "dlib/of_image.h"
 #include "ofEvents.h"
+#include "ofThreadChannel.h"
 #include "ofx/Dlib/AsyncProcess.h"
 #include "ofx/Dlib/Tracker.h"
 #include "ofx/Dlib/FaceDetector.h"
@@ -39,6 +40,7 @@ public:
 class FaceTracker
 {
 public:
+    typedef std::size_t FrameToken;
     typedef dlib::matrix<dlib::rgb_pixel> InputType;
     typedef std::vector<FaceTrackerEventArgs> OutputType;
     typedef AsyncProcess_<InputType, OutputType> AsyncProcess;
@@ -63,29 +65,24 @@ public:
     bool isLoaded() const;
 
     /// \brief Update the tracker state.
+    ///
+    /// The track function returns a frame id that can be used to associate
+    /// the resulting event data with the frame that was passed. This is
+    /// particularly useful when using the FaceTracker in asynchronous mode.
+    ///
+    /// \param frame The frame to track.
+    /// \returns a frame id that will be passed with all events. Zero returned on failure.
+    std::size_t track(const ofBaseHasPixels& frame);
+
+    /// \brief Update the tracker state.
+    ///
+    /// The track function returns a frame id that can be used to associate
+    /// the resulting event data with the frame that was passed. This is
+    /// particularly useful when using the FaceTracker in asynchronous mode.
+    ///
     /// \param pixels The pixels to search.
-    /// \todo Make accept dlib generic image types.
-    template<typename image_type>
-    void track(const image_type& image)
-    {
-        if (isLoaded())
-        {
-            if (!_settings.async)
-            {
-                OutputType output;
-                if (_processInput(dlib::mat(image), output))
-                {
-                    _processOutput(output);
-                    _fpsCounter.newFrame();
-                }
-            }
-            else
-            {
-                dlib::matrix<dlib::rgb_pixel> _image = dlib::mat(image);
-                _asyncProcess->tryProcess(_image);
-            }
-        }
-    }
+    /// \returns a frame id that will be passed with all events. Zero returned on failure.
+    std::size_t track(const ofPixels& frame);
 
     /// \brief Get the process
     double fps() const;
@@ -128,6 +125,11 @@ public:
         /// A value of 0 means no smoothing. A value close to 1 means greater
         /// smoothing but more latency.
         double faceShapeFilterSmoothness = 0.0;
+
+        /// \brief The duration of the frame history buffer in microseconds.
+        ///
+        /// Default value is 30 seconds.
+        uint64_t frameBufferDuration = 30 * 1000000;
 
     };
 
@@ -189,7 +191,13 @@ public:
     /// \brief Called for all TRACK_END events.
     ofEvent<FaceTrackerEventArgs> trackEnd;
 
+    /// \brief Called for all TRACK_ERROR events.
+    ofEvent<FaceTrackerEventArgs> trackError;
+
 private:
+    /// \brief The update function called when async != true;
+    void _update(ofEventArgs&);
+
     /// \brief The update listener.
     ofEventListener _updateListener;
 
@@ -199,7 +207,7 @@ private:
     /// \brief True if the settings were loaded correctly.
     bool _isLoaded = false;
 
-    /// \breif An FPS counter for sync processing.
+    /// \brief An FPS counter for sync processing.
     ofFpsCounter _fpsCounter;
 
     /// \brief The current tracks.
@@ -217,18 +225,25 @@ private:
     /// \brief The async processor.
     std::unique_ptr<AsyncProcess> _asyncProcess = nullptr;
 
-    bool _processInput(const InputType& input, OutputType& output);
-    void _processOutput(const OutputType& output);
+    bool _processInput(std::size_t frameId, const InputType& input, OutputType& output);
+    void _processOutput(std::size_t frameId, const OutputType& output);
 
     /// \brief The face detector.
     FaceDetector _detector;
 
-    /// \breif The face shape predictor.
+    /// \brief The face shape predictor.
     FaceShapePredictor _faceShapePredictor;
 
     /// \brief The bounding box tracker.
     Tracker_<ObjectDetection> _tracker;
 
+    std::size_t _frameId = 1;
+
+    /// \brief True if _syncOutput needs processing.
+    bool _hasSyncOutput = false;
+
+    /// \brief The output used during sync tracking;
+    OutputType _syncOutput;
 
 };
 

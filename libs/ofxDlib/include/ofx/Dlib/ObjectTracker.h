@@ -36,12 +36,17 @@ public:
         TRACK_UPDATE,
         /// \brief The state when a track expires and is lost.
         TRACK_END,
+        /// \brief The state when a tracker has an error.
+        TRACK_ERROR,
         /// \brief The state when an event is not tracking.
         TRACK_NONE
     };
 
     /// \brief The tracker state.
     State state = State::TRACK_NONE;
+
+    /// \brief The frame id used to synchronize frames.
+    std::size_t frameId = 0;
 
     /// \brief The tracker label associated with this event.
     std::size_t label = static_cast<std::size_t>(-1);
@@ -52,7 +57,7 @@ public:
     /// \brief The time since last seen.
     uint64_t lastSeen = 0;
 
-    /// \brief The Face associated with this event, if any.
+    /// \brief The detection associated with this event, if any.
     ///
     /// This will only be valid for state == TRACK_BEGIN and
     /// state == TRACK_UPDATE.

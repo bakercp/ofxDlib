@@ -41,8 +41,10 @@ bool FaceTracker::setup(const Settings& settings)
     ofLogWarning("FaceTracker::setup") << "FaceDetector runs much faster when compiled with optimizations (i.e. RELEASE Mode). http://dlib.net/faq.html#Whyisdlibslow";
 #endif
 
+    _frameId = 1;
     _isLoaded = false;
     _asyncProcess.reset();
+    _updateListener.unsubscribe();
     _tracks.clear();
     _shapes.clear();
     _tracker = Tracker_<ObjectDetection>();
@@ -60,9 +62,13 @@ bool FaceTracker::setup(const Settings& settings)
 
         if (settings.async)
         {
-            _asyncProcess = std::make_unique<AsyncProcess>([this](const InputType& input, OutputType& output) { return _processInput(input, output); },
-                                                           [this](const OutputType& output) { _processOutput(output); }
+            _asyncProcess = std::make_unique<AsyncProcess>([this](std::size_t frameId, const InputType& input, OutputType& output) { return _processInput(frameId, input, output); },
+                                                           [this](std::size_t frameId, const OutputType& output) { _processOutput(frameId, output); }
                                                            );
+        }
+        else
+        {
+            _updateListener = ofEvents().update.newListener(this, &FaceTracker::_update, OF_EVENT_ORDER_AFTER_APP);
         }
 
         _settings = settings;
@@ -79,11 +85,43 @@ bool FaceTracker::isLoaded() const
 }
 
 
+std::size_t FaceTracker::track(const ofBaseHasPixels& frame)
+{
+    return track(frame.getPixels());
+}
+
+
+std::size_t FaceTracker::track(const ofPixels& frame)
+{
+    if (isLoaded())
+    {
+        // Increment the frameId.
+        _frameId++;
+
+        if (!_settings.async)
+        {
+            _processInput(_frameId, dlib::mat(frame), _syncOutput);
+            _hasSyncOutput = true;
+            _fpsCounter.newFrame();
+            return _frameId;
+        }
+        else if (_asyncProcess->tryProcess(_frameId, dlib::mat(frame)))
+        {
+            _fpsCounter.newFrame();
+            return _frameId;
+        }
+
+        // Failed, so decrement.
+        _frameId--;
+    }
+
+    return 0;
+}
+
+
+
 double FaceTracker::fps() const
 {
-    if (_settings.async)
-        return _asyncProcess->fps();
-
     return _fpsCounter.getFps();
 }
 
@@ -106,7 +144,8 @@ FaceTracker::Settings FaceTracker::settings() const
 }
 
 
-bool FaceTracker::_processInput(const InputType& input,
+bool FaceTracker::_processInput(std::size_t frameId,
+                                const InputType& input,
                                 OutputType& output)
 {
     _tracker.track(_detector.detect(input));
@@ -119,6 +158,7 @@ bool FaceTracker::_processInput(const InputType& input,
         for (std::size_t label: labels)
         {
             TrackerEventArgs evt;
+            evt.frameId = frameId;
             evt.state = state;
             evt.label = label;
 
@@ -172,6 +212,7 @@ bool FaceTracker::_processInput(const InputType& input,
                     _boundingBoxFilter.end(event.label);
                     break;
                 }
+                case TrackerEventArgs::State::TRACK_ERROR:
                 case TrackerEventArgs::State::TRACK_NONE:
                     break;
             }
@@ -183,6 +224,7 @@ bool FaceTracker::_processInput(const InputType& input,
     // Face shape analysis.
     // calculate optical flow.
 
+    output.clear();
     output.reserve(trackerEvents.size());
 
     for (auto& event: trackerEvents)
@@ -207,6 +249,7 @@ bool FaceTracker::_processInput(const InputType& input,
                     _faceLandmarkFilter.end(event.label);
                     break;
                 }
+                case TrackerEventArgs::State::TRACK_ERROR:
                 case TrackerEventArgs::State::TRACK_NONE:
                     break;
             }
@@ -222,7 +265,8 @@ bool FaceTracker::_processInput(const InputType& input,
     return true;
 }
 
-void FaceTracker::_processOutput(const OutputType& output)
+
+void FaceTracker::_processOutput(std::size_t frameId, const OutputType& output)
 {
     _tracks.clear();
     _shapes.clear();
@@ -254,9 +298,20 @@ void FaceTracker::_processOutput(const OutputType& output)
                 ofNotifyEvent(trackEnd, event, this);
                 break;
             }
+            case TrackerEventArgs::State::TRACK_ERROR:
             case TrackerEventArgs::State::TRACK_NONE:
                 break;
         }
+    }
+}
+
+
+void FaceTracker::_update(ofEventArgs&)
+{
+    if (_hasSyncOutput)
+    {
+        _processOutput(_frameId, _syncOutput);
+        _hasSyncOutput = false;
     }
 }
 

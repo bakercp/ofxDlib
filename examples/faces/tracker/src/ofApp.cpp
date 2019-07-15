@@ -70,7 +70,7 @@ void ofApp::setup()
     // emits tracker events from the main thread. If you want the tracking to
     // also run in the main thread, set this value to false.
     //
-    // settings.async = true;
+    // settings.async = false;
 
     // Set up the detector.
     tracker.setup(settings);
@@ -80,6 +80,7 @@ void ofApp::setup()
 
     // Set up the video input.
     video.setup(1280, 720);
+
 }
 
 
@@ -135,4 +136,10 @@ void ofApp::onTrackUpdate(ofxDlib::FaceTrackerEventArgs& evt)
 void ofApp::onTrackEnd(ofxDlib::FaceTrackerEventArgs& evt)
 {
     std::cout << "Track end: " << evt.label << std::endl;
+}
+
+
+void ofApp::onTrackError(ofxDlib::FaceTrackerEventArgs& evt)
+{
+    std::cout << "Track error: " << evt.label << std::endl;
 }

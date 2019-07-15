@@ -10,7 +10,7 @@
 
 #include "dlib/pipe.h"
 #include "dlib/threads.h"
-//#include "ofThreadChannel.h"
+#include "ofEvent.h"
 
 
 namespace ofx {
@@ -31,8 +31,8 @@ public:
     ///
     /// \param procesInput The input processor.
     /// \param processOutput The output processor.
-    AsyncProcess_(std::function<bool(const InputType& input, OutputType& output)> processInput,
-                  std::function<void(const OutputType& output)> processOutput):
+    AsyncProcess_(std::function<bool(std::size_t id, const InputType& input, OutputType& output)> processInput,
+                  std::function<void(std::size_t id, const OutputType& output)> processOutput):
         _processInput(processInput),
         _processOutput(processOutput),
         _updateListener(ofEvents().update.newListener(this, &AsyncProcess_::_update,
@@ -55,48 +55,48 @@ public:
     /// \brief Try to submit intput for processing.
     /// \param input The intput the process.
     /// \returns true if the input was accepted. False if the input was dropped.
-    bool tryProcess(InputType& input)
+    bool tryProcess(std::size_t id, const InputType& input)
     {
-        if (!_inputPipe.enqueue_or_timeout(input, 0))
+        if (!_inputPipe.enqueue_or_timeout(std::make_pair(id, input), 0))
             return false;
         return true;
     }
 
     /// \returns the fps measured by delivered output events.
-    double fps() const
-    {
-        return _fpsCounter.getFps();
-    }
+//    double fps() const
+//    {
+//        return _fpsCounter.getFps();
+//    }
 
 private:
     /// \brief The input process function.
-    std::function<bool(const InputType& input, OutputType& output)> _processInput;
+    std::function<bool(std::size_t id, const InputType& input, OutputType& output)> _processInput;
 
     /// \brief The output process function.
-    std::function<void(const OutputType& output)> _processOutput;
+    std::function<void(std::size_t id, const OutputType& output)> _processOutput;
 
-    /// \brief The update listener.
+    /// \brief The pdate listener.
     ofEventListener _updateListener;
 
     /// \brief The exit listener.
     ofEventListener _exitListener;
 
     /// \brief The input pipe.
-    dlib::pipe<InputType> _inputPipe;
+    dlib::pipe<std::pair<std::size_t, InputType>> _inputPipe;
 
     /// \brief The output channel.
-    dlib::pipe<OutputType> _outputPipe;
+    dlib::pipe<std::pair<std::size_t, OutputType>> _outputPipe;
 
     /// \brief The update callback.
     ///
     /// This will call processOuput from the main thread.
     void _update(ofEventArgs&)
     {
-        OutputType output;
+        std::pair<std::size_t, OutputType> output;
         while (_outputPipe.dequeue_or_timeout(output, 0))
         {
-            _processOutput(output);
-            _fpsCounter.newFrame();
+            _processOutput(output.first, output.second);
+//            _fpsCounter.newFrame();
         }
     }
 
@@ -109,16 +109,18 @@ private:
     }
 
     /// \brief an FPS counter.
-    ofFpsCounter _fpsCounter;
+//    ofFpsCounter _fpsCounter;
 
     void thread() override
     {
-        InputType lastInput;
-        OutputType lastOutput;
+        std::pair<std::size_t, InputType> lastInput;
+        std::pair<std::size_t, OutputType> lastOutput;
 
         while (_inputPipe.dequeue(lastInput))
         {
-            if (_processInput(lastInput, lastOutput))
+            if (_processInput(lastInput.first,
+                              lastInput.second,
+                              lastOutput.second))
                 _outputPipe.enqueue(lastOutput);
         }
     }
