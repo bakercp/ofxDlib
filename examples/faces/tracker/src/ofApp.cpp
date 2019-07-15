@@ -120,26 +120,20 @@ void ofApp::draw()
 
 void ofApp::onTrackBegin(ofxDlib::FaceTrackerEventArgs& evt)
 {
-    std::cout << "Track begin: " << evt.label << std::endl;
+    std::cout << "Track begin: ID:" << evt.label << std::endl;
 }
 
 
 void ofApp::onTrackUpdate(ofxDlib::FaceTrackerEventArgs& evt)
 {
     if (evt.lastSeen != 0)
-        std::cout << "Track Update (Lost): " << evt.label << " " << evt.age << " " << evt.lastSeen << std::endl;
+        std::cout << "Track Update (Lost): ID: " << evt.label << " Age: " << evt.age << " Last Seen: " << evt.lastSeen << std::endl;
     else
-        std::cout << "Track Update: " << evt.label << " " << evt.age << std::endl;
+        std::cout << "Track Update: ID: " << evt.label << " Age: " << evt.age << std::endl;
 }
 
 
 void ofApp::onTrackEnd(ofxDlib::FaceTrackerEventArgs& evt)
 {
     std::cout << "Track end: " << evt.label << std::endl;
-}
-
-
-void ofApp::onTrackError(ofxDlib::FaceTrackerEventArgs& evt)
-{
-    std::cout << "Track error: " << evt.label << std::endl;
 }

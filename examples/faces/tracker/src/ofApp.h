@@ -22,7 +22,6 @@ public:
     void onTrackBegin(ofxDlib::FaceTrackerEventArgs& evt);
     void onTrackUpdate(ofxDlib::FaceTrackerEventArgs& evt);
     void onTrackEnd(ofxDlib::FaceTrackerEventArgs& evt);
-    void onTrackError(ofxDlib::FaceTrackerEventArgs& evt);
 
     // The video grabber.
     ofVideoGrabber video;
