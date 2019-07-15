@@ -8,7 +8,7 @@
 #pragma once
 
 
-//#if defined(OF_SERIALIZER_H)
+#if defined(OF_SERIALIZER_H)
 
 
 #include "ofSerializer.h"
@@ -111,4 +111,4 @@ inline void from_json(const nlohmann::json& j, FaceTracker::Settings& v)
 } } // namespace ofx::Dlib
 
 
-//#endif
+#endif
