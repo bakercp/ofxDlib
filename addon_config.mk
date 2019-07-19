@@ -69,7 +69,7 @@ linux64:
 	ADDON_PKG_CONFIG_LIBRARIES += blas lapack
 
 	# If dlib is compiled with CUDA support, you need to include these.
-	# ADDON_LDFLAGS += -L/usr/local/cuda/lib64 -lcuda -lcudart -lcudnn -lcublas -lcurand -lcusolver
+	ADDON_LDFLAGS += -L/usr/local/cuda/lib64 -lcuda -lcudart -lcudnn -lcublas -lcurand -lcusolver
 
 	# If dlib is compiled with MKL support, you need to add flags support MKL.
 	# Typically, if installed with sudo, MKL is installed @ /opt/intel/mkl on Linux.
@@ -77,15 +77,15 @@ linux64:
 	# These flags were chosen using the calculator here:
 	# https://software.intel.com/en-us/articles/intel-mkl-link-line-advisor.
 
-	# ADDON_INCLUDES += /opt/intel/mkl/include
-	# ADDON_INCLUDES += /opt/intel/include
-	# ADDON_LDFLAGS  += -Wl,--start-group
-	# ADDON_LDFLAGS  += /opt/intel/mkl/lib/intel64/libmkl_intel_lp64.a
-	# ADDON_LDFLAGS  += /opt/intel/mkl/lib/intel64/libmkl_sequential.a
-	# ADDON_LDFLAGS  += /opt/intel/mkl/lib/intel64/libmkl_core.a
-	# ADDON_LDFLAGS  += -Wl,--end-group
-	# ADDON_LDFLAGS  += -lpthread -lm -ldl
-	# ADDON_CPPFLAGS += -m64
+	ADDON_INCLUDES += /opt/intel/mkl/include
+	ADDON_INCLUDES += /opt/intel/include
+	ADDON_LDFLAGS  += -Wl,--start-group
+	ADDON_LDFLAGS  += /opt/intel/mkl/lib/intel64/libmkl_intel_lp64.a
+	ADDON_LDFLAGS  += /opt/intel/mkl/lib/intel64/libmkl_sequential.a
+	ADDON_LDFLAGS  += /opt/intel/mkl/lib/intel64/libmkl_core.a
+	ADDON_LDFLAGS  += -Wl,--end-group
+	ADDON_LDFLAGS  += -lpthread -lm -ldl
+	ADDON_CPPFLAGS += -m64
 
 android/armeabi-v7a:
 	ADDON_LIBS = libs/dlib/lib/android/armeabi-v7a/libdlib.a
