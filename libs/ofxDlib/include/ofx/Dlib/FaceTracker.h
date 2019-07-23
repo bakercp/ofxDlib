@@ -107,7 +107,7 @@ public:
         /// \brief Face detector settings.
         FaceDetector::Settings faceDetectorSettings;
 
-        /// \brief Face shape
+        /// \brief Face shape predictor settings.
         FaceShapePredictor::Settings faceShapePredictorSettings;
 
         /// \brief Face detector filter alpha.
@@ -125,11 +125,6 @@ public:
         /// A value of 0 means no smoothing. A value close to 1 means greater
         /// smoothing but more latency.
         double faceShapeFilterSmoothness = 0.0;
-
-        /// \brief The duration of the frame history buffer in microseconds.
-        ///
-        /// Default value is 30 seconds.
-        uint64_t frameBufferDuration = 30 * 1000000;
 
     };
 
