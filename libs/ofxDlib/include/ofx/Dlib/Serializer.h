@@ -8,10 +8,10 @@
 #pragma once
 
 
-#if defined(OF_SERIALIZER_H)
+#ifdef OF_SERIALIZER_H
 
 
-#include "ofSerializer.h"
+#include "ofxSerializer.h"
 #include "json.hpp"
 #include "ofx/Dlib/FaceDetector.h"
 #include "ofx/Dlib/FaceTracker.h"
@@ -56,11 +56,26 @@ inline void from_json(const nlohmann::json& j, FaceDetector::Settings& v)
     v.minimumDetectionSize = j.value("minimum_detection_size", v.minimumDetectionSize);
     v.modelsPath = j.value("models_path", v.modelsPath);
     v.gpuDevice = j.value("gpu_device", v.gpuDevice);
+}
 
-//    j.at("name").get_to(p.name);
-//    j.at("address").get_to(p.address);
-//    j.at("age").get_to(p.age);
 
+inline void to_json(nlohmann::json& j, const FaceShapePredictor::Settings& v)
+{
+    j["face_shape_type"] = v.faceShapeType;
+    j["create_aligned_image"] = v.createAlignedImage;
+    j["aligned_image_size"] = v.alignedImageSize;
+    j["aligned_image_padding"] = v.alignedImagePadding;
+    j["models_path"] = v.modelsPath;
+}
+
+
+inline void from_json(const nlohmann::json& j, FaceShapePredictor::Settings& v)
+{
+    v.faceShapeType = j.value("face_shape_type", v.faceShapeType);
+    v.createAlignedImage = j.value("create_aligned_image", v.createAlignedImage);
+    v.alignedImageSize = j.value("aligned_image_size", v.alignedImageSize);
+    v.alignedImagePadding = j.value("aligned_image_padding", v.alignedImagePadding);
+    v.modelsPath = j.value("models_path", v.modelsPath);
 }
 
 
@@ -72,7 +87,6 @@ inline void to_json(nlohmann::json& j, const typename Tracker_<T>::Settings& v)
 }
 
 
-
 template <class T>
 inline void from_json(const nlohmann::json& j, typename Tracker_<T>::Settings& v)
 {
@@ -81,31 +95,26 @@ inline void from_json(const nlohmann::json& j, typename Tracker_<T>::Settings& v
 }
 
 
-
 inline void to_json(nlohmann::json& j, const FaceTracker::Settings& v)
 {
-//    j["async"] = v.async;
-
-//    to_json<ObjectDetection>(j["tracker_settings"], v.trackerSettings);
-
-////    j["tracker_settings"] = v.trackerSettings;
-//    j["face_detector_settings"] = v.faceDetectorSettings;
-//    //j["face_shape_predictor_settings"] = v.faceShapePredictorSettings;
-//    j["face_detector_filter_smoothness"] = v.faceDetectorFilterSmoothness;
-//    j["face_shape_filter_smoothness"] = v.faceShapeFilterSmoothness;
+    j["async"] = v.async;
+    //  j["tracker_settings"] = v.trackerSettings;
+    j["face_detector_settings"] = v.faceDetectorSettings;
+    j["face_shape_predictor_settings"] = v.faceShapePredictorSettings;
+    j["face_detector_filter_smoothness"] = v.faceDetectorFilterSmoothness;
+    j["face_shape_filter_smoothness"] = v.faceShapeFilterSmoothness;
 }
 
 
 inline void from_json(const nlohmann::json& j, FaceTracker::Settings& v)
 {
-//    v.async = j.value("async", v.async);
-    //v.trackerSettings = j.value("tracker_settings", v.trackerSettings);
-//    v.faceDetectorSettings = j.value("face_detector_settings", v.faceDetectorSettings);
-    //v.faceShapePredictorSettings = j.value("face_shape_predictor_settings", v.faceShapePredictorSettings);
-//    v.faceDetectorFilterSmoothness = j.value("face_detector_filter_smoothness", v.faceDetectorFilterSmoothness);
-//    v.faceShapeFilterSmoothness = j.value("face_shape_filter_smoothness", v.faceShapeFilterSmoothness);
+    v.async = j.value("async", v.async);
+    // v.trackerSettings = j.value("tracker_settings", v.trackerSettings);
+    v.faceDetectorSettings = j.value("face_detector_settings", v.faceDetectorSettings);
+    v.faceShapePredictorSettings = j.value("face_shape_predictor_settings", v.faceShapePredictorSettings);
+    v.faceDetectorFilterSmoothness = j.value("face_detector_filter_smoothness", v.faceDetectorFilterSmoothness);
+    v.faceShapeFilterSmoothness = j.value("face_shape_filter_smoothness", v.faceShapeFilterSmoothness);
 }
-
 
 
 } } // namespace ofx::Dlib
