@@ -61,11 +61,11 @@ float FaceShape::getMeasurement(Measurement measurement) const
 {
     switch (_type)
     {
-        case Type::FACE_SHAPE_5_LANDMARKS:
-        {
-            // TODO
-            break;
-        }
+//        case Type::FACE_SHAPE_5_LANDMARKS:
+//        {
+//            // TODO
+//            break;
+//        }
         case Type::FACE_SHAPE_68_LANDMARKS:
         {
             switch (measurement)
@@ -100,11 +100,11 @@ std::vector<std::size_t> FaceShape::getFeatureIndices(Feature feature) const
 {
     switch (_type)
     {
-        case Type::FACE_SHAPE_5_LANDMARKS:
-        {
-            // TODO
-            break;
-        }
+//        case Type::FACE_SHAPE_5_LANDMARKS:
+//        {
+//            // TODO
+//            break;
+//        }
         case Type::FACE_SHAPE_68_LANDMARKS:
         {
             switch (feature)
@@ -141,7 +141,7 @@ std::vector<std::size_t> FaceShape::getFeatureIndices(Feature feature) const
                     return std::vector<std::size_t>(faceOutline, faceOutline + 27);
                 }
 
-                case ALL_FEATURES: return consecutive(0, 68);
+                //case ALL_FEATURES: return consecutive(0, 68);
             }
         }
     }
@@ -180,6 +180,37 @@ ofPolyline FaceShape::getFeatureAsPolyline(Feature feature) const
 }
 
 
+std::map<FaceShape::Feature, ofPolyline> FaceShape::getFeatureSetAsPolylines(FeatureSet featureSet) const
+{
+    std::map<Feature, ofPolyline> results;
+
+    switch (featureSet)
+    {
+        case EYES:
+        {
+            results[Feature::LEFT_EYEBROW] = getFeatureAsPolyline(Feature::LEFT_EYEBROW);
+            results[Feature::RIGHT_EYEBROW] = getFeatureAsPolyline(Feature::RIGHT_EYEBROW);
+            results[Feature::LEFT_EYE] = getFeatureAsPolyline(Feature::LEFT_EYE);
+            results[Feature::RIGHT_EYE] = getFeatureAsPolyline(Feature::RIGHT_EYE);
+            break;
+        }
+        case MOUTH:
+        {
+            results[Feature::OUTER_MOUTH] = getFeatureAsPolyline(Feature::OUTER_MOUTH);
+            results[Feature::INNER_MOUTH] = getFeatureAsPolyline(Feature::INNER_MOUTH);
+            break;
+        }
+        case NOSE:
+        {
+            results[Feature::NOSE_BRIDGE] = getFeatureAsPolyline(Feature::NOSE_BRIDGE);
+            results[Feature::NOSE_BASE] = getFeatureAsPolyline(Feature::NOSE_BASE);
+        }
+    }
+
+    return results;
+}
+
+
 std::vector<glm::vec2> FaceShape::getFeature(Feature feature) const
 {
     std::vector<glm::vec2> polyline;
@@ -193,7 +224,6 @@ std::vector<glm::vec2> FaceShape::getFeature(Feature feature) const
 
     return polyline;
 }
-
 
 
 std::vector<std::size_t> FaceShape::consecutive(std::size_t startIndex,

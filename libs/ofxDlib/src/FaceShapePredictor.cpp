@@ -33,9 +33,10 @@ bool FaceShapePredictor::setup(const Settings& settings)
 
     std::filesystem::path path = ofToDataPath(settings.modelsPath, true);
 
+    /*
     if (settings.faceShapeType == FaceShape::Type::FACE_SHAPE_5_LANDMARKS)
         path /= "shape_predictor_5_face_landmarks.dat";
-    else if (settings.faceShapeType == FaceShape::Type::FACE_SHAPE_68_LANDMARKS)
+    else*/ if (settings.faceShapeType == FaceShape::Type::FACE_SHAPE_68_LANDMARKS)
         path /= "shape_predictor_68_face_landmarks.dat";
 
     if (std::filesystem::exists(path))
