@@ -46,6 +46,8 @@ Visual Studio, MSYS [![Build status](https://ci.appveyor.com/api/projects/status
 
 The `master` branch of this repository is meant to be compatible with the openFrameworks [master branch](https://github.com/openframeworks/openFrameworks/tree/master).
 
+The `develop` and other branches are where experimentation is happening and are usually compatible with the `master` branch, but may be broken or a work-in-progress. The develop branch should not be used for production, as it may change at any given moment.
+
 Some past openFrameworks releases are supported via tagged versions, but only `stable` and `master` branches are actively supported.
 
 ## Versioning
