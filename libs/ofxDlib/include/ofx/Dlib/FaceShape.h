@@ -23,7 +23,7 @@ public:
     enum class Type
     {
         /// \brief The fast 5 landmark face shape predictor.
-        FACE_SHAPE_5_LANDMARKS,
+        // FACE_SHAPE_5_LANDMARKS,
 
         /// \brief The precise 68 landmark face shape predictor.
         FACE_SHAPE_68_LANDMARKS
@@ -51,9 +51,14 @@ public:
         NOSE_BRIDGE,
         NOSE_BASE,
 
-        FACE_OUTLINE,
+        FACE_OUTLINE
+    };
 
-        ALL_FEATURES,
+    enum FeatureSet
+    {
+        EYES,
+        MOUTH,
+        NOSE
     };
 
     enum Measurement
@@ -118,8 +123,13 @@ public:
 
     /// \brief Get the landmarks for the given feature as a polyline.
     /// \param feature The feature to query.
-    /// \returns the feature indicies or an empty polyline if not available.
+    /// \returns the feature polyline or an empty polyline if not available.
     ofPolyline getFeatureAsPolyline(Feature feature) const;
+
+    /// \brief Get the landmarks for the given set of features as polylines.
+    /// \param featureSet The feature set to query.
+    /// \returns the mapped feature set or an empty map if none available.
+    std::map<Feature, ofPolyline> getFeatureSetAsPolylines(FeatureSet featureSet) const;
 
     /// \brief Get the landmarks for the given feature.
     /// \param feature The feature to query.
