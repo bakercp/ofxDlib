@@ -57,6 +57,7 @@ public:
     enum FeatureSet
     {
         EYES,
+        EYEBROWS,
         MOUTH,
         NOSE
     };

@@ -188,10 +188,14 @@ std::map<FaceShape::Feature, ofPolyline> FaceShape::getFeatureSetAsPolylines(Fea
     {
         case EYES:
         {
-            results[Feature::LEFT_EYEBROW] = getFeatureAsPolyline(Feature::LEFT_EYEBROW);
-            results[Feature::RIGHT_EYEBROW] = getFeatureAsPolyline(Feature::RIGHT_EYEBROW);
             results[Feature::LEFT_EYE] = getFeatureAsPolyline(Feature::LEFT_EYE);
             results[Feature::RIGHT_EYE] = getFeatureAsPolyline(Feature::RIGHT_EYE);
+            break;
+        }
+        case EYEBROWS:
+        {
+            results[Feature::LEFT_EYEBROW] = getFeatureAsPolyline(Feature::LEFT_EYEBROW);
+            results[Feature::RIGHT_EYEBROW] = getFeatureAsPolyline(Feature::RIGHT_EYEBROW);
             break;
         }
         case MOUTH:
