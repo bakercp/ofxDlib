@@ -17,9 +17,11 @@ namespace Dlib {
 
 
 FaceTrackerEventArgs::FaceTrackerEventArgs(const TrackerEventArgs& trackerEventArgs,
-                                           const FaceShape& faceShape_):
+                                           const FaceShape& faceShape_,
+                                           const std::vector<float>& faceCode_):
     TrackerEventArgs(trackerEventArgs),
-    faceShape(faceShape_)
+    faceShape(faceShape_),
+    faceCode(faceCode_)
 {
 }
 
@@ -38,7 +40,7 @@ FaceTracker::FaceTracker(const Settings& settings)
 bool FaceTracker::setup(const Settings& settings)
 {
 #if !defined(__OPTIMIZE__)
-    ofLogWarning("FaceTracker::setup") << "FaceDetector runs much faster when compiled with optimizations (i.e. RELEASE Mode). http://dlib.net/faq.html#Whyisdlibslow";
+    ofLogWarning("FaceTracker::setup") << "FaceTracker runs much faster when compiled with optimizations (i.e. RELEASE Mode). http://dlib.net/faq.html#Whyisdlibslow";
 #endif
 
     _frameId = 1;
@@ -49,13 +51,15 @@ bool FaceTracker::setup(const Settings& settings)
     _shapes.clear();
     _tracker = Tracker_<ObjectDetection>();
     _faceShapePredictor = FaceShapePredictor();
+    _faceCoder = FaceCoder();
 
     _boundingBoxFilter.clear();
     _faceLandmarkFilter.clear();
 
     if (_detector.setup(settings.faceDetectorSettings)
     && _tracker.setup(settings.trackerSettings)
-    && _faceShapePredictor.setup(settings.faceShapePredictorSettings))
+    && _faceShapePredictor.setup(settings.faceShapePredictorSettings)
+    && _faceCoder.setup(settings.faceCoderSettings))
     {
         _boundingBoxFilter.setAlpha(settings.faceDetectorFilterSmoothness);
         _faceLandmarkFilter.setAlpha(settings.faceShapeFilterSmoothness);
@@ -230,6 +234,13 @@ bool FaceTracker::_processInput(std::size_t frameId,
     {
         FaceShape shape = _faceShapePredictor.predict(input,
                                                       event.detection.rectangle);
+        std::vector<float> faceCode;
+        
+        if (_settings.faceCoderEnabled)
+        {
+            faceCode = _faceCoder.code(shape.alignedFace());
+        }
+
         // Do filtering if possible.
         if (_settings.faceShapeFilterSmoothness > 0)
         {
@@ -252,11 +263,14 @@ bool FaceTracker::_processInput(std::size_t frameId,
                     break;
             }
 
-            output.push_back(FaceTrackerEventArgs(event, FaceShape(shape, filteredLandmarks)));
+            output.push_back(FaceTrackerEventArgs(event,
+                                                  FaceShape(shape,
+                                                            filteredLandmarks),
+                                                  faceCode));
         }
         else
         {
-            output.push_back(FaceTrackerEventArgs(event, shape));
+            output.push_back(FaceTrackerEventArgs(event, shape, faceCode));
         }
     }
 

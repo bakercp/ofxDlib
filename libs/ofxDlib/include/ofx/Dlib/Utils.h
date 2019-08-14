@@ -16,6 +16,7 @@
 #include "ofPixels.h"
 #include "ofRectangle.h"
 #include "ofTypes.h"
+#include "ofVectorMath.h"
 #include "dlib/of_image.h"
 #include "dlib/to_of.h"
 
@@ -654,6 +655,49 @@ inline float distance(const ofRectangle& a, const ofRectangle& b)
     // The combined distance.
     return centerDistance + sizeDistance;
 }
+
+
+
+/// \brief Create a collection of slight image variations.
+///
+/// This calls `dlib::jitter_image` a total of `n` times and returns the
+/// collection of jittered imaged. Jittered images are slightly rotated,
+/// zoomed, translated and mirrored randomly.
+///
+/// \param img The image to jitter.
+/// \param n The number of jittered image variations to return.
+/// \returns a collection of `n` jittered images.
+/// \tparam image_type The image type to itter. This can be any compatible
+/// openFrameworks or dlib image type.
+template<typename image_type>
+std::vector<image_type> jitterImage(const image_type& img, std::size_t n)
+{
+    // All this function does is make `n` copies of img, all slightly
+    // jittered by being zoomed, rotated, and translated a little bit
+    // differently. They are also randomly mirrored left to right.
+    thread_local dlib::rand rnd;
+
+    std::vector<image_type> crops;
+
+    for (std::size_t i = 0; i < n; ++i)
+        crops.push_back(dlib::jitter_image(img, rnd));
+
+    return crops;
+}
+
+//
+inline std::vector<glm::vec2> createGuassianCluster(const glm::vec2& mean,
+                                                    float stdDev,
+                                                    std::size_t n)
+{
+    std::vector<glm::vec2> results(n);
+    for (std::size_t i = 0; i < n; ++i)
+        results[i] = glm::gaussRand(mean, { stdDev, stdDev });
+    return results;
+}
+
+
+
 
 
 

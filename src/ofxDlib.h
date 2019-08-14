@@ -11,8 +11,10 @@
 #include "dlib/of_default_adapter.h"
 #include "dlib/of_image.h"
 #include "dlib/to_of.h"
+#include "ofx/Dlib/Serializer.h"
 #include "ofx/Dlib/Tracker.h"
 #include "ofx/Dlib/Face.h"
+#include "ofx/Dlib/FaceCoder.h"
 #include "ofx/Dlib/FaceShape.h"
 #include "ofx/Dlib/FaceDetector.h"
 #include "ofx/Dlib/FaceFinder.h"
@@ -27,7 +29,6 @@
 #include "ofx/Dlib/Network/MMODFaceDetector.h"
 #include "ofx/Dlib/Network/FaceRecognitionResnetModelV1.h"
 #include "ofx/Dlib/PCA.h"
-#include "ofx/Dlib/Serializer.h"
 
 
 #include <iostream>

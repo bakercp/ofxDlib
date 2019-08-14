@@ -14,6 +14,7 @@
 #include "ofThreadChannel.h"
 #include "ofx/Dlib/AsyncProcess.h"
 #include "ofx/Dlib/Tracker.h"
+#include "ofx/Dlib/FaceCoder.h"
 #include "ofx/Dlib/FaceDetector.h"
 #include "ofx/Dlib/FaceShapePredictor.h"
 #include "ofx/Dlib/FilterGroup.h"
@@ -29,9 +30,11 @@ class FaceTrackerEventArgs: public TrackerEventArgs
 {
 public:
     FaceTrackerEventArgs(const TrackerEventArgs& trackerEventArgs,
-                         const FaceShape& faceShape);
+                         const FaceShape& faceShape,
+                         const std::vector<float>& faceCode = { });
 
     FaceShape faceShape;
+    std::vector<float> faceCode;
 
 };
 
@@ -109,6 +112,12 @@ public:
 
         /// \brief Face shape predictor settings.
         FaceShapePredictor::Settings faceShapePredictorSettings;
+
+        /// \brief Face coder settings.
+        FaceCoder::Settings faceCoderSettings;
+
+        /// \brief This is false if the face coder is disabled.
+        bool faceCoderEnabled = true;
 
         /// \brief Face detector filter alpha.
         ///
@@ -228,6 +237,9 @@ private:
 
     /// \brief The face shape predictor.
     FaceShapePredictor _faceShapePredictor;
+
+    /// \brief The face coder.
+    FaceCoder _faceCoder;
 
     /// \brief The bounding box tracker.
     Tracker_<ObjectDetection> _tracker;

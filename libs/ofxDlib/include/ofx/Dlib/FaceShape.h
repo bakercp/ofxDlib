@@ -158,6 +158,7 @@ private:
 
     /// \brief The aligned face pixels.
     ofPixels _alignedFace;
+
 };
 
 

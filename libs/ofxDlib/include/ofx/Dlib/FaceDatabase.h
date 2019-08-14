@@ -26,8 +26,6 @@ public:
 
     std::size_t getId(const Face& face) const;
 
-
-
     /// \returns true if a face has been loaded.
     bool isLoaded() const;
 

@@ -26,7 +26,7 @@ FaceShapePredictor::FaceShapePredictor(const Settings& settings)
 bool FaceShapePredictor::setup(const Settings& settings)
 {
 #if !defined(__OPTIMIZE__)
-    ofLogWarning("FaceShapePredictor::setup") << "FaceDetector runs much faster when compiled with optimizations (i.e. RELEASE Mode). http://dlib.net/faq.html#Whyisdlibslow";
+    ofLogWarning("FaceShapePredictor::setup") << "FaceShapePredictor runs much faster when compiled with optimizations (i.e. RELEASE Mode). http://dlib.net/faq.html#Whyisdlibslow";
 #endif
 
     _isLoaded = false;
