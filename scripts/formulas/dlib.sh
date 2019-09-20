@@ -66,7 +66,14 @@ function build() {
               ..
         fi
 
-        cmake --build . --config Release
+        if [ "$TYPE" == "vs" ] ; then
+            # Windows can not use "make install", so we use cmake's install
+            # Windows needs Debug lib, otherwise project does not link
+            cmake --build . --config Debug --target INSTALL
+            cmake --build . --config Release --target INSTALL
+        else
+            cmake --build . --config Release
+        fi
         popd || return
     elif [ "$TYPE" == "android" ] ; then
         ${NDK_ROOT}/ndk-build -j4 NDK_DEBUG=0 NDK_PROJECT_PATH=.
