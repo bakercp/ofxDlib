@@ -64,3 +64,22 @@ android/x86:
 	ADDON_LIBS = libs/dlib/lib/android/x86/libdlib.a
 	# If your processor supports SIMD AVX instructions.
 	ADDON_CPPFLAGS += -mavx
+
+vs:
+	# automatically find libs under Debug and Release folder
+	# ADDON_LIBS =
+	ADDON_CFLAGS = /bigobj
+
+	# If dlib is compiled with CUDA support, you need to include these.
+	# All of cuda libs resides in $(CUDA_PATH)/lib/x64. maybe we dont need all though
+	ADDON_LIBS += $(CUDA_PATH)/lib/x64/cublas.lib cublasLt.lib cuda.lib cudadevrt.lib cudart.lib cudart_static.lib cudnn.lib cufft.lib cufftw.lib curand.lib cusolver.lib cusolverMg.lib cusparse.lib nppc.lib nppial.lib nppicc.lib nppicom.lib nppidei.lib nppif.lib nppig.lib nppim.lib nppist.lib nppisu.lib nppitc.lib npps.lib nvblas.lib nvgraph.lib nvjpeg.lib nvml.lib nvrtc.lib OpenCL.lib
+
+	# If dlib is compiled with MKL support, 
+	# please turn on MKL feature via VS's project properties
+	# Properties -> Configuration Properties -> Intel Performance Libraries -> Intel Math Kernel Library -> Use Intel KML -> Parallel
+	# Might be nice to check another option, Sequencial and Cluster
+	
+	# Also please turn on TBB which comes with MKL
+	# Properties -> Configuration Properties -> Intel Performance Libraries -> Intel Threding Building Blocks -> Use Intel TBB -> Yes
+
+	
