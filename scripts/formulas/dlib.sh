@@ -106,7 +106,6 @@ function copy() {
         cp -vr obj/local/armeabi-v7a/libdlib.a $1/lib/android/armeabi-v7a/libdlib.a
         cp -vr obj/local/x86/libdlib.a $1/lib/android/x86/libdlib.a
     elif [ "$TYPE" == "vs" ] ; then
-
         INSTALLED_DIR=$LIBS_DIR/dlib/install         
         OFX_DLIB_DIR=$FORMULA_DIR/../../
         rm -rf $OFX_DLIB_DIR/include
@@ -115,6 +114,7 @@ function copy() {
         mkdir -p $OFX_DLIB_DIR/libs/dlib/lib/vs/x64/Debug
         mkdir -p $OFX_DLIB_DIR/libs/dlib/lib/vs/x64/Release
 
+        # match to lib file like dlib19.17.99_debug_64bit_msvc1922.lib
         cp -v ${INSTALLED_DIR}/lib/dlib*debug*.lib $OFX_DLIB_DIR/libs/dlib/lib/vs/x64/Debug/dlib_debug.lib
         cp -v ${INSTALLED_DIR}/lib/dlib*release*.lib $OFX_DLIB_DIR/libs/dlib/lib/vs/x64/Release/dlib.lib
     fi
