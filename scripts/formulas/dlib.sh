@@ -105,6 +105,18 @@ function copy() {
         rm  $1/include/dlib/all_gui.cpp
         cp -vr obj/local/armeabi-v7a/libdlib.a $1/lib/android/armeabi-v7a/libdlib.a
         cp -vr obj/local/x86/libdlib.a $1/lib/android/x86/libdlib.a
+    elif [ "$TYPE" == "vs" ] ; then
+
+        INSTALLED_DIR=$LIBS_DIR/dlib/install         
+        OFX_DLIB_DIR=$FORMULA_DIR/../../
+        rm -rf $OFX_DLIB_DIR/include
+        rm -rf $OFX_DLIB_DIR/lib/vs/x64
+        mkdir -p $OFX_DLIB_DIR/libs/dlib/include
+        mkdir -p $OFX_DLIB_DIR/libs/dlib/lib/vs/x64/Debug
+        mkdir -p $OFX_DLIB_DIR/libs/dlib/lib/vs/x64/Relase
+
+        cp -v ${INSTALLED_DIR}/lib/dlib*debug*.lib $OFX_DLIB_DIR/libs/dlib/lib/vs/x64/Debug/dlib_debug.lib
+        cp -v ${INSTALLED_DIR}/lib/dlib*release*.lib $OFX_DLIB_DIR/libs/dlib/lib/vs/x64/Release/dlib.lib
     fi
 }
 
