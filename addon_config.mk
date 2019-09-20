@@ -72,7 +72,7 @@ vs:
 
 	# If dlib is compiled with CUDA support, you need to include these.
 	# All of cuda libs resides in $(CUDA_PATH)/lib/x64. maybe we dont need all though
-	ADDON_LIBS += $(CUDA_PATH)/lib/x64/cublas.lib cublasLt.lib cuda.lib cudadevrt.lib cudart.lib cudart_static.lib cudnn.lib cufft.lib cufftw.lib curand.lib cusolver.lib cusolverMg.lib cusparse.lib nppc.lib nppial.lib nppicc.lib nppicom.lib nppidei.lib nppif.lib nppig.lib nppim.lib nppist.lib nppisu.lib nppitc.lib npps.lib nvblas.lib nvgraph.lib nvjpeg.lib nvml.lib nvrtc.lib OpenCL.lib
+	#ADDON_LIBS += $(CUDA_PATH)/lib/x64/cublas.lib cublasLt.lib cuda.lib cudadevrt.lib cudart.lib cudart_static.lib cudnn.lib cufft.lib cufftw.lib curand.lib cusolver.lib cusolverMg.lib cusparse.lib nppc.lib nppial.lib nppicc.lib nppicom.lib nppidei.lib nppif.lib nppig.lib nppim.lib nppist.lib nppisu.lib nppitc.lib npps.lib nvblas.lib nvgraph.lib nvjpeg.lib nvml.lib nvrtc.lib OpenCL.lib
 
 	# If dlib is compiled with MKL support, 
 	# please turn on MKL feature via VS's project properties
