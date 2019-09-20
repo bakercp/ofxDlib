@@ -83,12 +83,13 @@ function build() {
 # executed inside the lib src dir, first arg $1 is the dest libs dir root
 function copy() {
     # headers
-    if [ -d $1/include ]; then
-        rm -rf $1/include
+    if [ "$TYPE" != "vs" ] ; then
+        if [ -d $1/include ] ; then
+            rm -rf $1/include
+        fi
+        mkdir -p $1/include
+        mkdir -p $1/lib/$TYPE
     fi
-
-    mkdir -p $1/include
-    mkdir -p $1/lib/$TYPE
 
     if [ "$TYPE" == "osx" ] || [ "$TYPE" == "linux64" ] || [ "$TYPE" == "linuxarmv6l" ] ; then
         cd "${BUILD_DIR}/dlib/build" || exit 1
