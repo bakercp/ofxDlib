@@ -113,7 +113,7 @@ function copy() {
         rm -rf $OFX_DLIB_DIR/lib/vs/x64
         mkdir -p $OFX_DLIB_DIR/libs/dlib/include
         mkdir -p $OFX_DLIB_DIR/libs/dlib/lib/vs/x64/Debug
-        mkdir -p $OFX_DLIB_DIR/libs/dlib/lib/vs/x64/Relase
+        mkdir -p $OFX_DLIB_DIR/libs/dlib/lib/vs/x64/Release
 
         cp -v ${INSTALLED_DIR}/lib/dlib*debug*.lib $OFX_DLIB_DIR/libs/dlib/lib/vs/x64/Debug/dlib_debug.lib
         cp -v ${INSTALLED_DIR}/lib/dlib*release*.lib $OFX_DLIB_DIR/libs/dlib/lib/vs/x64/Release/dlib.lib
