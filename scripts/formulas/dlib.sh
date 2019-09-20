@@ -12,7 +12,7 @@ GIT_URL="https://github.com/davisking/dlib"
 GIT_TAG="v$VER"
 GIT_TAG=
 
-FORMULA_TYPES=( "osx" "android" "linux64" "linuxarmv6l")
+FORMULA_TYPES=( "osx" "android" "linux64" "linuxarmv6l" "vs")
 
 # download the source code and unpack it into LIB_NAME
 function download() {
@@ -32,7 +32,7 @@ function prepare() {
 
 # executed inside the lib src dir
 function build() {
-    if [ "$TYPE" == "osx" ] || [ "$TYPE" == "linux64" ] || [ "$TYPE" == "linuxarmv6l" ] ; then
+    if [ "$TYPE" == "osx" ] || [ "$TYPE" == "linux64" ] || [ "$TYPE" == "linuxarmv6l" ] || [ "$TYPE" == "vs" ]; then
         mkdir -p "build"
         pushd "build" || return
         if [ "$TYPE" == "linuxarmv6l" ] ; then
