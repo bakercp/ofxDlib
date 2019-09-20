@@ -130,6 +130,18 @@ function clean() {
         cd ..
     elif [ "$TYPE" == "android" ] ; then
         rm -rf obj
+    elif [ "$TYPE" == "vs" ] ; then
+
+        # delete openFrameworks/scirpts/apothecary/apothecary/build
+        rm -rf ${BUILD_DIR}/dlib
+
+        # delete openFrameworks/scirpts/apothecary/dlib
+        INSTALLED_DIR=$LIBS_DIR/dlib
+        rm -rf ${INSTALLED_DIR}
+
+        # delete /your/addon/place//ofxDlib/libs/vs/x64
+        OFX_DLIB_DIR=$FORMULA_DIR/../../
+        rm -rf $OFX_DLIB_DIR/libs/dlib/lib/vs/x64
     fi
 
 }
