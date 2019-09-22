@@ -56,7 +56,7 @@ function build() {
               -D DLIB_NO_GUI_SUPPORT=YES \
               -D CMAKE_INSTALL_PREFIX="${LIBS_DIR}/dlib/install" \
               ..
-        elif [ $"TYPE" == "vs"] ; then
+        elif [ "$TYPE" == "vs" ] ; then
             cmake \
               -G "Visual Studio 15 2017" \
               -A x64 \
