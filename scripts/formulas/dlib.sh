@@ -127,8 +127,8 @@ function copy() {
         cp -vr ${INSTALLED_DIR}/include/dlib $OFX_DLIB_DIR/libs/dlib/include
 
         # match to lib file like dlib19.17.99_debug_64bit_msvc1922.lib
-        cp -v ${INSTALLED_DIR}/lib/dlib*debug*.lib $OFX_DLIB_DIR/libs/dlib/lib/vs/x64/Debug/dlib_debug.lib
-        cp -v ${INSTALLED_DIR}/lib/dlib*release*.lib $OFX_DLIB_DIR/libs/dlib/lib/vs/x64/Release/dlib.lib
+        cp -v ${INSTALLED_DIR}/lib/dlib*debug*.lib $OFX_DLIB_DIR/libs/dlib/lib/vs/x64/Debug/
+        cp -v ${INSTALLED_DIR}/lib/dlib*release*.lib $OFX_DLIB_DIR/libs/dlib/lib/vs/x64/Release/
     fi
 }
 
