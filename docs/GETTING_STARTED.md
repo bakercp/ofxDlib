@@ -57,7 +57,7 @@ cmake --build . --config Release --target INSTALL
 #### Prepare ofxDlib
 Now copy the dlib includes and libraries into the addon folder.
 
-* folder `dlib` from `[dlib download folder]` to `[of addons folder]/ofxDlib/libs/dlib/include`
+* folder `/build/install/dlib` from `[dlib download folder]` to `[of addons folder]/ofxDlib/libs/dlib/include`
 * `dlib_xxx_debug_64bit_xxx.lib` from `[dlib download folder]/build/dlib/Debug`  to `[of addons folder]/ofxDlib/libs/dlib/lib/vs/x64/Debug`
 * `dlib_xxx_release_64bit_xxx.lib` from `[dlib download folder]/build/dlib/Release` to `[of addons folder]/ofxDlib/libs/dlib/lib/vs/x64/Release`
 
