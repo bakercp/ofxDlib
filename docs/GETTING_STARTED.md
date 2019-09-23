@@ -68,7 +68,7 @@ Go to project settings
 * in _C/C++/preprocessor/preprocessor definitions_ add
         `DLIB_PNG_SUPPORT`  →  if you want to use the png functionality
         `DLIB_JPEG_SUPPORT` → if you want to use the jpg functionality
-* in _C/C++/command line/additiona options_ add
+* in _C/C++/command line/additional options_ add
         /bigobj
 
 Now you're ready to compile!
