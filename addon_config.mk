@@ -347,7 +347,10 @@ android/x86:
 
 vs:
 	ADDON_DEFINES += DLIB_PNG_SUPPORT
-	ADDON_CFLAGS += /bigobj
+	ADDON_CFLAGS = /bigobj
+	
+	# only in newer version of PG 
+	# ADDON_CFLAGS += /bigobj
 
 	ADDON_SOURCE_INCLUDES += libs/dlib/include/dlib/all
 	ADDON_INCLUDES += libs/dlib/include/dlib/external/libpng
