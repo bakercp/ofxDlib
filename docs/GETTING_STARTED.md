@@ -33,7 +33,7 @@ Since there is no script yet, you need to download and compile dlib by yourself.
 
 #### Download dlib
 
-[http://dlib.net/]
+(http://dlib.net/)
 
 #### Compile
 You need CMake installed [https://cmake.org/]. Make sure you put the CMake folder in your Path system variable (default is `c:\Program Files\CMake\bin`).
@@ -57,9 +57,9 @@ cmake --build . --config Release --target INSTALL
 #### Prepare ofxDlib
 Now copy the dlib includes and libraries into the addon folder.
 
-* folder `/build/install/dlib` from `[dlib download folder]` to `[of addons folder]/ofxDlib/libs/dlib/include`
-* `dlib_xxx_debug_64bit_xxx.lib` from `[dlib download folder]/build/dlib/Debug`  to `[of addons folder]/ofxDlib/libs/dlib/lib/vs/x64/Debug`
-* `dlib_xxx_release_64bit_xxx.lib` from `[dlib download folder]/build/dlib/Release` to `[of addons folder]/ofxDlib/libs/dlib/lib/vs/x64/Release`
+* folder `/build/install/include` from `[dlib download folder]` to `[of addons folder]/ofxDlib/libs/dlib/include`
+* `dlib_xxx_debug_64bit_xxx.lib` from `[dlib download folder]/build/install/lib`  to `[of addons folder]/ofxDlib/libs/dlib/lib/vs/x64/Debug`
+* `dlib_xxx_release_64bit_xxx.lib` from `[dlib download folder]/build/install/lib` to `[of addons folder]/ofxDlib/libs/dlib/lib/vs/x64/Release`
 
 #### Create project
 Use the project generator to create your project. Then you have to add some additional commands since the project generator is net yet able to add them automatically.
@@ -68,7 +68,5 @@ Go to project settings
 * in _C/C++/preprocessor/preprocessor definitions_ add
         `DLIB_PNG_SUPPORT`  →  if you want to use the png functionality
         `DLIB_JPEG_SUPPORT` → if you want to use the jpg functionality
-* in _C/C++/command line/additional options_ add
-        /bigobj
 
 Now you're ready to compile!
