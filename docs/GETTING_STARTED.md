@@ -33,10 +33,10 @@ Since there is no script yet, you need to download and compile dlib by yourself.
 
 #### Download dlib
 
-(http://dlib.net/)
+http://dlib.net/
 
 #### Compile
-You need CMake installed [https://cmake.org/]. Make sure you put the CMake folder in your Path system variable (default is `c:\Program Files\CMake\bin`).
+You need CMake installed https://cmake.org/. Make sure you put the CMake folder in your Path system variable (default is `c:\Program Files\CMake\bin`).
 
 Then configure and compile dlib using these commands in the terminal (opfen the dlib folder in the terminal)
 
@@ -52,7 +52,7 @@ cmake --build . --config Debug --target INSTALL
 cmake --build . --config Release --target INSTALL
 ```
 
-(This instruction roughly followed [https://medium.com/beesightsoft/build-dlib-on-windows-534209e8340a])
+(This instruction roughly followed https://medium.com/beesightsoft/build-dlib-on-windows-534209e8340a)
 
 #### Prepare ofxDlib
 Now copy the dlib includes and libraries into the addon folder.
