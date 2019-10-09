@@ -44,7 +44,7 @@ Then configure and compile dlib using these commands in the terminal (opfen the 
 mkdir build
 cd build
 
-cmake -G "Visual Studio 15 2017" -A x64 -DDLIB_USE_CUDA=1 -DUSE_AVX_INSTRUCTIONS=1 -DJEPG_INCLUDE_DIR=..\dlib\external\libjpeg -DJEPG_LIBRARY=..\dlib\external\libjpeg -DPNG_PNG_INCLUDE_DIR=..\dlib\external\libpng -DPNG_LIBRARY_RELEASE=..\dlib\external\libpng -DZLIB_INCLUDE_DIR=..\dlib\external\zlib \-DZLIB_LIBRARY_RELEASE=..\dlib\external\zlib -DCMAKE_INSTALL_PREFIX=install ..
+cmake -G "Visual Studio 15 2017" -A x64 -DUSE_AVX_INSTRUCTIONS=1 -DJEPG_INCLUDE_DIR=..\dlib\external\libjpeg -DJEPG_LIBRARY=..\dlib\external\libjpeg -DPNG_PNG_INCLUDE_DIR=..\dlib\external\libpng -DPNG_LIBRARY_RELEASE=..\dlib\external\libpng -DZLIB_INCLUDE_DIR=..\dlib\external\zlib \-DZLIB_LIBRARY_RELEASE=..\dlib\external\zlib -DCMAKE_INSTALL_PREFIX=install ..
 ```
 
 ```
