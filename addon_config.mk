@@ -75,9 +75,5 @@ vs:
 	ADDON_SOURCE_INCLUDES += libs/dlib/include/dlib/all
 	ADDON_INCLUDES += libs/dlib/include/dlib/external/libpng
 
-	# If dlib is compiled with CUDA support, you need to include these (and set the matching CUDA path).
-	#ADDON_LIBS += $(CUDA_PATH)/lib/x64/cublas.lib
-	#ADDON_LIBS += cudart.lib
-	#ADDON_LIBS += cudnn.lib
-	#ADDON_LIBS += cusolver.lib
-	#ADDON_LIBS += curand.lib
+	# If dlib is compiled with CUDA support, you need to include these.
+	ADDON_LIBS += $(CUDA_PATH)/lib/x64/cublas.lib cublasLt.lib cuda.lib cudadevrt.lib cudart.lib cudart_static.lib cudnn.lib cufft.lib cufftw.lib curand.lib cusolver.lib cusolverMg.lib cusparse.lib nppc.lib nppial.lib nppicc.lib nppicom.lib nppidei.lib nppif.lib nppig.lib nppim.lib nppist.lib nppisu.lib nppitc.lib npps.lib nvblas.lib nvgraph.lib nvjpeg.lib nvml.lib nvrtc.lib OpenCL.lib
