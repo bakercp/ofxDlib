@@ -44,6 +44,12 @@ $ yaourt -s cudnn
 -L/usr/local/cuda/lib64 -> -L/opt/cuda/lib64
 ```
 
+- add LDFLAG to `config.make : 79'
+```
+PROJECT_LDFLAGS=-Wl,-rpath=./libs -ldlib
+```
+- compile and run
+
 ## Troubleshooting
 
 For more, see [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md).
