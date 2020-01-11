@@ -23,6 +23,17 @@ An [openFrameworks](http://openframeworks.cc) wrapper for [dlib](http://dlib.net
 
 For more, see [docs/GETTING_STARTED.md](docs/GETTING_STARTED.md).
 
+### for arch linux
+- download dlib from [http://dlib.net](http://dlib.net)
+- unarchive
+```
+$ mkdir build
+$ cd build
+$ cmake ..
+$ make 
+$ sudo make install
+```
+
 ## Troubleshooting
 
 For more, see [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md).
