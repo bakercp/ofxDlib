@@ -23,6 +23,40 @@ An [openFrameworks](http://openframeworks.cc) wrapper for [dlib](http://dlib.net
 
 For more, see [docs/GETTING_STARTED.md](docs/GETTING_STARTED.md).
 
+### for arch linux
+#### compile and install Dlib
+- download dlib from [http://dlib.net](http://dlib.net)
+- unarchive
+```
+$ mkdir build
+$ cd build
+$ cmake ..
+$ make 
+$ sudo make install
+```
+- copy `libdlib.a` to `_ADDON_DIRECTORY_/ofxDlib/libs/dlib/lib/linux64/`
+
+#### install Cuda
+```
+$ yaourt -s cuda
+$ yaourt -s cudnn
+```
+
+#### modify addon_config.mk (ofxDlib addon directory)
+```
+# line 52: add cblas
+ADDON_PKG_CONFIG_LIBRARIES += blas lapack -> ADDON_PKG_CONFIG_LIBRARIES += blas lapack cblas
+# line 53:
+-L/usr/local/cuda/lib64 -> -L/opt/cuda/lib64
+```
+
+#### project setting (project directory)
+
+- add LDFLAG to `config.make : 79'
+```
+PROJECT_LDFLAGS=-Wl,-rpath=./libs -ldlib
+```
+
 ## Troubleshooting
 
 For more, see [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md).
