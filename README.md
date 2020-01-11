@@ -34,13 +34,15 @@ $ cmake ..
 $ make 
 $ sudo make install
 ```
+- copy libdlib.a to `_ADDON_DIRECTORY_/ofxDlib/libs/dlib/lib/linux64/`
 
 #### install Cuda
 ```
 $ yaourt -s cuda
 $ yaourt -s cudnn
 ```
-- modify addon_config.mk :53
+
+#### modify addon_config.mk (ofxDlib addon directory)
 ```
 # line 52: add cblas
 ADDON_PKG_CONFIG_LIBRARIES += blas lapack -> ADDON_PKG_CONFIG_LIBRARIES += blas lapack cblas
@@ -48,7 +50,7 @@ ADDON_PKG_CONFIG_LIBRARIES += blas lapack -> ADDON_PKG_CONFIG_LIBRARIES += blas 
 -L/usr/local/cuda/lib64 -> -L/opt/cuda/lib64
 ```
 
-#### project setting 
+#### project setting (project directory)
 
 - add LDFLAG to `config.make : 79'
 ```
