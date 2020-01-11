@@ -24,7 +24,7 @@ An [openFrameworks](http://openframeworks.cc) wrapper for [dlib](http://dlib.net
 For more, see [docs/GETTING_STARTED.md](docs/GETTING_STARTED.md).
 
 ### for arch linux
-#### prepair dlib
+#### compile and install Dlib
 - download dlib from [http://dlib.net](http://dlib.net)
 - unarchive
 ```
@@ -34,17 +34,22 @@ $ cmake ..
 $ make 
 $ sudo make install
 ```
-#### prepare cuda
+
+#### install Cuda
 ```
 $ yaourt -s cuda
 $ yaourt -s cudnn
 ```
 - modify addon_config.mk :53
 ```
+# line 52: add cblas
+ADDON_PKG_CONFIG_LIBRARIES += blas lapack -> ADDON_PKG_CONFIG_LIBRARIES += blas lapack cblas
+# line 53:
 -L/usr/local/cuda/lib64 -> -L/opt/cuda/lib64
 ```
 
-#### Dlib setting (in project directory)
+#### project setting 
+
 - add LDFLAG to `config.make : 79'
 ```
 PROJECT_LDFLAGS=-Wl,-rpath=./libs -ldlib
