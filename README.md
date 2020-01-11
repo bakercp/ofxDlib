@@ -24,6 +24,7 @@ An [openFrameworks](http://openframeworks.cc) wrapper for [dlib](http://dlib.net
 For more, see [docs/GETTING_STARTED.md](docs/GETTING_STARTED.md).
 
 ### for arch linux
+#### prepair dlib
 - download dlib from [http://dlib.net](http://dlib.net)
 - unarchive
 ```
@@ -32,6 +33,15 @@ $ cd build
 $ cmake ..
 $ make 
 $ sudo make install
+```
+#### prepare cuda
+```
+$ yaourt -s cuda
+$ yaourt -s cudnn
+```
+- modify addon_config.mk :53
+```
+-L/usr/local/cuda/lib64 -> -L/opt/cuda/lib64
 ```
 
 ## Troubleshooting
