@@ -34,7 +34,7 @@ $ cmake ..
 $ make 
 $ sudo make install
 ```
-- copy libdlib.a to `_ADDON_DIRECTORY_/ofxDlib/libs/dlib/lib/linux64/`
+- copy `libdlib.a` to `_ADDON_DIRECTORY_/ofxDlib/libs/dlib/lib/linux64/`
 
 #### install Cuda
 ```
