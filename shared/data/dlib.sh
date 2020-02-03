@@ -45,6 +45,7 @@ FILES=(
   "shape_predictor_5_face_landmarks.dat"
   "shape_predictor_68_face_landmarks.dat"
   "mnist_network.dat"
+  "mnist_network_tagged.dat"
 )
 
 for file in "${FILES[@]}"

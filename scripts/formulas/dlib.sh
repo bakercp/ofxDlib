@@ -12,7 +12,7 @@ GIT_URL="https://github.com/davisking/dlib"
 GIT_TAG="v$VER"
 GIT_TAG=
 
-FORMULA_TYPES=( "osx" "android" "linux64" "linuxarmv6l")
+FORMULA_TYPES=( "osx" "android" "linux64" "linuxarmv6l" "vs")
 
 # download the source code and unpack it into LIB_NAME
 function download() {
@@ -32,7 +32,7 @@ function prepare() {
 
 # executed inside the lib src dir
 function build() {
-    if [ "$TYPE" == "osx" ] || [ "$TYPE" == "linux64" ] || [ "$TYPE" == "linuxarmv6l" ] ; then
+    if [ "$TYPE" == "osx" ] || [ "$TYPE" == "linux64" ] || [ "$TYPE" == "linuxarmv6l" ] || [ "$TYPE" == "vs" ]; then
         mkdir -p "build"
         pushd "build" || return
         if [ "$TYPE" == "linuxarmv6l" ] ; then
@@ -56,6 +56,16 @@ function build() {
               -D DLIB_NO_GUI_SUPPORT=YES \
               -D CMAKE_INSTALL_PREFIX="${LIBS_DIR}/dlib/install" \
               ..
+        elif [ "$TYPE" == "vs" ] ; then
+            cmake \
+              -G "Visual Studio 15 2017" \
+              -A x64 \
+              -DUSE_SSE2_INSTRUCTIONS=ON \
+              -DUSE_SSE4_INSTRUCTIONS=ON \
+              -DUSE_AVX_INSTRUCTIONS=ON \
+              -D DLIB_NO_GUI_SUPPORT=YES \
+              -D CMAKE_INSTALL_PREFIX="${LIBS_DIR}/dlib/install" \
+              ..
         else
             cmake \
               -DUSE_SSE2_INSTRUCTIONS=ON \
@@ -66,7 +76,14 @@ function build() {
               ..
         fi
 
-        cmake --build . --config Release
+        if [ "$TYPE" == "vs" ] ; then
+            # Windows can not use "make install", so we use cmake's install
+            # Windows needs Debug lib, otherwise project does not link
+            cmake --build . --config Debug --target INSTALL
+            cmake --build . --config Release --target INSTALL
+        else
+            cmake --build . --config Release
+        fi
         popd || return
     elif [ "$TYPE" == "android" ] ; then
         ${NDK_ROOT}/ndk-build -j4 NDK_DEBUG=0 NDK_PROJECT_PATH=.
@@ -76,12 +93,13 @@ function build() {
 # executed inside the lib src dir, first arg $1 is the dest libs dir root
 function copy() {
     # headers
-    if [ -d $1/include ]; then
-        rm -rf $1/include
+    if [ "$TYPE" != "vs" ] ; then
+        if [ -d $1/include ] ; then
+            rm -rf $1/include
+        fi
+        mkdir -p $1/include
+        mkdir -p $1/lib/$TYPE
     fi
-
-    mkdir -p $1/include
-    mkdir -p $1/lib/$TYPE
 
     if [ "$TYPE" == "osx" ] || [ "$TYPE" == "linux64" ] || [ "$TYPE" == "linuxarmv6l" ] ; then
         cd "${BUILD_DIR}/dlib/build" || exit 1
@@ -97,6 +115,20 @@ function copy() {
         rm  $1/include/dlib/all_gui.cpp
         cp -vr obj/local/armeabi-v7a/libdlib.a $1/lib/android/armeabi-v7a/libdlib.a
         cp -vr obj/local/x86/libdlib.a $1/lib/android/x86/libdlib.a
+    elif [ "$TYPE" == "vs" ] ; then
+        INSTALLED_DIR=$LIBS_DIR/dlib/install         
+        OFX_DLIB_DIR=$FORMULA_DIR/../../
+        rm -rf $OFX_DLIB_DIR/include
+        rm -rf $OFX_DLIB_DIR/lib/vs/x64
+        mkdir -p $OFX_DLIB_DIR/libs/dlib/include
+        mkdir -p $OFX_DLIB_DIR/libs/dlib/lib/vs/x64/Debug
+        mkdir -p $OFX_DLIB_DIR/libs/dlib/lib/vs/x64/Release
+
+        cp -vr ${INSTALLED_DIR}/include/dlib $OFX_DLIB_DIR/libs/dlib/include
+
+        # match to lib file like dlib19.17.99_debug_64bit_msvc1922.lib
+        cp -v ${INSTALLED_DIR}/lib/dlib*debug*.lib $OFX_DLIB_DIR/libs/dlib/lib/vs/x64/Debug/
+        cp -v ${INSTALLED_DIR}/lib/dlib*release*.lib $OFX_DLIB_DIR/libs/dlib/lib/vs/x64/Release/
     fi
 }
 
@@ -110,6 +142,18 @@ function clean() {
         cd ..
     elif [ "$TYPE" == "android" ] ; then
         rm -rf obj
+    elif [ "$TYPE" == "vs" ] ; then
+
+        # delete openFrameworks/scirpts/apothecary/apothecary/build
+        rm -rf ${BUILD_DIR}/dlib
+
+        # delete openFrameworks/scirpts/apothecary/dlib
+        INSTALLED_DIR=$LIBS_DIR/dlib
+        rm -rf ${INSTALLED_DIR}
+
+        # delete /your/addon/place//ofxDlib/libs/vs/x64
+        OFX_DLIB_DIR=$FORMULA_DIR/../../
+        rm -rf $OFX_DLIB_DIR/libs/dlib/lib/vs/x64
     fi
 
 }
