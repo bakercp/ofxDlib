@@ -58,3 +58,10 @@ Segmentation fault
 ```
 
 *This can happen (especially on Linux) when CUDA 8 is installed and the underlying NVIDIA drivers are too old, e.g. `nvidia-370` or `nvidia-375`. The solution is to make sure you have the latest NVIDIA drivers installed with the Driver Manager (which may require installing a more [here](https://launchpad.net/~graphics-drivers/+archive/ubuntu/ppa)).*
+
+
+## iOS
+
+Make sure that you have no data aliases in your bin/data folder. Otherwise, the iOS deployment will fail with an error like those mentioned here:
+
+- https://stackoverflow.com/questions/46319561/xcode-9-app-installation-failed-could-not-write-to-the-device
