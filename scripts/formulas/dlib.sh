@@ -5,7 +5,7 @@
 # uses CMake
 
 # define the version
-VER=19.20
+VER=19.21
 
 # tools for git use
 GIT_URL="https://github.com/davisking/dlib"
@@ -16,11 +16,11 @@ FORMULA_TYPES=( "osx" "android" "linux64" "linuxarmv6l")
 
 # download the source code and unpack it into LIB_NAME
 function download() {
-    # curl -Lk http://dlib.net/files/dlib-$VER.tar.bz2 -o dlib-$VER.tar.bz2
-    # tar -xjvf dlib-$VER.tar.bz2
-    # mv dlib-$VER dlib
-    # rm dlib-$VER.tar.bz2
-    git clone https://github.com/davisking/dlib.git
+    curl -Lk http://dlib.net/files/dlib-$VER.tar.bz2 -o dlib-$VER.tar.bz2
+    tar -xjvf dlib-$VER.tar.bz2
+    mv dlib-$VER dlib
+    rm dlib-$VER.tar.bz2
+    # git clone https://github.com/davisking/dlib.git
 }
 
 # prepare the build environment, executed inside the lib src dir
