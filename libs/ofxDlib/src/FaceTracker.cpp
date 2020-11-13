@@ -118,6 +118,10 @@ std::size_t FaceTracker::track(const ofPixels& frame)
         // Failed, so decrement.
         _frameId--;
     }
+    else
+    {
+        ofLogWarning("FaceTracker::track") << "FaceTracker has not been set up.";
+    }
 
     return 0;
 }
@@ -236,11 +240,13 @@ bool FaceTracker::_processInput(std::size_t frameId,
                                                       event.detection.rectangle);
         std::vector<float> faceCode;
         
-        if (_settings.faceCoderEnabled)
+        
+        if ((_settings.faceCodeOnTrackBegin && event.state == TrackerEventArgs::State::TRACK_BEGIN)
+        || (_settings.faceCodeOnTrackUpdate && event.state == TrackerEventArgs::State::TRACK_UPDATE))
         {
             faceCode = _faceCoder.code(shape.alignedFace());
         }
-
+        
         // Do filtering if possible.
         if (_settings.faceShapeFilterSmoothness > 0)
         {

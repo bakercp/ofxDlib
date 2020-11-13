@@ -40,6 +40,9 @@ public:
 
 
 /// \brief The FaceTracker.
+///
+/// The face tracker has the capability to detect faces and track them spatially. It can also optionally calculate
+/// the face shape and a face code for identification and matching.
 class FaceTracker
 {
 public:
@@ -87,7 +90,8 @@ public:
     /// \returns a frame id that will be passed with all events. Zero returned on failure.
     std::size_t track(const ofPixels& frame);
 
-    /// \brief Get the process
+    /// \brief Get the process frame rate.
+    /// \returns the current frame rate of the tracker.
     double fps() const;
 
     /// \returns the current tracks.
@@ -116,9 +120,12 @@ public:
         /// \brief Face coder settings.
         FaceCoder::Settings faceCoderSettings;
 
-        /// \brief This is false if the face coder is disabled.
-        bool faceCoderEnabled = true;
-
+        /// \brief This is true if the face coder is called on a track begin.
+        bool faceCodeOnTrackBegin = false;
+        
+        /// \brief This is true if the face coder is called on a track update.
+        bool faceCodeOnTrackUpdate = false;
+        
         /// \brief Face detector filter alpha.
         ///
         /// A simple low-pass filter can be applied to the corners of the face
